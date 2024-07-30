@@ -18,18 +18,18 @@ timezone: Asia/Shanghai
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: Jin blog # the main title
+title: CMS blog # the main title
 
-tagline: Coding for anything # it will display as the sub-title
+tagline: 春风吹又生 # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
-  code, paper, blog; python, pytorch, transformers
+  code, paper, blog; python, pytorch, 3D computer vision
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
 url: ""
 
 github:
-  username: JinHanLei # change to your github username
+  username: cfcys # change to your github username
 
 # twitter:
   # username: twitter_username # change to your twitter username
@@ -37,12 +37,12 @@ github:
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
-  name: JinHanlei
-  email: jhl.99@qq.com # change to your email address
+  name: 蔡明硕
+  email: caimingshuo@gamil.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
-    # - https://twitter.com/username # change to your twitter homepage
-    - https://github.com/JinHanlei # change to your github homepage
+    # - https://twitter.com/MingshuoCai # change to your twitter homepage
+    - https://github.com/cfcys # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
     # - https://www.linkedin.com/in/username
@@ -96,7 +96,7 @@ comments:
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
   giscus:
-    repo: JinHanLei/JinHanLei.github.io
+    repo: camingshuo/caimingshuo.github.io
     repo_id: R_kgDOJltMow
     category: Q&A
     category_id: DIC_kwDOJltMo84CaOcz
