@@ -20,7 +20,7 @@ timezone: Asia/Shanghai
 
 title: CMS blog # the main title
 
-tagline: 春风吹又生 # it will display as the sub-title
+tagline: 野火烧不尽，春风吹又生 # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   code, paper, blog; python, pytorch, 3D computer vision
@@ -38,7 +38,7 @@ social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
   name: 蔡明硕
-  email: caimingshuo@gamil.com # change to your email address
+  email: caimingshoo@gmail.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
     # - https://twitter.com/MingshuoCai # change to your twitter homepage
