@@ -1,44 +1,409 @@
+:root {
+    /* 绿色主题调色板 */
+    --primary: #10b981;       /* 核心科技绿 */
+    --primary-dark: #059669;  /* 深绿色（用于悬浮和交互） */
+    --primary-light: rgba(16, 185, 129, 0.1); /* 浅绿背景 */
+    
+    --text-main: #1e293b;     /* 主文本色 */
+    --text-light: #64748b;    /* 次要文本色 */
+    
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --highlight: #e11d48;     /* 红色用于特别强调 */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
 body {
-  margin-top:20px;   
-  margin-bottom:60px;
-  font-family: Palatino, sans-serif;
-  line-height:155%;
-  font-size: 16px;
+    /* 全局替换为更具特色和现代感的 Outfit 字体 */
+    font-family: 'Outfit', sans-serif;
+    background-color: #f8fafc;
+    color: var(--text-main);
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-a {
-  /* color: #305b81; */
-  color: #176a9d;
-  text-decoration: none;
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
 }
 
-a:hover {
-  /* color:rgb(197, 139, 92); */
-  color:rgb(106, 0, 95);
-  /* color: #B01C33; */
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-heading {
-  font-size: 22px;
+/* 玻璃拟态卡片通用样式 */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.05); 
+    margin-bottom: 24px;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-papertitle {
-  font-size: 18px;
-  font-weight: bold;
+.glass:hover {
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
 }
 
-name {
-  font-size: 32px;
-  line-height:130%;
+/* 个人介绍卡片 */
+.profile-card {
+    padding: 45px;
+    position: relative;
+    overflow: hidden;
 }
 
-note {
-  color: #080808a6;
-  font-size: 13px;
+.profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
 }
 
-highlight {
-  /* color:	#B01C33; */
-  /* color: #305b81; */
-  color: #176a9d;
+.profile-content {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #1e293b, var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.chinese-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-left: 12px;
+    -webkit-text-fill-color: initial;
+}
+
+.subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    display: inline-block;
+}
+
+.subtitle a {
+    color: var(--text-main);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--text-light);
+    transition: all 0.2s ease;
+}
+
+.subtitle a:hover {
+    color: var(--primary-dark);
+    border-bottom-color: var(--primary-dark);
+}
+
+.cursor {
+    animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* =========================================
+   Bio 正文排版与超链接样式优化
+========================================= */
+.bio p {
+    margin-bottom: 16px;
+    font-size: 1.05rem;
+    color: var(--text-main);
+    font-weight: 300; /* 让正文字重轻一点，显得更优雅 */
+    letter-spacing: 0.2px;
+}
+
+.bio strong {
+    font-weight: 500;
+    color: #0f172a;
+}
+
+/* 针对 Bio 中的超链接（如导师名字）进行专属设计 */
+.bio a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+/* 悬浮时的绿色下划线动画 */
+.bio a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 1.5px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary-dark);
+    transform-origin: bottom right;
+    transition: transform 0.3s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.bio a:hover {
+    color: var(--primary-dark);
+}
+
+.bio a:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.highlight {
+    color: var(--highlight);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    background: rgba(225, 29, 72, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* 头像交互 */
+.profile-photo {
+    flex-shrink: 0;
+}
+
+.profile-photo img {
+    width: 190px;
+    height: 190px;
+    border-radius: 16px;
+    object-fit: cover;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.profile-photo:hover img {
+    transform: scale(1.05) rotate(2deg);
+}
+
+/* 社交链接按钮 */
+.social-links {
+    margin-top: 30px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.social-links a {
+    padding: 8px 18px;
+    border-radius: 8px;
+    background: white;
+    text-decoration: none;
+    color: var(--text-main);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.social-links a i {
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.social-links a:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--primary-light);
+}
+
+.social-links a:hover i {
+    color: white;
+}
+
+/* 布局网格 */
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+}
+
+.section {
+    padding: 30px;
+}
+
+h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-main);
+}
+
+h2 i { color: var(--primary); font-size: 1.1rem; }
+
+/* 论文卡片 */
+.paper-card {
+    padding: 24px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.paper-card:hover {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 4px 15px var(--primary-light);
+    transform: translateX(5px);
+}
+
+.paper-badge {
+    font-family: 'JetBrains Mono', monospace;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.paper-badge.esi {
+    background: rgba(225, 29, 72, 0.08);
+    color: var(--highlight);
+}
+
+.paper-card h3 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.authors {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 300;
+}
+
+.desc {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 15px;
+    font-weight: 300;
+}
+
+.paper-links {
+    display: flex;
+    gap: 16px;
+}
+
+.paper-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s ease;
+}
+
+.paper-links a i {
+    font-size: 0.9rem;
+}
+
+.paper-links a:hover {
+    color: var(--primary);
+}
+
+.paper-links a.disabled {
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* 列表样式 (News & Honors) */
+.news-list, .honor-list {
+    list-style: none;
+}
+
+.news-list li, .honor-list li {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    padding-left: 20px;
+    position: relative;
+    color: var(--text-main);
+    font-weight: 300;
+}
+
+.news-list li strong, .honor-list li strong {
+    font-weight: 500;
+}
+
+.news-list li::before, .honor-list li::before {
+    content: ">>";
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--primary);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-size: 0.75rem;
+}
+
+.date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    display: block;
+    margin-bottom: 2px;
+}
+
+footer {
+    padding: 20px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .profile-content { flex-direction: column-reverse; text-align: center; gap: 30px; }
+    .grid-layout { grid-template-columns: 1fr; }
+    .social-links { justify-content: center; }
+    .name { font-size: 2.2rem; }
+    .bio p { text-align: justify; }
 }
