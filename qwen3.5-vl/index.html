@@ -1,0 +1,2570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学透 Qwen3.5-VL：原生视觉语言大模型深度讲解</title>
+<style>
+:root{
+  --accent:#615ced;
+  --accent-dark:#4a44c8;
+  --accent-bg:#f0eefe;
+  --bg:#faf9f6;
+  --panel:#ffffff;
+  --text:#25232e;
+  --muted:#6d6b78;
+  --border:#e5e2da;
+  --code-bg:#26242f;
+  --code-text:#e8e6f0;
+  --warn:#b3541e;
+  --warn-bg:#fdf1e7;
+  --error:#b3352b;
+  --error-bg:#fdeeec;
+  --green:#2e7d4f;
+  --green-bg:#edf7f1;
+  --blue:#2f5f9e;
+  --blue-bg:#edf3fb;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  font-size:16.5px;line-height:1.85;-webkit-font-smoothing:antialiased}
+/* ---------- 布局 ---------- */
+.topbar{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--panel);
+  border-bottom:1px solid var(--border);z-index:60;align-items:center;padding:0 14px}
+.topbar .brand{font-weight:700;color:var(--accent-dark);font-size:15px}
+.hamburger{background:none;border:1px solid var(--border);border-radius:8px;width:40px;height:36px;
+  margin-right:12px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.hamburger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:264px;background:var(--panel);
+  border-right:1px solid var(--border);overflow-y:auto;padding:22px 0 60px;z-index:50}
+.sidebar .brand{display:block;padding:0 22px 14px;font-weight:800;font-size:17px;color:var(--accent-dark);
+  text-decoration:none;border-bottom:1px solid var(--border);line-height:1.5}
+.sidebar .brand small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:4px}
+.nav-group{padding:8px 0}
+.nav-link{display:block;padding:7px 22px;color:var(--text);text-decoration:none;font-size:14.5px;
+  border-left:3px solid transparent;line-height:1.5}
+.nav-link:hover{background:#f4f2fb;color:var(--accent-dark)}
+.nav-link.active{border-left-color:var(--accent);background:var(--accent-bg);color:var(--accent-dark);font-weight:600}
+.nav-sub{display:block;padding:3px 22px 3px 38px;color:var(--muted);text-decoration:none;font-size:13px;
+  border-left:3px solid transparent}
+.nav-sub:hover{color:var(--accent-dark)}
+.nav-sub.active{border-left-color:var(--accent);color:var(--accent-dark)}
+.main{margin-left:264px;padding:48px 32px 120px}
+.content{max-width:760px;margin:0 auto}
+/* ---------- 排版 ---------- */
+h1{font-size:30px;line-height:1.4;margin:0 0 8px;letter-spacing:.5px}
+.subtitle{color:var(--muted);font-size:15px;margin-bottom:10px}
+.meta-line{color:var(--muted);font-size:13.5px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:10px 0;margin:18px 0 40px}
+h2{font-size:24px;margin:64px 0 6px;padding-top:10px;line-height:1.45}
+h2 .chnum{color:var(--accent);font-weight:800;margin-right:6px}
+.chapter-intro{color:var(--muted);font-size:15.5px;margin-bottom:20px}
+h3{font-size:19px;margin:42px 0 12px;color:var(--accent-dark)}
+h4{font-size:16.5px;margin:26px 0 8px}
+p{margin:14px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:5px 0}
+strong{font-weight:700}
+a{color:var(--accent-dark)}
+hr{border:none;border-top:1px solid var(--border);margin:40px 0}
+/* ---------- 盒子 ---------- */
+.box{border-radius:8px;padding:14px 18px;margin:22px 0;font-size:15.5px;border-left:4px solid}
+.box .box-title{font-weight:800;margin-bottom:6px;font-size:14.5px;letter-spacing:1px}
+.box p{margin:8px 0}
+.box-analogy{background:var(--accent-bg);border-color:var(--accent)}
+.box-analogy .box-title{color:var(--accent-dark)}
+.analogy-limit{margin-top:10px;padding-top:8px;border-top:1px dashed #c9c4f2;font-size:14.5px;color:#4c4870}
+.analogy-limit strong{color:var(--accent-dark)}
+.box-misconception{background:var(--error-bg);border-color:var(--error)}
+.box-misconception .box-title{color:var(--error)}
+.box-why{background:var(--green-bg);border-color:var(--green)}
+.box-why .box-title{color:var(--green)}
+.box-note{background:var(--blue-bg);border-color:var(--blue)}
+.box-note .box-title{color:var(--blue)}
+.oneline{background:#f4f2fb;border-left:4px solid var(--accent);padding:10px 16px;border-radius:6px;margin:20px 0;font-size:15.5px}
+.goals{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:8px;padding:16px 20px;margin:26px 0}
+.goals .box-title{font-weight:800;color:var(--accent-dark);margin-bottom:8px;font-size:15px}
+.goals ul{margin:6px 0;padding-left:22px}
+.goals li{margin:4px 0;font-size:15px}
+/* ---------- 自测题 ---------- */
+details.quiz{background:var(--panel);border:1px solid var(--border);border-radius:8px;margin:24px 0;overflow:hidden}
+details.quiz>summary{cursor:pointer;padding:13px 18px;font-weight:700;font-size:15.5px;list-style:none;
+  display:flex;align-items:center;gap:8px;background:#fbfaf7}
+details.quiz>summary::-webkit-details-marker{display:none}
+details.quiz>summary::before{content:"✍";color:var(--accent);flex:none}
+details.quiz>summary:hover{background:var(--accent-bg)}
+details.quiz[open]>summary{border-bottom:1px solid var(--border)}
+details.quiz .quiz-body{padding:12px 20px 18px;font-size:15px}
+details.quiz .quiz-body p{margin:10px 0}
+details.quiz .q-stem{padding:4px 0 10px;border-bottom:1px dashed var(--border);margin-bottom:10px}
+.ladder{margin:8px 0;padding:10px 14px;background:#fbfaf7;border-radius:6px;border-left:3px solid #cfcbf0}
+.ladder strong{color:var(--accent-dark)}
+.variant{background:var(--warn-bg);border-left:3px solid var(--warn);padding:10px 14px;border-radius:6px;margin-top:14px;font-size:14.5px}
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:20px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+caption{caption-side:top;text-align:left;font-weight:700;color:var(--muted);font-size:13.5px;padding-bottom:8px}
+th,td{border:1px solid var(--border);padding:7px 12px;text-align:left;vertical-align:top}
+th{background:#f2f0e9;font-weight:700;white-space:nowrap}
+tbody tr:nth-child(even){background:#f7f6f1}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.hl td{background:var(--accent-bg)}
+.best{color:var(--accent-dark);font-weight:800}
+/* ---------- 代码 ---------- */
+code{font-family:"SF Mono",Menlo,Consolas,"Courier New",monospace;font-size:.88em;
+  background:#efece4;padding:1px 6px;border-radius:4px}
+pre{background:var(--code-bg);color:var(--code-text);padding:16px 18px;border-radius:8px;
+  overflow-x:auto;font-size:13.5px;line-height:1.7;margin:18px 0}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+.cmt{color:#8f8ba3}
+.kw{color:#b7a8ff}
+.str{color:#a8d8a8}
+/* ---------- 图 ---------- */
+figure{margin:26px 0;text-align:center}
+figure svg{max-width:100%;height:auto}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:8px;text-align:center}
+.formula{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:14px 20px;margin:18px 0;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:14.5px;
+  overflow-x:auto;text-align:center}
+/* ---------- 章末 ---------- */
+.chapter-end{margin-top:44px;border-top:2px solid var(--border);padding-top:20px}
+.summary-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 20px}
+.summary-box .box-title{font-weight:800;color:var(--accent-dark);margin-bottom:8px}
+.next-step{margin-top:14px;padding:12px 18px;background:var(--accent-bg);border-radius:8px;font-size:15px}
+.next-step strong{color:var(--accent-dark)}
+footer{margin-top:80px;border-top:1px solid var(--border);padding-top:20px;color:var(--muted);font-size:13.5px}
+.toc-inline{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px 22px;margin:26px 0;font-size:14.5px}
+.toc-inline ol{margin:8px 0}
+/* ---------- Hero 区 ---------- */
+.hero{background:linear-gradient(135deg,#4a44c8 0%,#615ced 55%,#8b85f5 100%);
+  border-radius:16px;padding:52px 40px 44px;margin:0 0 30px;color:#fff;text-align:center;
+  box-shadow:0 8px 30px rgba(97,92,237,.25)}
+.hero-kicker{font-size:13px;letter-spacing:2px;opacity:.85;margin-bottom:14px}
+.hero h1{font-size:42px;margin:0 0 12px;color:#fff;letter-spacing:1px}
+.hero-tag{font-size:16px;opacity:.92;margin:0 auto 30px;max-width:600px;line-height:1.8}
+.hero-badges{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.badge{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+  border-radius:12px;padding:14px 20px;min-width:110px;backdrop-filter:blur(4px);
+  transition:transform .2s ease,background .2s ease;cursor:default}
+.badge:hover{transform:translateY(-4px);background:rgba(255,255,255,.22)}
+.badge-num{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.badge-label{font-size:12px;opacity:.85;margin-top:2px}
+/* ---------- 目录卡片 ---------- */
+.toc-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:28px 0}
+.toc-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;text-decoration:none;color:var(--text);display:block;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.toc-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(60,55,140,.12);border-color:var(--accent)}
+.toc-card .tc-num{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:1px}
+.toc-card .tc-title{font-weight:700;font-size:15.5px;margin:4px 0 6px;line-height:1.5}
+.toc-card .tc-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:8px}
+.toc-card .tc-tag{display:inline-block;font-size:11.5px;background:var(--accent-bg);color:var(--accent-dark);
+  border-radius:20px;padding:2px 10px;margin:0 4px 4px 0}
+/* ---------- 阅读进度条 / 返回顶部 / 复制按钮 ---------- */
+#progressBar{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:100;
+  transition:width .1s linear}
+#backTop{position:fixed;right:24px;bottom:24px;width:46px;height:46px;border-radius:50%;
+  background:var(--accent);color:#fff;border:none;font-size:20px;cursor:pointer;z-index:90;
+  box-shadow:0 4px 14px rgba(97,92,237,.4);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#backTop.show{opacity:1;pointer-events:auto}
+#backTop:hover{transform:translateY(-3px)}
+pre{position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);color:#cfcbe8;
+  border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer}
+.copy-btn:hover{background:rgba(255,255,255,.25);color:#fff}
+/* ---------- 交互可视化组件（公共） ---------- */
+.viz{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin:26px 0}
+.viz-title{font-weight:800;color:var(--accent-dark);font-size:15px;margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.viz-btn{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:14px;cursor:pointer;min-height:38px}
+.viz-btn:hover{background:var(--accent-dark)}
+.viz-btn.ghost{background:#fff;color:var(--accent-dark);border:1px solid var(--accent)}
+.viz-btn.ghost:hover{background:var(--accent-bg)}
+.viz-read{background:#fbfaf7;border-left:3px solid var(--accent);border-radius:6px;padding:10px 14px;margin-top:12px;font-size:14px;color:#4c4870}
+.viz-read strong{color:var(--accent-dark)}
+.viz-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:14px;margin:8px 0}
+.viz-row label{font-weight:600;white-space:nowrap}
+input[type=range].viz-slider{flex:1;min-width:140px;accent-color:var(--accent);height:28px}
+.viz svg{max-width:100%;height:auto;display:block}
+.viz-num{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent-dark)}
+/* 组件 2：DeepStack 对比 */
+.viz2-dim{opacity:.28;transition:opacity .3s}
+/* 组件 4：注意力热力图 */
+.viz4-grid{display:grid;gap:3px;margin:10px 0;font-size:12.5px}
+.viz4-cell{aspect-ratio:2.2/1;min-height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:default;font-size:11px}
+.viz4-head{display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text);cursor:pointer;border-radius:4px;padding:2px}
+.viz4-head:hover,.viz4-head.sel{background:var(--accent-bg);color:var(--accent-dark)}
+.viz4-status{font-size:13.5px;color:var(--accent-dark);min-height:22px;font-weight:600}
+/* 组件 5：MoE 路由器 */
+.viz5-experts{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:10px 0}
+.viz5-exp{background:#f2f0e9;border:1px solid var(--border);border-radius:6px;text-align:center;padding:8px 2px;font-size:11.5px;transition:background .4s,color .4s;min-height:44px}
+.viz5-exp .sc{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+.viz5-exp.hot{background:var(--accent);color:#fff;border-color:var(--accent-dark)}
+.viz5-exp.hot .sc{color:#e6e2ff}
+.viz5-bars{display:flex;align-items:flex-end;gap:3px;height:80px;border-bottom:1px solid var(--border);margin-top:8px}
+.viz5-bar{flex:1;background:#b7a8ff;border-radius:3px 3px 0 0;transition:height .3s;min-height:2px}
+/* 组件 7：benchmark 条形图 */
+.viz7-bar-row{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+.viz7-bar-label{width:110px;text-align:right;flex:none;color:var(--text)}
+.viz7-bar-track{flex:1;background:#f2f0e9;border-radius:4px;height:22px;position:relative}
+.viz7-bar-fill{height:100%;border-radius:4px;background:#b9b6d0;min-width:2px}
+.viz7-bar-fill.qwen{background:var(--accent)}
+.viz7-bar-val{margin-left:6px;font-weight:700;font-size:12.5px;position:absolute;top:2px}
+.viz7-na{position:absolute;top:2px;left:8px;font-size:12px;color:var(--muted);font-style:italic}
+/* 组件 8：计算器 */
+.viz8 select{font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:#fff;min-height:38px}
+.viz8-result{background:#fbfaf7;border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-top:10px;font-size:14.5px;line-height:2}
+.viz8-fit{font-weight:800;padding:2px 10px;border-radius:5px}
+.viz8-fit.ok{background:var(--green-bg);color:var(--green)}
+.viz8-fit.no{background:var(--error-bg);color:var(--error)}
+/* ---------- 深色模式 ---------- */
+.theme-toggle{position:fixed;top:10px;right:20px;z-index:80;width:42px;height:42px;border-radius:50%;
+  background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:18px;
+  cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.15);transition:transform .2s}
+.theme-toggle:hover{transform:scale(1.08)}
+body{transition:background .3s ease,color .3s ease}
+html[data-theme="dark"]{
+  --bg:#16151c; --panel:#201e29; --text:#e6e4f0; --muted:#a09dae;
+  --border:#3a3745; --accent:#8b85f5; --accent-dark:#aca7ff; --accent-bg:#292643;
+  --warn:#e08a4e; --warn-bg:#36281c; --error:#e06a5e; --error-bg:#372220;
+  --green:#5cb87f; --green-bg:#1d3128; --blue:#7aa5d8; --blue-bg:#1d2a3c;
+  --code-bg:#100f17;
+}
+html[data-theme="dark"] th{background:#2b2839}
+html[data-theme="dark"] tbody tr:nth-child(even){background:#252232}
+html[data-theme="dark"] details.quiz>summary{background:#252232}
+html[data-theme="dark"] .ladder{background:#252232;border-left-color:#4a4580}
+html[data-theme="dark"] code{background:#332f42}
+html[data-theme="dark"] .oneline{background:#29264a}
+html[data-theme="dark"] .nav-link:hover{background:#2b2940}
+html[data-theme="dark"] .analogy-limit{color:#b8b4d8;border-top-color:#4a4580}
+html[data-theme="dark"] .hero{box-shadow:0 8px 30px rgba(0,0,0,.45)}
+html[data-theme="dark"] .toc-card:hover{box-shadow:0 8px 22px rgba(0,0,0,.4)}
+html[data-theme="dark"] .variant{background:#36281c}
+/* 深色下 viz 组件保持浅色卡片，保证 SVG 硬编码配色可读 */
+html[data-theme="dark"] figure{background:#faf9f6;border-radius:10px;padding:14px 10px}
+html[data-theme="dark"] figcaption{color:#6d6b78}
+html[data-theme="dark"] .viz{background:#faf9f6;color:#25232e;
+  --panel:#ffffff; --text:#25232e; --muted:#6d6b78; --border:#e5e2da;
+  --accent:#615ced; --accent-dark:#4a44c8; --accent-bg:#f0eefe;
+  --warn:#b3541e; --warn-bg:#fdf1e7; --error:#b3352b; --error-bg:#fdeeec;
+  --green:#2e7d4f; --green-bg:#edf7f1; --blue:#2f5f9e; --blue-bg:#edf3fb}
+/* ---------- 排版打磨 ---------- */
+h2{border-left:5px solid var(--accent);padding-left:16px;position:relative}
+h2 .chnum{display:block;font-size:14px;letter-spacing:2px;margin-bottom:2px}
+.box .box-title::before{margin-right:6px}
+.box-analogy .box-title::before{content:"◆"}
+.box-misconception .box-title::before{content:"⚠"}
+.box-why .box-title::before{content:"★"}
+.box-note .box-title::before{content:"✎"}
+.oneline strong::before{content:"★ "}
+.chapter-end{border-top:none}
+.summary-box{position:relative;overflow:hidden}
+.summary-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),#b7a8ff)}
+.next-step{border-left:4px solid var(--accent)}
+table{border-radius:8px;overflow:hidden}
+.chapter-sep{border:none;height:1px;margin:56px 0 0;
+  background:linear-gradient(90deg,transparent,var(--border) 20%,var(--border) 80%,transparent)}
+/* ---------- 编年史时间线 ---------- */
+.timeline{position:relative;margin:26px 0 10px;padding-left:26px}
+.timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(180deg,#c9c4f2,var(--accent))}
+.tl-item{position:relative;margin-bottom:18px;background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;transition:transform .2s,border-color .2s}
+.tl-item:hover{transform:translateX(4px);border-color:var(--accent)}
+.tl-item::before{content:"";position:absolute;left:-25px;top:18px;width:12px;height:12px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 2px var(--accent)}
+.tl-date{font-size:12.5px;font-weight:800;color:var(--accent-dark);letter-spacing:.5px;margin-bottom:3px}
+.tl-body{font-size:14.5px;line-height:1.75}
+.tl-now{border-color:var(--accent);background:var(--accent-bg)}
+/* ---------- FAQ 折叠块（复用 quiz 样式，换图标） ---------- */
+details.faq{background:var(--panel);border:1px solid var(--border);border-radius:8px;margin:14px 0;overflow:hidden}
+details.faq>summary{cursor:pointer;padding:12px 18px;font-weight:700;font-size:15px;list-style:none;
+  display:flex;align-items:center;gap:8px;background:#fbfaf7}
+details.faq>summary::-webkit-details-marker{display:none}
+details.faq>summary::before{content:"Q";color:#fff;background:var(--accent);border-radius:50%;
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+details.faq>summary:hover{background:var(--accent-bg)}
+details.faq[open]>summary{border-bottom:1px solid var(--border)}
+details.faq .quiz-body{padding:10px 20px 16px;font-size:14.5px}
+html[data-theme="dark"] details.faq>summary{background:#252232}
+/* ---------- 响应式 ---------- */
+@media (max-width:960px){
+  .topbar{display:flex}
+  .sidebar{transform:translateX(-100%);transition:transform .25s ease;top:52px;width:280px;
+    box-shadow:2px 0 12px rgba(0,0,0,.08)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:76px 18px 100px}
+  h1{font-size:24px}
+  h2{font-size:21px}
+}
+</style>
+</head>
+<body>
+
+<div id="progressBar"></div>
+<button class="theme-toggle" id="themeToggle" title="切换深色 / 浅色模式" aria-label="切换深色模式">☾</button>
+
+<div class="topbar">
+  <button class="hamburger" id="menuBtn" aria-label="打开章节目录"><span></span><span></span><span></span></button>
+  <span class="brand">学透 Qwen3.5-VL</span>
+</div>
+
+<nav class="sidebar" id="sidebar">
+  <a class="brand" href="#top">学透 Qwen3.5-VL<small>原生视觉语言大模型 · 深度技术讲解</small></a>
+  <div class="nav-group">
+    <a class="nav-link" href="#ch0">第 0 章 · 起步：读之前你需要的基础</a>
+    <a class="nav-sub" href="#ch0-1">0.1 什么是视觉语言模型</a>
+    <a class="nav-sub" href="#ch0-2">0.2 一张图怎么变成 token</a>
+    <a class="nav-sub" href="#ch0-3">0.3 MoE：总参数与激活参数</a>
+    <a class="nav-sub" href="#ch0-4">0.4 线性注意力 vs 全注意力</a>
+    <a class="nav-link" href="#ch1">第 1 章 · 项目地图</a>
+    <a class="nav-sub" href="#ch1-1">1.1 Qwen3.5 是什么</a>
+    <a class="nav-sub" href="#ch1-2">1.2 家族矩阵</a>
+    <a class="nav-sub" href="#ch1-3">1.3 三代 VL 的演进</a>
+    <a class="nav-sub" href="#ch1-4">1.4 从哪里获取</a>
+    <a class="nav-link" href="#ch2">第 2 章 · 整体架构：三段式</a>
+    <a class="nav-sub" href="#ch2-1">2.1 数据流全景</a>
+    <a class="nav-sub" href="#ch2-2">2.2 ViT 与 merger</a>
+    <a class="nav-sub" href="#ch2-3">2.3 DeepStack 分层注入</a>
+    <a class="nav-link" href="#ch3">第 3 章 · MRoPE 与时空建模</a>
+    <a class="nav-sub" href="#ch3-1">3.1 一维位置编码为什么不够</a>
+    <a class="nav-sub" href="#ch3-2">3.2 三维 MRoPE 怎么工作</a>
+    <a class="nav-sub" href="#ch3-3">3.3 文本–时间戳对齐</a>
+    <a class="nav-link" href="#ch4">第 4 章 · 语言基座的效率革命</a>
+    <a class="nav-sub" href="#ch4-1">4.1 Gated DeltaNet 线性注意力</a>
+    <a class="nav-sub" href="#ch4-2">4.2 混合架构：为什么保留全注意力</a>
+    <a class="nav-sub" href="#ch4-3">4.3 MoE 稀疏度与 MTP</a>
+    <a class="nav-sub" href="#ch4-4">4.4 8.6× / 19× 吞吐从哪来</a>
+    <a class="nav-link" href="#ch5">第 5 章 · 能力全景</a>
+    <a class="nav-sub" href="#ch5-1">5.1 OCR 与文档理解</a>
+    <a class="nav-sub" href="#ch5-2">5.2 空间智能与 grounding</a>
+    <a class="nav-sub" href="#ch5-3">5.3 长视频理解</a>
+    <a class="nav-sub" href="#ch5-4">5.4 视觉 Agent 与 201 种语言</a>
+    <a class="nav-link" href="#ch6">第 6 章 · 读懂评测表</a>
+    <a class="nav-sub" href="#ch6-1">6.1 它赢在哪里</a>
+    <a class="nav-sub" href="#ch6-2">6.2 它输在哪里</a>
+    <a class="nav-sub" href="#ch6-3">6.3 如何不被榜单带节奏</a>
+    <a class="nav-link" href="#ch7">第 7 章 · 上手实战</a>
+    <a class="nav-sub" href="#ch7-1">7.1 transformers 加载</a>
+    <a class="nav-sub" href="#ch7-2">7.2 vLLM 部署</a>
+    <a class="nav-sub" href="#ch7-3">7.3 百炼 API 调用</a>
+    <a class="nav-link" href="#ch8">第 8 章 · 部署与成本账</a>
+    <a class="nav-sub" href="#ch8-1">8.1 显存估算表</a>
+    <a class="nav-sub" href="#ch8-2">8.2 预填充 vs 解码</a>
+    <a class="nav-sub" href="#ch8-3">8.3 长视频的成本结构</a>
+    <a class="nav-link" href="#ch9">第 9 章 · 总结与速查表</a>
+    <a class="nav-sub" href="#ch9-1">9.1 一张概念网</a>
+    <a class="nav-sub" href="#ch9-2">9.2 数字速查表</a>
+    <a class="nav-sub" href="#ch9-3">9.3 延伸学习路线</a>
+  </div>
+</nav>
+
+<div class="main">
+<div class="content" id="top">
+
+<header class="hero">
+<div class="hero-kicker">通义千问 · 2026 年 2 月 · 原生多模态旗舰</div>
+<h1>学透 Qwen3.5-VL</h1>
+<p class="hero-tag">从一张图怎么变成 token，到 256K 下 19× 吞吐——把「原生视觉语言模型」拆成你真正懂的零件</p>
+<div class="hero-badges">
+  <div class="badge"><div class="badge-num">397B</div><div class="badge-label">总参数（MoE）</div></div>
+  <div class="badge"><div class="badge-num">17B</div><div class="badge-label">每 token 激活</div></div>
+  <div class="badge"><div class="badge-num">1M</div><div class="badge-label">上下文（Plus 默认）</div></div>
+  <div class="badge"><div class="badge-num">201</div><div class="badge-label">种语言 / 方言</div></div>
+  <div class="badge"><div class="badge-num">19×</div><div class="badge-label">256K 解码吞吐</div></div>
+</div>
+</header>
+<p class="meta-line">
+内容来源：阿里巴巴 Qwen 团队官方博客《Qwen3.5: Towards Native Multimodal Agents》（2026-02-17 发布；Qwen3.5 于除夕夜 2 月 16 日发布），以及 Qwen3-VL 系列的公开资料。文中所有 benchmark 数字均来自官方博客；凡属本站估算或推断之处，都在原位明确标注了「估算」或「推断」。
+</p>
+
+<p>Qwen3.5 是通义千问在 2026 年 2 月发布的新一代旗舰模型。它最重要的身份不是「又一个更大的模型」，而是：<strong>原生视觉-语言模型</strong>（native vision-language model）——看东西的能力不是后来在语言模型外面挂一个视觉模块拼出来的，而是从基座训练开始就和语言能力长在一起。第一个开源的模型是 Qwen3.5-397B-A17B：总参数 3970 亿，每次前向只激活 170 亿。</p>
+
+<p>这个网站做的事情，是把这个项目从「新闻里的几个数字」拆成你能真正理解的零件：它怎么把一张图、一段视频变成 token，它的位置编码怎么同时表达「时间、高度、宽度」三个维度，它为什么敢在 256K 上下文下跑出上一代旗舰 19 倍的解码吞吐，以及——同样重要——它在哪些评测上其实输给了别人。</p>
+
+<p>读法建议：第 0 章是地基，讲清四个前置概念；第 1–4 章讲架构；第 5–6 章讲能力与评测；第 7–8 章讲怎么把它跑起来、要花多少钱；第 9 章是全篇速查。每节末尾有自测题，建议真的做了再翻答案。</p>
+
+<div class="toc-cards">
+<a class="toc-card" href="#ch0"><div class="tc-num">第 0 章</div><div class="tc-title">起步：读之前你需要的基础</div><div class="tc-desc">VLM、视觉 token、MoE、线性 vs 全注意力——四个前置概念一次补齐。</div><span class="tc-tag">注意力热力图</span><span class="tc-tag">复杂度表</span></a>
+<a class="toc-card" href="#ch1"><div class="tc-num">第 1 章</div><div class="tc-title">项目地图</div><div class="tc-desc">Qwen3.5 是什么、家族矩阵、三代 VL 演进、去哪拿权重和 API。</div><span class="tc-tag">家族矩阵</span><span class="tc-tag">编年史</span></a>
+<a class="toc-card" href="#ch2"><div class="tc-num">第 2 章</div><div class="tc-title">整体架构：三段式</div><div class="tc-desc">ViT → merger → 语言模型数据流；DeepStack 为什么分层注入。</div><span class="tc-tag">流水线动画</span><span class="tc-tag">DeepStack 对比</span></a>
+<a class="toc-card" href="#ch3"><div class="tc-num">第 3 章</div><div class="tc-title">MRoPE 与时空建模</div><div class="tc-desc">(t,h,w) 三维位置编码、交错布局、「第 30 秒」是怎么实现的。</div><span class="tc-tag">三维交互演示</span><span class="tc-tag">RoPE 数学直觉</span></a>
+<a class="toc-card" href="#ch4"><div class="tc-num">第 4 章</div><div class="tc-title">语言基座的效率革命</div><div class="tc-desc">Gated DeltaNet、混合注意力、MoE 稀疏度、MTP、19× 吞吐拆解。</div><span class="tc-tag">MoE 路由器</span><span class="tc-tag">显存曲线</span></a>
+<a class="toc-card" href="#ch5"><div class="tc-num">第 5 章</div><div class="tc-title">能力全景</div><div class="tc-desc">OCR/文档、空间定位、长视频、GUI Agent 四大能力域的成绩单。</div><span class="tc-tag">六张成绩表</span></a>
+<a class="toc-card" href="#ch6"><div class="tc-num">第 6 章</div><div class="tc-title">读懂评测表</div><div class="tc-desc">它赢在哪、输在哪、如何不被榜单带节奏。</div><span class="tc-tag">柱状图对比</span><span class="tc-tag">读表五步法</span></a>
+<a class="toc-card" href="#ch7"><div class="tc-num">第 7 章</div><div class="tc-title">上手实战</div><div class="tc-desc">transformers、vLLM、百炼 API、ModelScope 下载与报错 FAQ。</div><span class="tc-tag">可运行代码</span><span class="tc-tag">FAQ</span></a>
+<a class="toc-card" href="#ch8"><div class="tc-num">第 8 章</div><div class="tc-title">部署与成本账</div><div class="tc-desc">显存估算、预填充 vs 解码、长视频成本结构。</div><span class="tc-tag">显存计算器</span></a>
+<a class="toc-card" href="#ch9"><div class="tc-num">第 9 章</div><div class="tc-title">总结与速查表</div><div class="tc-desc">概念网、30+ 条名词速查、数字速查、延伸学习路线。</div><span class="tc-tag">速查表</span></a>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 0 章 ==================== -->
+<h2 id="ch0"><span class="chnum">第 0 章</span>起步：读这个项目前你需要的基础</h2>
+<p class="chapter-intro">这一章不属于 Qwen3.5 本身。它是一块地基：视觉语言模型是什么、图片怎么变成 token、MoE 为什么能让「大模型」和「快模型」不矛盾、线性注意力和全注意力的代价差在哪。读完它，后面九章里的每一个名词你都应该「能用自己的话讲清楚」。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>用一句话说清「视觉语言模型」和普通大语言模型的区别</li>
+<li>描述一张图片从像素变成视觉 token 的全过程</li>
+<li>分清总参数与激活参数，并解释 MoE 让哪个降下来了、哪个没降</li>
+<li>说出全注意力在长序列下的两个代价（平方计算量、线性增长的 KV 缓存）</li>
+<li>看懂一张「复杂度随长度增长」的表，并解释为什么线性注意力对视频理解是刚需</li>
+</ul>
+</div>
+
+<h3 id="ch0-1">0.1 什么是视觉语言模型</h3>
+<p>大语言模型（LLM）只会处理文字。你给它一段文本，它猜下一个 token。它看不见图片，听不见声音——它的世界里只有 token 序列。</p>
+<p><strong>视觉语言模型</strong>（Vision-Language Model, VLM）要解决的问题是：让同一个模型既能读文字，也能「看」图片和视频，并把两者放在同一个上下文里一起推理。你可以问它「这张图左上角红色框里写的是什么」「视频第 30 秒那个人拿起了什么」「根据这张架构图把代码补全」。这些问题的共同点是：答案必须同时来自视觉信息和语言推理，缺一个都答不出来。</p>
+<p>实现 VLM 有两种路线，理解 Qwen3.5 的第一步就是知道它走哪条：</p>
+<ul>
+<li><strong>外挂式</strong>：先训好一个纯语言模型，再额外训一个视觉编码器，用适配层把视觉特征「翻译」进语言模型的输入空间。视觉能力是后来接上去的。</li>
+<li><strong>原生式（native）</strong>：从基座预训练开始，文本、图片、视频就混在一起训练。视觉不是翻译进来的第二语言，而是母语的一部分。Qwen3.5 官方博客标题里的「Towards Native Multimodal Agents」说的就是这个路线——视觉语言能力内建于基座，而非外挂。</li>
+</ul>
+
+<div class="box box-why">
+<div class="box-title">为什么「原生」很重要</div>
+<p>外挂式路线的天花板在于：视觉信息在「翻译」成语言模型能懂的表示时会丢东西，尤其是空间关系和细粒度细节——语言模型的输入空间是为文字优化的，不是为像素优化的。原生路线让模型从第一天起就学会「文字和像素是同一个世界里的两类证据」，这在需要精细视觉推理的任务上（文档版式、UI 操作、视频时序定位）差距会被放大。第 5 章你会看到，Qwen3.5 最强的项目恰好集中在这几类任务上，这不是巧合。</p>
+</div>
+
+<div class="box box-misconception">
+<div class="box-title">常见误解</div>
+<p>「VLM = OCR 引擎 + LLM 拼接：先把图里的字识别出来，再让语言模型读。」</p>
+<p>这是 2018 年以前的思路，不是现代 VLM。现代 VLM 不是把图「转成文字描述」再读，而是直接把图片的视觉特征和文字的 token 放进<strong>同一个序列</strong>里，让注意力机制自由地在图文之间互查。「图里没有字的部分」（布局、颜色、空间关系、动作）根本不会经过文字这道有损压缩。</p>
+</div>
+
+<h3 id="ch0-2">0.2 一张图怎么变成 token</h3>
+<p>语言模型只认 token。所以一张图片要进入模型，必须先变成一串「视觉 token」。过程分三步：</p>
+<ol>
+<li><strong>切 patch</strong>：把图片切成规则的小方块（patch），比如每个 patch 是 16×16 像素。一张 448×448 的图会切成 28×28 = 784 个 patch。</li>
+<li><strong>视觉编码器（ViT）</strong>：Vision Transformer 把每个 patch 编码成一个向量——这就是视觉 token。ViT 内部也是 Transformer，只不过它的「词」是图片块。</li>
+<li><strong>压缩与对齐（merger）</strong>：把相邻的几个视觉 token 合并成一个（比如 2×2 合并，token 数减为四分之一），并投影到语言模型的向量维度上。出来的东西和文字 token 在形状上完全一样，可以混在同一个序列里。</li>
+</ol>
+<p>最终，「一张图 + 一个问题」在模型眼里就是一个混合序列：<code>[视觉token ×N][文字token：这张图上画了什么？]</code>。视频同理：抽帧后每帧都按图片处理，只是还要额外编码「这是第几秒的帧」——这是第 3 章的主题。</p>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>视觉 token 化像把一幅拼图按固定大小切成小块，每块贴上一张写有「这块大致是什么」的标签，然后把标签（而不是原图）交给一个只读过书的人去推理。merger 的 2×2 合并相当于把四张相邻标签浓缩成一张，省纸张但损失一点细节。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>「标签上写着是什么」暗示视觉 token 里存的是人类可读的描述。实际上视觉 token 是高维向量，没有任何一维对应「红色」「圆形」这种可命名的属性；而且模型推理时随时可以回头「看原图」——注意力让每个文字 token 都能直接访问任意视觉 token 的原始向量，并不是只能靠标签转述。</div>
+</div>
+
+<p>有一个数字直觉你必须建立：<strong>视觉 token 很费额度</strong>。一张普通分辨率的图就是几百到上千个视觉 token；视频每秒抽若干帧，一分钟的视频就是上万 token。这就是为什么「256K~1M 的上下文」对视频理解不是卖点而是底线——第 8 章会算这笔账。</p>
+
+<p class="oneline"><strong>一句话记住：</strong>图片进模型 = 切块 → ViT 编码 → merger 压缩对齐，出来的视觉 token 和文字 token 住在同一个序列里。</p>
+
+<details class="quiz">
+<summary>自测题 0.1：一个 60 秒的视频，每秒抽 2 帧，每帧压缩后产生 256 个视觉 token。仅视频部分要占多少 token？如果模型上下文是 256K，视频占了多少比例？</summary>
+<div class="quiz-body">
+<p class="q-stem">（提示：这是最基础的「视频 token 爆炸」估算，后面第 8 章会反复用到这个技能。）</p>
+<div class="ladder"><strong>先想：</strong>三步乘法：秒数 × 每秒帧数 × 每帧 token 数。</div>
+<div class="ladder"><strong>关键在于：</strong>别漏掉「每秒 2 帧」——不是 60 帧，是 120 帧。</div>
+<div class="ladder"><strong>第一步这样走：</strong>60 × 2 = 120 帧；120 × 256 = ?</div>
+<div class="ladder"><strong>完整答案：</strong>60 × 2 × 256 = 30,720 个视觉 token。占 256K（262,144）的约 11.7%。注意这还只是一分钟的短视频、且每帧只算 256 token 的「温柔」假设——高分辨率帧可以到上千 token。一段 30 分钟的视频按同样参数就是约 92 万 token，256K 上下文直接装不下，这就是为什么托管版要默认 1M 上下文。</div>
+<div class="variant"><strong>变式：</strong>如果上下文只有 32K，在不降低帧率的前提下，你只能靠「减少每帧 token 数」把这段 60 秒视频塞进去。每帧 token 数要压到多少以下？这种压缩的代价是什么？</div>
+</div>
+</details>
+
+<h3 id="ch0-3">0.3 MoE：总参数与激活参数</h3>
+<p>普通（稠密，Dense）模型里，每个 token 都要经过模型的全部参数。参数翻倍，计算量就翻倍——「大」和「贵」死死绑在一起。</p>
+<p><strong>混合专家</strong>（Mixture-of-Experts, MoE）解开了这个绑定：把每层的前馈网络复制成很多份（每份叫一个「专家」），加一个小「路由器」给当前 token 打分，<strong>只让得分最高的几个专家干活</strong>。Qwen3.5-397B-A17B 的名字就是这两个数字：总参数 397B，每个 token 只激活 17B——约 4.3%。</p>
+<div class="table-wrap">
+<table>
+<caption>三个必须分清的量</caption>
+<thead><tr><th>量</th><th>含义</th><th>Qwen3.5-397B-A17B</th><th>决定什么</th></tr></thead>
+<tbody>
+<tr><td>总参数</td><td>模型里一共有多少可训练的数</td><td class="num">397B</td><td>显存：要多少卡才装得下；知识容量上限</td></tr>
+<tr><td>激活参数</td><td>处理一个 token 实际用到多少</td><td class="num">17B</td><td>算力：每个 token 多贵、生成多快</td></tr>
+<tr><td>稀疏度</td><td>总参数 ÷ 激活参数</td><td class="num">≈23.3（397÷17，本站计算）</td><td>MoE 的「省算力倍数」的粗略上界</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>MoE 像一家有几百位专科医生的超级医院。你来看病，分诊台（路由器）看一眼症状，挑几位最对口的医生会诊。医院很大所以什么病都能治（总参数多 = 知识容量大），但你这次就诊只占用几位医生的时间（激活参数少 = 计算量小）。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>比方暗示专家们有清晰分工（「这位看眼科」）。真实 MoE 里专家的分工是训练中自发形成的，往往不对应任何人类能命名的领域，而且负载天然不均——有的专家被挤爆，有的门可罗雀。另外，所有医生都得同时「在医院里待命」：全部 397B 参数必须常驻显存，因为你无法预知下一个 token 会路由到哪几位专家。<strong>MoE 省的是算力，不是显存。</strong></div>
+</div>
+
+<p class="oneline"><strong>一句话记住：</strong>397B 决定「它懂多少」，17B 决定「它说一个字多快多贵」。Qwen3.5 的速度秘密全在后一个数字里。</p>
+
+<h3 id="ch0-4">0.4 线性注意力 vs 全注意力</h3>
+<p>注意力机制让每个 token 回头查前面所有 token，这带来两个代价：</p>
+<ol>
+<li><strong>计算量随长度平方增长</strong>：n 个 token 要打约 n²/2 次分。</li>
+<li><strong>KV 缓存随长度线性增长、且永不缩小</strong>：每生成一个新 token 都要回头查所有历史的 K、V，所以要把它们全存在显存里。上下文越长缓存越大。</li>
+</ol>
+<div class="viz" id="viz4">
+<div class="viz-title">▶ 交互演示 0-A：注意力打分热力图——「它」到底在看谁</div>
+<p style="font-size:14px;margin:6px 0">例句：<strong>「猫 追 老 鼠 ， 它 饿 了」</strong>（8 个 token）。每个格子是「行 token 关注列 token」的权重，颜色越深权重越大；<strong>悬停</strong>任意格子看数值，<strong>点击左侧 token</strong> 高亮它的整行注意力分布。</p>
+<div id="viz4-grid" class="viz4-grid"></div>
+<div class="viz4-status" id="viz4-status">把鼠标移到任意格子上……</div>
+<div class="viz-controls"><button class="viz-btn ghost" id="viz4-reset">重置选择</button></div>
+<noscript><p style="font-size:13px;color:var(--muted)">（未启用 JS：关键数据——「它」所在行：猫 0.62 / 鼠 0.12 / 老 0.10 / 追 0.08，其余接近 0。）</p></noscript>
+<div class="viz-read"><strong>怎么读这张图：</strong>看「它」那一行：最深的格子落在「猫」（0.62）上——模型解代词靠的不是语法规则，而是这行权重分布。再看「饿」那一行：「它」（0.43）和「猫」（0.35）都很深，因为「谁饿了」的答案藏在前面。两个要点：① 下三角之外全是空白——每个 token 只能看自己和左边（因果掩码），这就是语言模型「不能偷看未来」的几何形状；② 每行权重加起来等于 1——softmax 保证的，注意力本质是「按权重把别人的信息混进来」。本图权重为手工构造的教学示意数据，非真实模型输出，但分布形态（代词指向名词、标点就近聚集）是真实模型的典型样子。</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>全注意力的代价随序列长度增长（本站计算，n²/2 打分次数）</caption>
+<thead><tr><th class="num">序列长度 n</th><th class="num">打分次数（约）</th><th class="num">相对 4K 的倍数</th></tr></thead>
+<tbody>
+<tr><td class="num">4,096（4K）</td><td class="num">约 840 万</td><td class="num">1×</td></tr>
+<tr><td class="num">32,768（32K）</td><td class="num">约 5.4 亿</td><td class="num">64×</td></tr>
+<tr><td class="num">262,144（256K）</td><td class="num">约 344 亿</td><td class="num">4,096×</td></tr>
+<tr><td class="num">1,048,576（1M）</td><td class="num">约 5,500 亿</td><td class="num">65,536×</td></tr>
+</tbody>
+</table>
+</div>
+<p>长度涨 256 倍，注意力计算量涨 6.5 万倍。这就是纯全注意力模型做长视频理解根本跑不动的原因。</p>
+<p><strong>线性注意力</strong>换了一条路：不再为每个 token 单独存一份 K、V，而是维护一个<strong>固定大小的状态矩阵</strong>，每读一个 token 就把它的信息「揉」进状态里。不管你读了 4K 还是 1M 个 token，状态就那么大——显存占用是常数，每步计算量也是常数，总成本随长度<strong>线性</strong>增长而不是平方。</p>
+<p>代价是什么？固定大小的状态是有损压缩：它记不住「第 12,345 个 token 的确切内容」这种精确定位信息，而全注意力的 KV 缓存是逐 token 无损的。所以现代高效架构几乎都用<strong>混合</strong>方案：大部分层用线性注意力控制成本，少部分层保留全注意力保住精确检索能力。Qwen3.5 继承的 Qwen3-Next 架构正是这样：Gated DeltaNet（线性注意力）+ Gated Attention（全注意力）混合。第 4 章会详细拆。</p>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>全注意力像开会时把每个人的发言逐字记录在案，谁要引用就翻原话——精确，但会议越长记录越厚。线性注意力像只让一个记录员维护一块白板：每个人发言完，他把要点更新到白板上，旧内容不断被覆盖压缩——白板永远只有一块大，但你没法问他「第三个小时第二个人说的第三个词是什么」。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>「白板」暗示状态是完全无序的摘要。实际上线性注意力的状态矩阵有精确的数学结构（key 维度 × value 维度），查询时是用当前的 q 去和状态做运算，能取回的信息比「要点摘要」系统得多——只是容量确实有限，且写入时会互相干扰。另外 DeltaNet 的「delta」规则意味着它可以有选择地<strong>擦除</strong>旧信息再写入，比单纯覆盖聪明，这是普通会议纪要比方装不下的。</div>
+</div>
+
+<details class="quiz">
+<summary>自测题 0.2：某模型有 60 层全注意力层，每层每 token 的 KV 缓存为 4 KB。另有一个线性注意力变体，每层只维护一个固定 64 KB 的状态。(a) 256K 上下文下两者的「记忆」各占多少？(b) 为什么 Qwen3.5 不把 60 层全换成线性注意力？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>KV 缓存随 token 数涨，固定状态不随 token 数涨。分别算清楚再比较。</div>
+<div class="ladder"><strong>关键在于：</strong>(a) 问的是「记忆占用的显存」，不是计算量。注意单位换算：262,144 个 token × 每层 4 KB × 60 层。</div>
+<div class="ladder"><strong>第一步这样走：</strong>全注意力：262,144 × 4 KB = 1 GB（每层），再乘 60 层。线性注意力：64 KB × 60 层，与 token 数无关。</div>
+<div class="ladder"><strong>完整答案：</strong>(a) 全注意力 KV 缓存 = 262,144 × 4 KB × 60 = 60 GB；线性注意力状态 = 64 KB × 60 = 3.75 MB。相差约 16,000 倍——而且这个差距会随上下文变长继续拉大。(b) 因为固定状态记不住精确的逐 token 历史。像「把文档第 47 页第三行的数字和第 3 页的加起来」「视频第 30 秒出现的那个人穿什么衣服」这类任务，本质是对任意远位置的精确检索，只有全注意力的无损 KV 缓存做得到。所以 Qwen3-Next / Qwen3.5 的路线是混合：大部分层用 Gated DeltaNet 把成本压下去，保留一部分 Gated Attention 层负责精确查找。这不是折中主义，是让两种机制各干自己最擅长的事。</div>
+<div class="variant"><strong>变式：</strong>假设混合比例是 3:1（45 层线性 + 15 层全注意力），同样 256K 上下文，KV 缓存总量是多少？和 60 层全注意力相比省了多少？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 0.3：向一个完全不懂技术的朋友解释「为什么 Qwen3.5 能又大又快」。要求：不许用「参数」「token」这两个词。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>「大」对应生活里的什么概念（容量/藏书量）？「快」对应什么（每次办事要动用多少人手）？</div>
+<div class="ladder"><strong>关键在于：</strong>MoE 的核心是「总量」和「每次用量」脱钩——你的比方必须同时装下这两件事，还要装下它们的「解绑」。</div>
+<div class="ladder"><strong>第一步这样走：</strong>先造「大」的比方（一个藏书极多的图书馆），再造「快」的机制（每次提问只叫醒最相关的几位馆员），最后点破「藏书多 ≠ 每次都要全员出动」。</div>
+<div class="ladder"><strong>完整答案：</strong>示例：「它像一座藏书几千万册的图书馆，配了一个极聪明的前台。你每问一个问题，前台只叫醒几位最对口的馆员来回答。藏书量决定它懂多少（这是『大』），每次被叫醒的馆员数决定它答得多快、多省电（这是『快』）——别的图书馆是每次提问全馆馆员一起翻书，所以它又慢又贵。」评分点：① 必须同时覆盖「容量」与「每次成本」两个维度；② 必须体现两者的解耦；③ 只说「它很大所以懂得多」只得一半分。</div>
+<div class="variant"><strong>变式：</strong>朋友追问：「那它是不是一台小电脑就能装下？」——用同样不带术语的话纠正他（提示：所有的书都必须真的在馆里放着，不管这次用不用）。</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>四个概念装进脑子：VLM 让视觉和文字住进同一个 token 序列，Qwen3.5 走的是原生路线而非外挂；图片经「切 patch → ViT → merger」变成视觉 token，视频则是逐帧的图片，token 量爆炸是常态；MoE 让总参数（397B，决定容量）和激活参数（17B，决定速度）脱钩，但显存按总参数算；全注意力有平方计算量 + 线性 KV 缓存两个代价，线性注意力用固定大小状态换常数成本，代价是精确检索能力——所以实战架构都是混合的。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>第 1 章给你项目地图——Qwen3.5 家族都有哪些型号、从 Qwen2-VL 到 Qwen3.5 这条线是怎么演进过来的、权重和 API 分别去哪里拿。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 1 章 ==================== -->
+<h2 id="ch1"><span class="chnum">第 1 章</span>项目地图：Qwen3.5-VL 是什么</h2>
+<p class="chapter-intro">这一章回答四个问题：Qwen3.5 到底发布了什么、家族里有哪些型号各适合谁、从 Qwen2-VL 一路怎么演进过来、你想用的话去哪里拿。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>说清「Qwen3.5 是原生 VLM」这句话的准确含义</li>
+<li>背出家族矩阵里每个型号的总参数 / 激活参数，并说出各自定位</li>
+<li>按时间线复述 Qwen2-VL → Qwen2.5-VL → Qwen3-VL → Qwen3.5 的演进</li>
+<li>区分三种获取方式（Hugging Face、ModelScope、百炼 API）的适用场景</li>
+</ul>
+</div>
+
+<h3 id="ch1-1">1.1 Qwen3.5 是什么</h3>
+<p>Qwen3.5 是阿里巴巴 Qwen 团队（通义千问）2026 年 2 月 16 日（除夕夜）发布的新一代旗舰模型系列，官方博客《Qwen3.5: Towards Native Multimodal Agents》于 2 月 17 日发出。三个关键事实：</p>
+<ul>
+<li><strong>它是原生视觉-语言模型</strong>。不存在「Qwen3.5 语言版」和「Qwen3.5-VL 视觉版」两条产品线——视觉语言能力内建于基座。所以本站标题里的「Qwen3.5-VL」指的就是 Qwen3.5 本身。</li>
+<li><strong>首个开源模型是 Qwen3.5-397B-A17B</strong>：397B 总参数、17B 激活参数的 MoE 模型。</li>
+<li><strong>语言覆盖大幅扩展</strong>：支持的语言/方言从 119 种扩展到 201 种。</li>
+</ul>
+<p>架构上，Qwen3.5 = <strong>Qwen3-Next 的语言基座架构</strong>（混合注意力 + 高稀疏度 MoE + 多 token 预测）+ <strong>Qwen3-VL 的视觉栈</strong>（交错 MRoPE、DeepStack、文本-时间戳对齐）。第 2–4 章会逐个拆这些零件，这里先记住这句「配方」。</p>
+<p>后训练方面，官方的说法值得原文转述：Qwen3.5 的提升主要来自<strong>大规模扩展几乎所有能想到的 RL 任务与环境</strong>，重点是环境的难度与泛化性，而不是针对特定榜单刷分。这句话到第 6 章读评测表时要回来对照。</p>
+
+<h3 id="ch1-2">1.2 家族矩阵</h3>
+<div class="table-wrap">
+<table>
+<caption>Qwen3.5 家族（信息来自官方博客及 2026-02-25 的开源扩容公告）</caption>
+<thead><tr><th>型号</th><th>结构</th><th class="num">总参数</th><th class="num">激活参数</th><th>定位</th></tr></thead>
+<tbody>
+<tr class="hl"><td>Qwen3.5-397B-A17B</td><td>MoE</td><td class="num">397B</td><td class="num">17B</td><td>旗舰，首个开源（2 月 16 日）</td></tr>
+<tr><td>Qwen3.5-122B-A10B</td><td>MoE</td><td class="num">122B</td><td class="num">10B</td><td>2 月 25 日扩容</td></tr>
+<tr><td>Qwen3.5-35B-A3B</td><td>MoE</td><td class="num">35B</td><td class="num">3B</td><td>官方称已全面超越 Qwen3-235B-A22B 与 Qwen3-VL-235B-A22B</td></tr>
+<tr><td>Qwen3.5-27B</td><td>Dense（稠密）</td><td class="num">27B</td><td class="num">27B</td><td>单卡/小集群友好</td></tr>
+<tr><td>Qwen3.5-9B</td><td>Dense</td><td class="num">9B</td><td class="num">9B</td><td>端侧/低成本场景</td></tr>
+<tr class="hl"><td>Qwen3.5-Plus（托管）</td><td>—</td><td class="num">未公开</td><td class="num">未公开</td><td>阿里云百炼 Model Studio；默认 1M token 上下文，内置官方工具与自适应工具调用</td></tr>
+</tbody>
+</table>
+</div>
+<p>两个观察。第一，35B-A3B 这个「小」模型被官方拿来和上代 235B 旗舰对比并宣称超越——稀疏度更高的 MoE 加上新架构，让「以小打大」成为这一代的主旋律。第二，托管的 Plus 版和开源版是两种产品形态：Plus 默认 1M 上下文且内置官方工具链，适合不想管基础设施的人；开源版给你权重，但要自己解决部署（第 7、8 章）。</p>
+
+<div class="box box-misconception">
+<div class="box-title">常见误解</div>
+<p>「A17B 的 A 是版本号（类似 v17b）。」——不是。命名规则是「总参数-A-激活参数」：397B-A17B 读作「3970 亿总参数，激活 170 亿」。同理 122B-A10B、35B-A3B。看到 Dense 型号（27B、9B）没有 A 后缀，正是因为稠密模型总参数 = 激活参数，没必要标。</p>
+</div>
+
+<h3 id="ch1-3">1.3 三代 VL 的演进：从 Qwen2-VL 到 Qwen3.5</h3>
+<div class="table-wrap">
+<table>
+<caption>Qwen VL 产品线演进（据官方公开资料整理）</caption>
+<thead><tr><th>代际</th><th>时间</th><th>代表型号</th><th>这一代留下的东西</th></tr></thead>
+<tbody>
+<tr><td>Qwen2-VL</td><td>2024</td><td>2B / 7B / 72B（Dense）</td><td>Naive Dynamic Resolution（任意分辨率输入）、M-RoPE 首次登场</td></tr>
+<tr><td>Qwen2.5-VL</td><td>2025 初</td><td>3B / 7B / 72B（Dense 三件套）</td><td>文档解析、GUI 操作、按时间戳定位视频事件的雏形</td></tr>
+<tr><td>Qwen3-VL</td><td>2025-09 首发</td><td>235B-A22B（MoE）+ Dense 2B/4B/8B/32B，均有 Instruct 与 Thinking 版</td><td>三大创新：交错 MRoPE、DeepStack、文本-时间戳对齐；原生 256K 上下文可扩到 1M；Apache 2.0 开源</td></tr>
+<tr class="hl"><td>Qwen3.5</td><td>2026-02</td><td>397B-A17B 等（见家族矩阵）</td><td>VL 能力并入原生基座；语言基座换成 Qwen3-Next 混合架构；201 种语言</td></tr>
+</tbody>
+</table>
+</div>
+<p>这条线看下来有一个清晰的方法论：Qwen3.5 的视觉栈几乎原样继承 Qwen3-VL——因为 Qwen3-VL 的三大创新（第 2、3 章详解）已经被验证有效；这一代真正的大手术动在<strong>语言基座</strong>上（换成 Qwen3-Next 的混合注意力 + 高稀疏 MoE），以及把「视觉能力」从一条产品线升级成基座的内建属性。读懂这一点，你就知道第 2–3 章（视觉侧）和第 4 章（语言侧）的分工了。</p>
+
+<div class="timeline">
+<div class="tl-item"><div class="tl-date">2023-08</div><div class="tl-body"><strong>Qwen-VL</strong>——视觉线起点：ViT-bigG 视觉编码器 + Qwen-7B，固定 448×448 分辨率输入。</div></div>
+<div class="tl-item"><div class="tl-date">2024</div><div class="tl-body"><strong>Qwen2-VL</strong>（2B / 7B / 72B）——Naive Dynamic Resolution 实现任意分辨率输入；M-RoPE 首次登场，视觉位置编码进入多维时代。</div></div>
+<div class="tl-item"><div class="tl-date">2025 年初</div><div class="tl-body"><strong>Qwen2.5-VL</strong>（3B / 7B / 72B，后补 32B）——文档解析与 GUI 操作大幅强化，视频按时间戳定位的雏形出现。</div></div>
+<div class="tl-item"><div class="tl-date">2025-09 ~ 10</div><div class="tl-body"><strong>Qwen3-VL</strong>——235B-A22B MoE 首发，后出 Dense 2B/4B/8B/32B（均有 Instruct 与 Thinking 版）。三大创新定型：<strong>交错 MRoPE、DeepStack、文本-时间戳对齐</strong>；原生 256K 上下文可扩到 1M；Apache 2.0 开源。</div></div>
+<div class="tl-item"><div class="tl-date">2026-01</div><div class="tl-body"><strong>Qwen3-VL-Embedding / Reranker</strong>——多模态检索方向的支线：图文混合 embedding 与重排序模型。</div></div>
+<div class="tl-item tl-now"><div class="tl-date">2026-02</div><div class="tl-body"><strong>Qwen3.5</strong>——VL 能力并入原生基座：MoE 397B-A17B 首发（除夕夜），随后扩出 122B-A10B / 35B-A3B / 27B / 9B；语言支持 119 → 201 种。本站的全部主角。</div></div>
+</div>
+<p style="font-size:13px;color:var(--muted)">注：月份以官方公开资料为准；拿不准精确月份的节点只标注季度或年份，未编造具体日期。</p>
+
+<h3 id="ch1-4">1.4 从哪里获取</h3>
+<ul>
+<li><strong>Hugging Face</strong>（<code>huggingface.co/Qwen</code>）：开源权重的主渠道，配 transformers / vLLM 生态最顺。Qwen3-VL 系列权重为 Apache 2.0 许可。</li>
+<li><strong>ModelScope</strong>（<code>modelscope.cn</code>）：阿里自家的模型社区，国内网络环境下下载速度快得多，API 与 HF 高度类似。</li>
+<li><strong>阿里云百炼 Model Studio</strong>：托管 API，调用 Qwen3.5-Plus，OpenAI 兼容接口，按 token 计费，不用管显卡。第 7 章有完整调用示例。</li>
+</ul>
+
+<details class="quiz">
+<summary>自测题 1.1：你的团队要做一个「看懂工厂监控视频并报警」的内部系统，视频流 7×24 小时不断，数据不能出内网。你会选家族里哪个型号、走哪种获取方式？再说出你会排除掉的两个选项及理由。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>约束有两条：数据不出内网（排除托管 API）、视频流持续推理（成本敏感，激活参数越小越省）。</div>
+<div class="ladder"><strong>关键在于：</strong>「不能出内网」一条就直接否决百炼 Plus；剩下的问题是在开源型号里权衡显存预算与能力。</div>
+<div class="ladder"><strong>第一步这样走：</strong>列出开源候选：397B-A17B / 122B-A10B / 35B-A3B / 27B / 9B。7×24 持续推理 = 按激活参数付电费，35B-A3B 每 token 只激活 3B，且官方称其已超越上代 235B 旗舰。</div>
+<div class="ladder"><strong>完整答案：</strong>合理选择：35B-A3B（预算紧）或 122B-A10B（预算充裕、要更强细粒度能力），从 ModelScope（国内内网/下载友好）拉权重，自建 vLLM 服务（第 7 章）。排除项一：Qwen3.5-Plus——托管 API 意味着视频要传到云上，违反「不出内网」；排除项二：397B-A17B——能力最强但 BF16 需约 794 GB 显存（第 8 章会算），为监控这种高吞吐但单帧难度不高的任务付这个成本不划算。9B 则是另一个方向的候选：如果单路摄像头配单张消费卡，它可能是唯一能跑起来的，但要接受细粒度视觉理解能力的损失。答案不唯一，评分点在「约束 → 排除 → 权衡」的推理链条是否完整。</div>
+<div class="variant"><strong>变式：</strong>如果需求改成「每月离线分析一次历史录像，数据同样不能出内网」，你的选择会变吗？批处理场景和实时流场景的成本结构差在哪？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 1.2：官方说 Qwen3.5-35B-A3B「全面超越 Qwen3-VL-235B-A22B」。仅从命名数字出发，这个宣称如果为真，说明了哪两件事？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>对比两组数字：35B vs 235B（总参数），3B vs 22B（激活参数）。</div>
+<div class="ladder"><strong>关键在于：</strong>「超越」指的不是参数规模而是 benchmark 表现。参数小 6 倍多还能赢，多出来的能力从哪来？</div>
+<div class="ladder"><strong>第一步这样走：</strong>列出两代之间变了什么：语言基座架构（Qwen3-Next 混合注意力、更高稀疏度 MoE、MTP）、后训练（大规模 RL）、原生多模态训练。</div>
+<div class="ladder"><strong>完整答案：</strong>说明两件事。第一，<strong>架构与训练的代际红利大于参数规模红利</strong>：35B-A3B 的激活参数只有 3B（约为 235B-A22B 激活量 22B 的七分之一），却在官方口径下反超，差额只能来自架构效率、训练数据与 RL 后训练的进步。第二，<strong>「多少参数」越来越不是预测模型能力的好指标</strong>——这正是第 0 章说的总参数/激活参数脱钩逻辑的延伸：比较模型时要看架构代际、训练方式和激活成本，而不是只比总参数。也要注意：这是官方口径的宣称，第 6 章会教你以什么心态对待任何一方的自报分数。</div>
+<div class="variant"><strong>变式：</strong>如果三个月后第三方复测发现 35B-A3B 在文档类任务上确实超越了 235B-A22B、但在 GUI 操作上没有，你会怎么修正上面结论？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 1.3：官方说提升主要来自「大规模扩展几乎所有能想到的 RL 任务与环境，强调环境难度与泛化性而非刷榜」。为什么「强调不刷榜」本身值得写进博客？它在回应什么怀疑？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>如果提升主要来自「针对榜单优化」，外行和同行分别会怎么拆穿？</div>
+<div class="ladder"><strong>关键在于：</strong>RL 可以过拟合评测集——只在榜单题型上练，分数涨而真实能力不涨。「环境难度与泛化性」是在声明能力提升的「来源性质」。</div>
+<div class="ladder"><strong>第一步这样走：</strong>构造反例：只在 MMMU 风格的题目上做 RL，MMMU 分数大涨；此时「MMMU 85.0」还能证明什么、不能证明什么？</div>
+<div class="ladder"><strong>完整答案：</strong>这句话在回应「你的分是不是刷出来的」这一标准怀疑。针对已知榜单做定向优化，可以在不动真实能力的情况下推高分数（评测过拟合，reward hacking 的榜单版）。官方主动声明「扩的是环境覆盖面与难度，不是榜单拟合度」，实质是给出能力来源的可证伪叙述：若声明为真，优势应在未参与训练的新榜和真实任务上保持；若为假，会在第三方新评测中缩水。同时这句话也在向同行暗示技术路线（RL 环境工程是这一代主战场）、向用户暗示预期（强项会出现在分布外任务上）。正确读法：把它当「承诺」而非「结论」——第 6 章的自建评测集，就是你验证这句承诺的工具。</div>
+<div class="variant"><strong>变式：</strong>半年后某第三方新榜上 Qwen3.5 的优势明显缩水。这是否证伪了那句话？区分「模型被超越」与「当年刷榜」两种情形，各需要什么额外证据？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>Qwen3.5 = Qwen3-Next 语言基座 + Qwen3-VL 视觉栈，视觉语言能力原生内建。家族从 9B 稠密小模型到 397B-A17B MoE 旗舰，外加托管的 Plus（默认 1M 上下文）。演进线上，视觉侧的三大创新在 Qwen3-VL 一代定型并被继承，这一代的主战场是语言基座的效率革命与原生多模态。获取渠道：HF / ModelScope 拿权重，百炼拿 API。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>第 2 章拆开整体架构，看清「ViT → merger → 语言模型」三段流水线的每一环，以及 DeepStack 为什么要把视觉特征分好几层喂进去。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 2 章 ==================== -->
+<h2 id="ch2"><span class="chnum">第 2 章</span>整体架构：ViT + merger + 语言模型三段式</h2>
+<p class="chapter-intro">这一章把 Qwen3.5-VL 的数据流从头到尾走一遍：像素怎么进、token 怎么流、答案怎么出。重点是理解三段式的分工，以及 Qwen3-VL 留下的第一个关键创新——DeepStack。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>画出「ViT → merger → 语言模型」的三段数据流图，说清每段的输入输出</li>
+<li>解释 merger 为什么要压缩 token（以及压掉的是什么）</li>
+<li>说清 DeepStack 与「一次性注入」的区别，以及它为什么对细粒度视觉理解更好</li>
+<li>指出架构里哪一段是 Qwen3-VL 遗产、哪一段是 Qwen3-Next 遗产</li>
+</ul>
+</div>
+
+<h3 id="ch2-1">2.1 数据流全景</h3>
+<figure>
+<svg viewBox="0 0 720 330" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#615ced"/>
+    </marker>
+  </defs>
+  <!-- 输入 -->
+  <rect x="10" y="30" width="110" height="80" rx="8" fill="#f0eefe" stroke="#615ced" stroke-width="1.5"/>
+  <text x="65" y="62" text-anchor="middle" font-size="13" fill="#4a44c8" font-weight="700">图片 / 视频帧</text>
+  <text x="65" y="82" text-anchor="middle" font-size="11" fill="#6d6b78">像素</text>
+  <!-- ViT -->
+  <rect x="160" y="30" width="130" height="80" rx="8" fill="#fff" stroke="#615ced" stroke-width="1.5"/>
+  <text x="225" y="58" text-anchor="middle" font-size="13" font-weight="700" fill="#25232e">① ViT 视觉编码器</text>
+  <text x="225" y="76" text-anchor="middle" font-size="11" fill="#6d6b78">patch → 视觉特征</text>
+  <text x="225" y="92" text-anchor="middle" font-size="11" fill="#6d6b78">（多层级输出）</text>
+  <!-- merger -->
+  <rect x="330" y="30" width="120" height="80" rx="8" fill="#fff" stroke="#615ced" stroke-width="1.5"/>
+  <text x="390" y="58" text-anchor="middle" font-size="13" font-weight="700" fill="#25232e">② merger</text>
+  <text x="390" y="76" text-anchor="middle" font-size="11" fill="#6d6b78">2×2 压缩 +</text>
+  <text x="390" y="92" text-anchor="middle" font-size="11" fill="#6d6b78">投影到 LLM 维度</text>
+  <!-- LLM -->
+  <rect x="490" y="30" width="220" height="240" rx="8" fill="#fff" stroke="#4a44c8" stroke-width="2"/>
+  <text x="600" y="56" text-anchor="middle" font-size="13" font-weight="800" fill="#4a44c8">③ 语言模型（Qwen3-Next 基座）</text>
+  <rect x="505" y="70" width="190" height="26" rx="5" fill="#f0eefe" stroke="#c9c4f2"/>
+  <text x="600" y="87" text-anchor="middle" font-size="11.5" fill="#4a44c8">混合注意力层（DeltaNet + 全注意力）</text>
+  <rect x="505" y="104" width="190" height="26" rx="5" fill="#f0eefe" stroke="#c9c4f2"/>
+  <text x="600" y="121" text-anchor="middle" font-size="11.5" fill="#4a44c8">MoE 层（397B 总 / 17B 激活）</text>
+  <rect x="505" y="138" width="190" height="26" rx="5" fill="#f0eefe" stroke="#c9c4f2"/>
+  <text x="600" y="155" text-anchor="middle" font-size="11.5" fill="#4a44c8">MTP 多 token 预测头</text>
+  <rect x="505" y="180" width="190" height="70" rx="5" fill="#fdf1e7" stroke="#b3541e"/>
+  <text x="600" y="200" text-anchor="middle" font-size="11.5" font-weight="700" fill="#b3541e">DeepStack 注入口</text>
+  <text x="600" y="218" text-anchor="middle" font-size="10.5" fill="#6d6b78">ViT 浅 / 中 / 深层特征</text>
+  <text x="600" y="234" text-anchor="middle" font-size="10.5" fill="#6d6b78">分别注入 LLM 不同中间层</text>
+  <!-- 主流程箭头 -->
+  <line x1="120" y1="70" x2="156" y2="70" stroke="#615ced" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="290" y1="70" x2="326" y2="70" stroke="#615ced" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="450" y1="70" x2="486" y2="70" stroke="#615ced" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- DeepStack 箭头：ViT 多层 → LLM 中层 -->
+  <path d="M 225 110 C 225 215, 400 215, 500 215" fill="none" stroke="#b3541e" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arr)"/>
+  <text x="330" y="240" text-anchor="middle" font-size="11.5" fill="#b3541e">DeepStack：多层级特征分层注入（虚线）</text>
+  <!-- 文本输入 -->
+  <rect x="10" y="290" width="220" height="34" rx="8" fill="#fff" stroke="#615ced" stroke-width="1.2"/>
+  <text x="120" y="311" text-anchor="middle" font-size="12" fill="#25232e">文本 prompt（token 序列）</text>
+  <path d="M 230 307 L 486 245" fill="none" stroke="#615ced" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- 输出 -->
+  <rect x="560" y="290" width="150" height="34" rx="8" fill="#4a44c8"/>
+  <text x="635" y="311" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">输出 token（答案）</text>
+  <line x1="600" y1="270" x2="630" y2="288" stroke="#615ced" stroke-width="2" marker-end="url(#arr)"/>
+</svg>
+<figcaption>图 2-1：Qwen3.5-VL 三段式数据流示意。实线是主路径（像素 → 视觉 token → 混合序列 → 逐 token 生成答案），虚线是 DeepStack 的分层注入路径。为示意简图，层的数量与具体连接方式以官方实现为准。</figcaption>
+</figure>
+<p>主路径只有一句话：<strong>视觉 token 和文本 token 拼接成一个序列，送进同一个语言模型，逐 token 生成答案</strong>。三段各自的分工：</p>
+<ol>
+<li><strong>ViT</strong>：不看文字，专心把图像 patch 编成一串视觉特征向量。它是唯一「见过像素」的部分。</li>
+<li><strong>merger</strong>：把相邻 2×2 的视觉 token 合并 + 投影到语言模型的隐藏维度。两件事：省 token（数量降为 1/4），对齐空间（让视觉向量和文字向量量纲一致，能被同一个注意力处理）。</li>
+<li><strong>语言模型</strong>：Qwen3-Next 基座，混合注意力 + MoE + MTP（第 4 章详拆）。它对「这个 token 来自图还是来自字」没有特殊待遇——这正是原生多模态的含义。</li>
+</ol>
+
+<div class="viz" id="viz1">
+<div class="viz-title">▶ 交互演示 2-A：一张图变成 token 的流水线</div>
+<svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg" font-family="inherit" role="img" aria-label="图片切分成 patch、编码、压缩、与文本 token 排队进入语言模型的动画">
+  <!-- 1. 图片 patch 网格 -->
+  <g id="viz1-s0">
+    <rect x="15" y="30" width="90" height="90" fill="#f0eefe" stroke="#615ced" stroke-width="1.5"/>
+    <g stroke="#c9c4f2"><line x1="30" y1="30" x2="30" y2="120"/><line x1="45" y1="30" x2="45" y2="120"/><line x1="60" y1="30" x2="60" y2="120"/><line x1="75" y1="30" x2="75" y2="120"/><line x1="90" y1="30" x2="90" y2="120"/><line x1="15" y1="45" x2="105" y2="45"/><line x1="15" y1="60" x2="105" y2="60"/><line x1="15" y1="75" x2="105" y2="75"/><line x1="15" y1="90" x2="105" y2="90"/><line x1="15" y1="105" x2="105" y2="105"/></g>
+    <text x="60" y="140" text-anchor="middle" font-size="11" fill="#6d6b78">① 切 patch</text>
+  </g>
+  <!-- 2. patch 向量 -->
+  <g id="viz1-s1">
+    <g fill="#b7a8ff"><rect x="140" y="35" width="34" height="8" rx="2"/><rect x="140" y="48" width="34" height="8" rx="2"/><rect x="140" y="61" width="34" height="8" rx="2"/><rect x="140" y="74" width="34" height="8" rx="2"/><rect x="140" y="87" width="34" height="8" rx="2"/><rect x="140" y="100" width="34" height="8" rx="2"/></g>
+    <text x="157" y="140" text-anchor="middle" font-size="11" fill="#6d6b78">② 每个 patch</text>
+    <text x="157" y="154" text-anchor="middle" font-size="11" fill="#6d6b78">变向量</text>
+  </g>
+  <!-- 3. ViT -->
+  <g id="viz1-s2">
+    <rect x="205" y="42" width="86" height="66" rx="8" fill="#fff" stroke="#615ced" stroke-width="2"/>
+    <text x="248" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#4a44c8">ViT</text>
+    <text x="248" y="88" text-anchor="middle" font-size="10" fill="#6d6b78">视觉特征</text>
+    <text x="248" y="140" text-anchor="middle" font-size="11" fill="#6d6b78">③ 编码</text>
+  </g>
+  <!-- 4. merger 3x3 -->
+  <g id="viz1-s3">
+    <rect x="325" y="45" width="60" height="60" fill="#f0eefe" stroke="#615ced" stroke-width="1.5"/>
+    <g stroke="#c9c4f2"><line x1="345" y1="45" x2="345" y2="105"/><line x1="365" y1="45" x2="365" y2="105"/><line x1="325" y1="65" x2="385" y2="65"/><line x1="325" y1="85" x2="385" y2="85"/></g>
+    <text x="355" y="140" text-anchor="middle" font-size="11" fill="#6d6b78">④ merger 2×2 合并</text>
+    <text x="355" y="154" text-anchor="middle" font-size="10" fill="#6d6b78">token 数 ÷4</text>
+  </g>
+  <!-- 5. 混合 token 队列 -->
+  <g id="viz1-s4">
+    <g fill="#615ced"><rect x="430" y="50" width="16" height="16" rx="3"/><rect x="452" y="50" width="16" height="16" rx="3"/><rect x="474" y="50" width="16" height="16" rx="3"/><rect x="496" y="50" width="16" height="16" rx="3"/><rect x="518" y="50" width="16" height="16" rx="3"/><rect x="540" y="50" width="16" height="16" rx="3"/><rect x="562" y="50" width="16" height="16" rx="3"/><rect x="584" y="50" width="16" height="16" rx="3"/><rect x="606" y="50" width="16" height="16" rx="3"/></g>
+    <g fill="#d9d5c8"><rect x="628" y="50" width="16" height="16" rx="3"/><rect x="650" y="50" width="16" height="16" rx="3"/><rect x="672" y="50" width="16" height="16" rx="3"/><rect x="694" y="50" width="16" height="16" rx="3"/></g>
+    <text x="570" y="90" text-anchor="middle" font-size="10.5" fill="#6d6b78">紫色 = 视觉 token　灰色 = 文本 token</text>
+    <text x="570" y="140" text-anchor="middle" font-size="11" fill="#6d6b78">⑤ 排成一个序列</text>
+  </g>
+  <!-- 6. LLM -->
+  <g id="viz1-s5">
+    <rect x="520" y="160" width="180" height="38" rx="8" fill="#4a44c8"/>
+    <text x="610" y="184" text-anchor="middle" font-size="12.5" fill="#fff" font-weight="700">⑥ 语言模型逐 token 生成</text>
+  </g>
+  <!-- 流动数据包 -->
+  <rect id="viz1-pkt" x="-7" y="-7" width="14" height="14" rx="3" fill="#f5a623" stroke="#b3541e" style="transform:translate(67px,82px);transition:transform .9s ease"/>
+</svg>
+<div class="viz-controls">
+  <button class="viz-btn" id="viz1-play">播放</button>
+  <button class="viz-btn ghost" id="viz1-step">单步</button>
+  <button class="viz-btn ghost" id="viz1-reset">重置</button>
+</div>
+<div id="viz1-cap" style="font-size:14px;color:var(--accent-dark);font-weight:600;min-height:24px">第 1 步：原图被切成规则的 patch 网格</div>
+<noscript><p style="font-size:13px;color:var(--muted)">（未启用 JS：请按①→⑥的编号静态阅读这条流水线。）</p></noscript>
+<div class="viz-read"><strong>怎么读这张图：</strong>橙色小方块是「数据包」，跟着它走一遍就是一张图进入模型的完整旅程。注意第④步：网格从 6×6「缩」成 3×3——merger 把 4 个相邻 patch 压成 1 个 token，token 数除以 4，这就是后面所有层成本省一个量级的地方。到了第⑤步，紫色（视觉）和灰色（文本）方块已经躺在同一支队伍里——对语言模型来说它们再无区别，这正是「原生多模态」的字面含义。</div>
+</div>
+
+<h3 id="ch2-2">2.2 ViT 与 merger：压缩的艺术</h3>
+<p>merger 的 2×2 合并是一个典型且必要的折中：视觉 token 数直接决定进入语言模型的序列长度，而序列长度同时撞上第 0 章的两个代价（注意力计算、KV 缓存）。把 token 数压到 1/4，意味着后续所有层的成本低一个量级。代价是：合并之后，单个 token 对应原图 32×32 像素的区域，极小的文字、密集表格的细线这类信息可能被「平均掉」。</p>
+<p>这个张力——<strong>要省 token，又怕丢细节</strong>——正是 DeepStack 要缓解的问题。</p>
+
+<h3 id="ch2-3">2.3 DeepStack：分层注入为什么比一次性注入好</h3>
+<p>传统做法（以 LLaVA 系为代表）是「一次性注入」：ViT 跑完，取<strong>最后一层</strong>的特征，过 merger，全部塞给语言模型的输入层。之后语言模型就只能基于这一份特征做推理。</p>
+<p>问题在于 ViT 的不同层看到的本来就不一样：浅层特征偏局部细节（边缘、纹理、小字的笔画），深层特征偏全局语义（「这是一张发票」）。只取最后一层，等于只把「全局摘要」给了语言模型，细节在 ViT 内部就被丢掉了——深层网络的信息瓶颈。</p>
+<p><strong>DeepStack</strong>（Qwen3-VL 提出、Qwen3.5 继承）的做法：把 ViT 的<strong>多层级</strong>特征（浅、中、深）分别注入语言模型的<strong>多个中间层</strong>，而不是只在输入层给一次。语言模型在往深处推理的过程中，能不断「重新查阅」不同粒度的视觉信息——浅层细节在需要时被调出来（比如读小字、数格子），深层语义在理解整体时起作用。</p>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>一次性注入像考试前只允许你交一份「全书内容提要」给考生，考试时不许翻书。DeepStack 像开卷考试，而且书里不同详略的章节（目录、章节摘要、正文细节）分别在不同的答题阶段允许翻阅——做细节题时翻正文，做主旨题时看目录。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>开卷考试里「翻书」是人的主动动作；DeepStack 的注入是固定的结构连接——哪些 ViT 层接到 LLM 哪些层是架构设计好的，模型不能「想翻就翻」。它能做的是通过注意力权重决定「用多少」，但不能改变「在哪一层能看到什么粒度」。另外注入本身也要花 token 预算，不是免费的。</div>
+</div>
+
+<div class="box box-why">
+<div class="box-title">为什么 DeepStack 很重要</div>
+<p>看第 5、6 章的评测表你会发现 Qwen3.5 的强项集中在「细粒度」任务上：OCRBench 93.1（表中最高）、CountBench 97.2（数数）、RefCOCO 92.3（按描述定位图中物体）、OmniDocBench 90.8（文档版式解析）。这类任务的共同点是答案藏在小尺度视觉细节里——恰是一次性注入最容易丢、DeepStack 专门保住的信息。架构选择和 benchmark 强项之间的这条因果线，是理解这个项目的钥匙之一。</p>
+</div>
+
+<div class="viz" id="viz2">
+<div class="viz-title">▶ 交互演示 2-B：一次性注入 vs DeepStack——视觉信息在深层网络里的「存活率」</div>
+<div class="viz-controls">
+  <button class="viz-btn ghost" id="viz2-b1">只看一次性注入</button>
+  <button class="viz-btn ghost" id="viz2-b2">只看 DeepStack</button>
+  <button class="viz-btn" id="viz2-both">并排对比</button>
+</div>
+<svg viewBox="0 0 720 440" xmlns="http://www.w3.org/2000/svg" font-family="inherit" role="img" aria-label="左右对比：一次性注入时视觉信息随层深衰减，DeepStack 多层注入时保持">
+  <!-- 左：一次性注入 -->
+  <g id="viz2-left">
+    <text x="185" y="24" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b3352b">一次性注入（传统做法）</text>
+    <g font-size="10" fill="#6d6b78">
+      <rect x="70" y="40" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="55">LLM 第 0 层</text>
+      <rect x="70" y="68" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="83">第 1 层</text>
+      <rect x="70" y="96" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="111">第 2 层</text>
+      <rect x="70" y="124" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="139">第 3 层</text>
+      <rect x="70" y="152" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="167">第 4 层</text>
+      <rect x="70" y="180" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="195">第 5 层</text>
+      <rect x="70" y="208" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="223">第 6 层</text>
+      <rect x="70" y="236" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="76" y="251">第 7 层 …</text>
+    </g>
+    <!-- 注入箭头：只在第 0 层 -->
+    <rect x="18" y="40" width="34" height="22" rx="4" fill="#fdf1e7" stroke="#b3541e"/>
+    <text x="35" y="55" text-anchor="middle" font-size="9.5" fill="#b3541e" font-weight="700">ViT</text>
+    <line x1="52" y1="51" x2="68" y2="51" stroke="#b3541e" stroke-width="2.5"/>
+    <!-- 视觉信息强度指示条：逐层淡出 -->
+    <g>
+      <rect x="200" y="40" width="26" height="22" fill="#615ced" opacity="1"/>
+      <rect x="200" y="68" width="26" height="22" fill="#615ced" opacity=".82"/>
+      <rect x="200" y="96" width="26" height="22" fill="#615ced" opacity=".64"/>
+      <rect x="200" y="124" width="26" height="22" fill="#615ced" opacity=".48"/>
+      <rect x="200" y="152" width="26" height="22" fill="#615ced" opacity=".34"/>
+      <rect x="200" y="180" width="26" height="22" fill="#615ced" opacity=".24"/>
+      <rect x="200" y="208" width="26" height="22" fill="#615ced" opacity=".16"/>
+      <rect x="200" y="236" width="26" height="22" fill="#615ced" opacity=".1"/>
+      <text x="213" y="276" text-anchor="middle" font-size="10" fill="#6d6b78">视觉信息</text>
+      <text x="213" y="289" text-anchor="middle" font-size="10" fill="#6d6b78">逐层淡出</text>
+    </g>
+  </g>
+  <!-- 右：DeepStack -->
+  <g id="viz2-right">
+    <text x="535" y="24" text-anchor="middle" font-size="13.5" font-weight="800" fill="#2e7d4f">DeepStack（Qwen3-VL → Qwen3.5）</text>
+    <g font-size="10" fill="#6d6b78">
+      <rect x="420" y="40" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="55">LLM 第 0 层</text>
+      <rect x="420" y="68" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="83">第 1 层</text>
+      <rect x="420" y="96" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="111">第 2 层</text>
+      <rect x="420" y="124" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="139">第 3 层</text>
+      <rect x="420" y="152" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="167">第 4 层</text>
+      <rect x="420" y="180" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="195">第 5 层</text>
+      <rect x="420" y="208" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="223">第 6 层</text>
+      <rect x="420" y="236" width="120" height="22" rx="4" fill="#f0eefe" stroke="#c9c4f2"/><text x="426" y="251">第 7 层 …</text>
+    </g>
+    <!-- 注入箭头：第 0 / 3 / 6 层（示意多层级注入） -->
+    <g>
+      <rect x="368" y="40" width="34" height="22" rx="4" fill="#fdf1e7" stroke="#b3541e"/><text x="385" y="55" text-anchor="middle" font-size="9" fill="#b3541e" font-weight="700">ViT深</text>
+      <line x1="402" y1="51" x2="418" y2="51" stroke="#b3541e" stroke-width="2.5"/>
+      <rect x="368" y="124" width="34" height="22" rx="4" fill="#fdf1e7" stroke="#b3541e"/><text x="385" y="139" text-anchor="middle" font-size="9" fill="#b3541e" font-weight="700">ViT中</text>
+      <line x1="402" y1="135" x2="418" y2="135" stroke="#b3541e" stroke-width="2.5"/>
+      <rect x="368" y="208" width="34" height="22" rx="4" fill="#fdf1e7" stroke="#b3541e"/><text x="385" y="223" text-anchor="middle" font-size="9" fill="#b3541e" font-weight="700">ViT浅</text>
+      <line x1="402" y1="219" x2="418" y2="219" stroke="#b3541e" stroke-width="2.5"/>
+    </g>
+    <!-- 强度指示条：注入点回血 -->
+    <g>
+      <rect x="550" y="40" width="26" height="22" fill="#615ced" opacity="1"/>
+      <rect x="550" y="68" width="26" height="22" fill="#615ced" opacity=".85"/>
+      <rect x="550" y="96" width="26" height="22" fill="#615ced" opacity=".72"/>
+      <rect x="550" y="124" width="26" height="22" fill="#615ced" opacity="1"/>
+      <rect x="550" y="152" width="26" height="22" fill="#615ced" opacity=".85"/>
+      <rect x="550" y="180" width="26" height="22" fill="#615ced" opacity=".72"/>
+      <rect x="550" y="208" width="26" height="22" fill="#615ced" opacity="1"/>
+      <rect x="550" y="236" width="26" height="22" fill="#615ced" opacity=".85"/>
+      <text x="563" y="276" text-anchor="middle" font-size="10" fill="#6d6b78">注入点</text>
+      <text x="563" y="289" text-anchor="middle" font-size="10" fill="#6d6b78">「回血」</text>
+    </g>
+  </g>
+  <!-- 底部衰减曲线 -->
+  <g>
+    <text x="360" y="322" text-anchor="middle" font-size="12" font-weight="700" fill="#25232e">视觉信息保留度（纵轴）随 LLM 层深（横轴）变化——示意图</text>
+    <line x1="60" y1="336" x2="60" y2="420" stroke="#999"/>
+    <line x1="60" y1="420" x2="660" y2="420" stroke="#999"/>
+    <polyline points="60,344 180,372 300,392 420,406 540,414 660,418" fill="none" stroke="#b3352b" stroke-width="2.5"/>
+    <polyline points="60,344 160,376 200,344 300,376 340,344 440,376 480,344 660,368" fill="none" stroke="#2e7d4f" stroke-width="2.5"/>
+    <rect x="470" y="330" width="12" height="4" fill="#b3352b"/><text x="486" y="337" font-size="10.5" fill="#6d6b78">一次性注入</text>
+    <rect x="560" y="330" width="12" height="4" fill="#2e7d4f"/><text x="576" y="337" font-size="10.5" fill="#6d6b78">DeepStack（锯齿回血）</text>
+  </g>
+</svg>
+<div class="viz-read"><strong>怎么读这张图：</strong>两侧各是一支 8 层的语言模型缩影（实际几十层），层旁的紫色条表示「这一层还能取用多少视觉信息」。左侧：视觉特征只在第 0 层进一次，之后每层做抽象变换就丢一点细节，紫色条一路淡出——底部红线的持续下滑是同一件事的曲线版。右侧：DeepStack 在多个中间层反复注入 ViT 的浅/中/深层特征，每到注入点紫色条「回血」，绿线呈锯齿状保持高位。<strong>注：保留度数值是示意</strong>，层数与注入位置也做了缩放（真实模型对应「多层级注入多个中间层」，如第 0/8/16 层量级）；按钮可单独放大任一侧。</div>
+</div>
+
+<p class="oneline"><strong>一句话记住：</strong>一次性注入只把 ViT 的「深层摘要」交给语言模型；DeepStack 让浅层细节在 LLM 的多个中间层持续可达。</p>
+
+<details class="quiz">
+<summary>自测题 2.1：有人主张「DeepStack 没必要，只要把 ViT 加深、最后一层特征自然会包含所有信息」。用信息流的观点反驳他。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>深层特征「包含」浅层信息吗？神经网络的层间变换是可逆的还是压缩的？</div>
+<div class="ladder"><strong>关键在于：</strong>ViT 逐层做非线性变换，是为了把像素抽象成语义——这个过程天然是丢弃式的。深层特征也许「理论上可解码出」细节，但那要求网络专门分配容量去保留它。</div>
+<div class="ladder"><strong>第一步这样走：</strong>想一个具体例子：图角落有个 6 号小字体页码。ViT 深层要表达「这是第 47 页」，就必须在高层向量里给这个小数字留通道；而训练目标（对齐语义）并不强迫它保留所有这类细节。</div>
+<div class="ladder"><strong>完整答案：</strong>反驳分三层。① 抽象即丢弃：ViT 的训练目标就是把像素压成语义，深层特征对浅层细节是有损压缩；「深层自然包含一切」把「数学上不必然为零」误当成「实际上可取用」。② 就算深层向量里残余了细节信息，语言模型想用它也得学会从高层表示里「反解」出来，这浪费了 LLM 的容量去做本可以免费的解码。③ DeepStack 的成本极低——只是把已有的中间层特征多接几条线——换来的是细节信息的「直接可达」。实证上 Qwen3-VL 论文正是用它提升细粒度视觉理解，Qwen3.5 的细粒度强项（第 5 章表格）与之吻合。一句话：信息「存在」和信息「可被低成本取用」是两回事。</div>
+<div class="variant"><strong>变式：</strong>DeepStack 让 LLM 的中间层直接接收视觉特征。这对「视觉 token 压缩率」的设计意味着什么——有了 DeepStack，merger 是不是可以放心压得更狠？还是会引入新问题？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 2.2：一张 896×896 的图，patch 大小 16×16，merger 做 2×2 合并。(a) 进入语言模型的视觉 token 有多少个？(b) 若语言模型上下文为 256K，纯放这种图大约能放几张（忽略文本和系统开销）？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>先算 patch 网格，再算合并后的网格。</div>
+<div class="ladder"><strong>关键在于：</strong>2×2 合并是「每 2×2 个 patch 变 1 个 token」，不是 token 数减半。</div>
+<div class="ladder"><strong>第一步这样走：</strong>896/16 = 56，所以 patch 网格 56×56 = 3136。合并后 28×28 = ?</div>
+<div class="ladder"><strong>完整答案：</strong>(a) 28×28 = 784 个视觉 token。(b) 262,144 ÷ 784 ≈ 334 张。两个提醒：这是「忽略一切开销」的理论上限；且实际系统会按图像内容动态调整分辨率（Qwen 系列从 Qwen2-VL 起就是 naive dynamic resolution），每张图的 token 数并不固定。这个练习的目的是建立量级直觉：上下文长度对图片是「几百张」量级，对视频是「几分钟」量级（回忆自测题 0.1）。</div>
+<div class="variant"><strong>变式：</strong>如果 merger 改成 3×3 合并，token 数变为多少（取整）？压缩率从 4× 提到 9×，你觉得哪类任务会最先受伤？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 2.3：有人提议「既然 DeepStack 能补细节，merger 干脆从 2×2 压到 4×4（1/16），更省 token」。分析这个提议的收益与风险。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>压缩和注入分别作用在信息链的哪一环？谁先谁后？</div>
+<div class="ladder"><strong>关键在于：</strong>信息瓶颈的顺序——压缩发生在注入之前。被压缩丢掉的信息，后面的任何机制都补不回来；DeepStack 注入的 token 自己也要先过压缩这一关。</div>
+<div class="ladder"><strong>第一步这样走：</strong>算一下 4×4 合并后单个 token 对应原图多大的区域（patch 16×16 → 合并后 64×64 像素），再想这个区域里还能不能装下「6 号小字页码」。</div>
+<div class="ladder"><strong>完整答案：</strong>收益明确：token 预算再降 4 倍，长视频与多图场景的上下文压力大幅缓解。风险有三层。① DeepStack 不免疫压缩：它保证「ViT 不同层的特征能到达 LLM 不同深度」，但这些特征本身已按更高压缩率切分——注入通道还在，通道里流的细节变少了，不是免费午餐。② 物理上限：单 token 覆盖 64×64 像素后，小字、细线、密集表格在 ViT 输入侧就接近不可分辨，这先于任何架构设计。③ 推理难度转移：LLM 要从更粗的 token 里反解细粒度关系，等于把省下的 token 成本换成任务难度。正确姿势：把压缩率当任务相关的旋钮——OCR/文档场景保守少压，粗粒度监控可以激进多压。架构给的是「可调范围」，不是「越狠越好」。</div>
+<div class="variant"><strong>变式：</strong>设计一个快速实验：用第 5 章的哪个 benchmark 最能测出「压到 1/16 是否伤到了细粒度能力」？为什么是它而不是 MMMU？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>三段式：ViT 把像素编成视觉特征，merger 压缩 4× 并对齐到 LLM 维度，语言模型把视觉 token 当普通 token 处理。DeepStack 把 ViT 多层级特征分层注入 LLM 的多个中间层，用很低的结构成本保住了细粒度视觉信息——它和 Qwen3.5 在 OCR/数数/定位类任务上的强势直接相关。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>视觉 token 进了序列之后，模型怎么知道某个 token「在图的第几行第几列」「在视频的第几秒」？这是第 3 章 MRoPE 要回答的问题。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 3 章 ==================== -->
+<h2 id="ch3"><span class="chnum">第 3 章</span>MRoPE 与时空建模</h2>
+<p class="chapter-intro">注意力机制本身是「无序」的——它不知道 token 的先后，更不知道视觉 token 在图里的行列、在视频里的秒数。位置编码负责把这些信息补回去。这一章讲 Qwen VL 线的第二个关键创新：交错 MRoPE，以及建立在它之上的文本-时间戳对齐。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>解释为什么文本的一维位置编码不足以描述图片和视频</li>
+<li>说出 MRoPE 的三个维度（t / h / w）各自编码什么</li>
+<li>解释「交错」布局相对「分块」布局的动机</li>
+<li>说明文本-时间戳对齐如何实现「第 30 秒发生了什么」这种秒级定位</li>
+</ul>
+</div>
+
+<h3 id="ch3-1">3.1 一维位置编码为什么不够</h3>
+<p>文本是一维的：token 排成一队，每个位置就是一个序号（第 1 个、第 2 个……）。RoPE（旋转位置编码）给每个位置一个「旋转角度」，让注意力打分天然感知两个 token 的距离。对纯文本，这够了。</p>
+<p>图片进来了之后问题来了：一个视觉 token 的位置本质是<strong>二维</strong>的（第几行、第几列）。硬把图片按行扫成一队，原来上下相邻的两个 patch 在序列里隔了一整行那么远——位置编码会告诉模型「它们离得很远」，这是错误的几何。视频更糟：还要加一维「第几帧」。</p>
+<p><strong>MRoPE</strong>（Multidirectional RoPE，多维旋转位置编码）的回答：给每个视觉 token 一个<strong>三元组位置 (t, h, w)</strong>——时间（帧序）、高度（行）、宽度（列）。文本 token 则三个维度取相同的值，退化成普通的一维位置——于是文本和视觉可以在同一套机制里共处。</p>
+
+<figure>
+<svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <!-- 视频帧序列 -->
+  <g font-size="11" fill="#6d6b78">
+    <rect x="40" y="40" width="150" height="100" rx="6" fill="#f0eefe" stroke="#615ced" stroke-width="1.5"/>
+    <rect x="205" y="40" width="150" height="100" rx="6" fill="#f0eefe" stroke="#615ced" stroke-width="1.5"/>
+    <rect x="370" y="40" width="150" height="100" rx="6" fill="#f0eefe" stroke="#615ced" stroke-width="1.5"/>
+    <text x="115" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#4a44c8">t = 第 0 秒</text>
+    <text x="280" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#4a44c8">t = 第 1 秒</text>
+    <text x="445" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#4a44c8">t = 第 2 秒</text>
+    <!-- 帧内网格 -->
+    <g stroke="#c9c4f2" stroke-width="1">
+      <line x1="90" y1="40" x2="90" y2="140"/><line x1="140" y1="40" x2="140" y2="140"/>
+      <line x1="40" y1="73" x2="190" y2="73"/><line x1="40" y1="106" x2="190" y2="106"/>
+      <line x1="255" y1="40" x2="255" y2="140"/><line x1="305" y1="40" x2="305" y2="140"/>
+      <line x1="205" y1="73" x2="355" y2="73"/><line x1="205" y1="106" x2="355" y2="106"/>
+      <line x1="420" y1="40" x2="420" y2="140"/><line x1="470" y1="40" x2="470" y2="140"/>
+      <line x1="370" y1="73" x2="520" y2="73"/><line x1="370" y1="106" x2="520" y2="106"/>
+    </g>
+    <rect x="90" y="73" width="50" height="33" fill="#615ced" opacity="0.85"/>
+    <rect x="255" y="73" width="50" height="33" fill="#615ced" opacity="0.55"/>
+    <rect x="420" y="73" width="50" height="33" fill="#615ced" opacity="0.3"/>
+    <text x="115" y="94" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">(0, 1, 1)</text>
+    <text x="280" y="94" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">(1, 1, 1)</text>
+    <text x="445" y="94" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">(2, 1, 1)</text>
+    <text x="115" y="160" text-anchor="middle">同一个空间位置 (h=1, w=1)，随 t 推进</text>
+  </g>
+  <!-- 三维坐标说明 -->
+  <g font-size="12">
+    <rect x="560" y="40" width="140" height="120" rx="8" fill="#fff" stroke="#615ced"/>
+    <text x="630" y="62" text-anchor="middle" font-weight="800" fill="#4a44c8">位置三元组</text>
+    <text x="572" y="86" fill="#25232e">t：第几帧（时间）</text>
+    <text x="572" y="108" fill="#25232e">h：第几行（高度）</text>
+    <text x="572" y="130" fill="#25232e">w：第几列（宽度）</text>
+    <text x="572" y="152" fill="#6d6b78" font-size="10.5">文本 token：t=h=w，退化为 1D</text>
+  </g>
+  <text x="360" y="215" text-anchor="middle" font-size="12.5" fill="#25232e">每个视觉 token 的位置 = (t, h, w) 三元组；三个维度的旋转角交错分布到特征维度上</text>
+  <text x="360" y="238" text-anchor="middle" font-size="11" fill="#6d6b78">示意图：网格只画 3×3，实际帧为几十×几十的 patch 网格</text>
+</svg>
+<figcaption>图 3-1：MRoPE 三维位置示意。视频帧序列中，同一空间位置的 patch 拥有相同 (h, w) 但不同的 t；文本 token 三个维度取同值，等价于普通一维 RoPE。</figcaption>
+</figure>
+
+<h3 id="ch3-2">3.2 三维 MRoPE 怎么工作：为什么是「交错」</h3>
+<p>实现上，RoPE 的旋转作用在特征向量的不同「频率组」上。多维版本要回答一个设计问题：<strong>特征维度怎么在 t / h / w 三个轴之间分配？</strong></p>
+<ul>
+<li><strong>分块式</strong>（早期 M-RoPE）：把特征维度切成三段，前 1/3 只管 t、中间 1/3 只管 h、最后 1/3 只管 w。简单直接，但高频/低频的分配被割裂：每个轴只拿到一部分频率资源。</li>
+<li><strong>交错式</strong>（Qwen3-VL 的 Interleaved MRoPE）：把三个轴的位置编码<strong>交错</strong>分布到特征维度上——这一维归 t、下一维归 h、再下一维归 w，循环排列。这样每个轴都能均匀拿到从高频到低频的全频段资源。</li>
+</ul>
+<p>为什么要全频段？直觉是：高频分量编码近处的精细距离，低频分量编码远处的粗略距离。如果某个轴（比如时间轴 t）只分到窄频段，它在「区分相隔很远的两帧」或「区分相邻两帧」上就会变钝。视频理解恰恰两个都要：既要知道「这两件事隔了十分钟」，也要知道「这两个动作是连续两帧」。</p>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>分块式像给三个部门分办公楼层：t 部门独占 1–10 楼、h 部门 11–20 楼、w 部门 21–30 楼——边界清楚，但有的部门永远拿不到采光好的楼层。交错式像工位按 t-h-w-t-h-w 循环排位：每个部门的人都均匀散布在所有楼层和所有朝向，谁也不吃亏。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>比方里的「楼层好坏」是舒适度问题，而 RoPE 频率分配是表达能力问题——不是「吃亏」，而是数学上某些距离会变得不可区分。另外真实特征维度有成百上千个，是三轴「细粒度交织」，远不是 30 层楼三个部门这么粗。</div>
+</div>
+
+<p class="oneline"><strong>一句话记住：</strong>MRoPE = 给每个 token 一个 (t, h, w) 三维坐标；交错布局让三个轴平分全部频率资源，远近都能分辨。</p>
+
+<h4>3.2.1 补充：从 RoPE 到 MRoPE 的数学直觉</h4>
+<p>位置编码要解决的原始问题是：注意力打分只看内容（q·k 点积），不看顺序。RoPE（旋转位置编码）的思路优雅得近乎偷懒——<strong>不给向量加位置信息，而是按位置把它「转」一个角度</strong>。</p>
+<p>把每个 token 的 q、k 向量看成一组二维平面上的指针（每两个特征维度组成一个平面）。位置为 n 的 token，它的指针在第 i 个平面上被旋转角度 θ = n × f<sub>i</sub>，其中 f<sub>i</sub> 是这个平面的固定频率。妙处在于：两个 token 做注意力打分时，旋转的作用相互抵消一部分，<strong>结果只取决于它们的位置之差（n − m），而不取决于各自的绝对位置</strong>——这正是我们想要的「相对距离感知」。用复数写就是一行：乘上 e<sup>iθ</sup> 是旋转，e<sup>iθ<sub>q</sub></sup> · e<sup>−iθ<sub>k</sub></sup> = e<sup>i(θ<sub>q</sub>−θ<sub>k</sub>)</sup>，绝对位置消掉了。</p>
+<div class="table-wrap">
+<table>
+<caption>不同频率的维度分工（直觉版）</caption>
+<thead><tr><th>频率</th><th>转多快</th><th>擅长区分</th><th>类比</th></tr></thead>
+<tbody>
+<tr><td>高频维度（f 大）</td><td>位置差 1 就转很大角度</td><td>相邻位置（近处的精细距离）</td><td>钟表的秒针</td></tr>
+<tr><td>低频维度（f 小）</td><td>位置差很多才转一圈</td><td>远距离位置（粗略但量程大）</td><td>钟表的时针</td></tr>
+</tbody>
+</table>
+</div>
+<p>一组高、低频搭配，就像一套完整的钟表：秒针分针时针合起来，你才能读出任意时刻。这就是 3.2 节「交错布局让每个轴平分全频段」的数学背景——<strong>频率资源就是量程资源</strong>，哪个轴缺了高频或低频，哪个轴上就会出现「读不出的时刻」。</p>
+<p>从 RoPE 到 MRoPE 的推广现在只剩一步：文本的位置是一个数 n，旋转角是 n × f；视觉的位置是三个数 (t, h, w)，那就让不同维度组分别执行 t × f、h × f、w × f 三种旋转——一个 token 的位置向量从「一个角度」变成「一组角度的组合」，三维相对距离 (Δt, Δh, Δw) 同样自然地进入注意力打分。</p>
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>RoPE 像给每个人发一个指南针，指针转过的角度 = 你站的位置。两个人见面，不用报坐标，只要对一下各自指南针的差，就知道彼此隔多远。MRoPE 则是发三个指南针：一个随时间转、一个随行号转、一个随列号转——三个人（t/h/w 三轴）的相对位置同时对得出来。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>指南针只有一个频率（转一圈就是一圈），而 RoPE 是一整套不同频率的「指南针组」，每个频率负责一种量程；而且真实旋转发生在高维空间的两两平面上，不是物理空间的方向。另外「对一下差就知道距离」淡化了代价：相对位置信息是在每次点积时现算的，模型并没有一张现成的「距离表」可查。</div>
+</div>
+
+<div class="viz" id="viz3">
+<div class="viz-title">▶ 交互演示 3-A：MRoPE 的三维位置——拖滑块，看 (t, h, w) 坐标和旋转角怎么变</div>
+<div class="viz-row"><label>t（第几帧）</label><input type="range" class="viz-slider" id="viz3-t" min="0" max="7" value="2"><span class="viz-num" id="viz3-tv">2</span></div>
+<div class="viz-row"><label>h（第几行）</label><input type="range" class="viz-slider" id="viz3-h" min="0" max="7" value="3"><span class="viz-num" id="viz3-hv">3</span></div>
+<div class="viz-row"><label>w（第几列）</label><input type="range" class="viz-slider" id="viz3-w" min="0" max="7" value="5"><span class="viz-num" id="viz3-wv">5</span></div>
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" font-family="inherit" role="img" aria-label="MRoPE 三维位置交互：帧序列、帧内网格与旋转角">
+  <!-- 左：t 轴帧序列（伪 3D 斜堆叠） -->
+  <text x="105" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#4a44c8">t 轴：8 帧视频</text>
+  <g stroke="#615ced" fill="#f0eefe">
+    <rect id="viz3-f0" x="40" y="180" width="64" height="44"/>
+    <rect id="viz3-f1" x="60" y="168" width="64" height="44"/>
+    <rect id="viz3-f2" x="80" y="156" width="64" height="44"/>
+    <rect id="viz3-f3" x="100" y="144" width="64" height="44"/>
+    <rect id="viz3-f4" x="120" y="132" width="64" height="44"/>
+    <rect id="viz3-f5" x="140" y="120" width="64" height="44"/>
+    <rect id="viz3-f6" x="160" y="108" width="64" height="44"/>
+    <rect id="viz3-f7" x="180" y="96" width="64" height="44"/>
+  </g>
+  <text x="130" y="250" text-anchor="middle" font-size="10.5" fill="#6d6b78">选中的帧高亮为紫色</text>
+  <!-- 中：帧内 h×w 网格 -->
+  <text x="340" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#4a44c8">帧内：h（行）× w（列）</text>
+  <g stroke="#c9c4f2">
+    <line x1="260" y1="40" x2="420" y2="40"/><line x1="260" y1="60" x2="420" y2="60"/><line x1="260" y1="80" x2="420" y2="80"/><line x1="260" y1="100" x2="420" y2="100"/><line x1="260" y1="120" x2="420" y2="120"/><line x1="260" y1="140" x2="420" y2="140"/><line x1="260" y1="160" x2="420" y2="160"/><line x1="260" y1="180" x2="420" y2="180"/><line x1="260" y1="200" x2="420" y2="200"/>
+    <line x1="260" y1="40" x2="260" y2="200"/><line x1="280" y1="40" x2="280" y2="200"/><line x1="300" y1="40" x2="300" y2="200"/><line x1="320" y1="40" x2="320" y2="200"/><line x1="340" y1="40" x2="340" y2="200"/><line x1="360" y1="40" x2="360" y2="200"/><line x1="380" y1="40" x2="380" y2="200"/><line x1="400" y1="40" x2="400" y2="200"/><line x1="420" y1="40" x2="420" y2="200"/>
+  </g>
+  <rect id="viz3-cell" x="360" y="100" width="20" height="20" fill="#615ced" opacity=".85" style="transition:x .15s,y .15s"/>
+  <text x="340" y="226" text-anchor="middle" font-size="10.5" fill="#6d6b78">紫色格 = 当前 (h, w)</text>
+  <!-- 右：读数与旋转角 -->
+  <text id="viz3-triple" x="455" y="48" font-size="14" font-weight="800" fill="#25232e">(t, h, w) = (2, 3, 5)</text>
+  <g font-size="10.5" fill="#6d6b78">
+    <text x="455" y="82">t 轴·高频维</text><text x="455" y="108">t 轴·低频维</text>
+    <text x="455" y="142">h 轴·高频维</text><text x="455" y="168">h 轴·低频维</text>
+    <text x="455" y="202">w 轴·高频维</text><text x="455" y="228">w 轴·低频维</text>
+  </g>
+  <g>
+    <rect x="540" y="72" width="150" height="12" rx="3" fill="#f2f0e9"/><rect id="viz3-b0" x="540" y="72" width="50" height="12" rx="3" fill="#615ced" style="transition:width .15s"/><text id="viz3-d0" x="696" y="82" font-size="10" fill="#4a44c8">115°</text>
+    <rect x="540" y="98" width="150" height="12" rx="3" fill="#f2f0e9"/><rect id="viz3-b1" x="540" y="98" width="50" height="12" rx="3" fill="#b7a8ff" style="transition:width .15s"/><text id="viz3-d1" x="696" y="108" font-size="10" fill="#4a44c8">11°</text>
+    <rect x="540" y="132" width="150" height="12" rx="3" fill="#f2f0e9"/><rect id="viz3-b2" x="540" y="132" width="50" height="12" rx="3" fill="#615ced" style="transition:width .15s"/><text id="viz3-d2" x="696" y="142" font-size="10" fill="#4a44c8">172°</text>
+    <rect x="540" y="158" width="150" height="12" rx="3" fill="#f2f0e9"/><rect id="viz3-b3" x="540" y="158" width="50" height="12" rx="3" fill="#b7a8ff" style="transition:width .15s"/><text id="viz3-d3" x="696" y="168" font-size="10" fill="#4a44c8">17°</text>
+    <rect x="540" y="192" width="150" height="12" rx="3" fill="#f2f0e9"/><rect id="viz3-b4" x="540" y="192" width="50" height="12" rx="3" fill="#615ced" style="transition:width .15s"/><text id="viz3-d4" x="696" y="202" font-size="10" fill="#4a44c8">286°</text>
+    <rect x="540" y="218" width="150" height="12" rx="3" fill="#f2f0e9"/><rect id="viz3-b5" x="540" y="218" width="50" height="12" rx="3" fill="#b7a8ff" style="transition:width .15s"/><text id="viz3-d5" x="696" y="228" font-size="10" fill="#4a44c8">29°</text>
+  </g>
+  <!-- 底：文本 1D vs 视觉 3D 对照 -->
+  <line x1="40" y1="282" x2="250" y2="282" stroke="#b7a8ff" stroke-width="2"/>
+  <g fill="#615ced"><circle cx="60" cy="282" r="4"/><circle cx="105" cy="282" r="4"/><circle cx="150" cy="282" r="4"/><circle cx="195" cy="282" r="4"/><circle cx="240" cy="282" r="4"/></g>
+  <text x="145" y="270" text-anchor="middle" font-size="10.5" fill="#6d6b78">文本 token：位置是一条线（t=h=w=n）</text>
+  <g stroke="#615ced" fill="none">
+    <rect x="330" y="262" width="28" height="28"/>
+    <rect x="342" y="254" width="28" height="28"/>
+    <line x1="330" y1="262" x2="342" y2="254"/><line x1="358" y1="262" x2="370" y2="254"/><line x1="330" y1="290" x2="342" y2="282"/><line x1="358" y1="290" x2="370" y2="282"/>
+  </g>
+  <text x="350" y="248" text-anchor="middle" font-size="10.5" fill="#6d6b78">视觉 token：位置是一个立方体 (t,h,w)</text>
+  <text x="540" y="282" text-anchor="middle" font-size="10.5" fill="#6d6b78">交错布局：t/h/w 的频率段在特征维度上交替排列</text>
+</svg>
+<noscript><p style="font-size:13px;color:var(--muted)">（未启用 JS：默认显示 (t,h,w)=(2,3,5) 时的静态状态。）</p></noscript>
+<div class="viz-read"><strong>怎么读这张图：</strong>三个滑块分别对应视频理解的三个「坐标轴」。拖 t：左边帧堆里高亮的帧在移动，网格不动——因为你换的是「哪一秒」，不是「画面里的哪个点」。拖 h/w：帧堆不动，网格里的紫格在移动。右侧的彩色条是 RoPE 旋转角（θ = 位置 × 频率，折回 360°）：高频维转得快、负责区分「相邻」位置，低频维转得慢、负责区分「相隔很远」的位置。底部对照是关键一句：<strong>文本位置是一条线，视觉位置是一个立方体</strong>——而三个轴的高/低频段交错排列在特征维度上（「交错 MRoPE」的得名），保证每个轴都既有高频也有低频可用。角度数值为演示用简化频率，非官方超参。</div>
+</div>
+
+<h3 id="ch3-3">3.3 文本-时间戳对齐：「第 30 秒」是怎么实现的</h3>
+<p>有了时间轴位置编码，还差一步才能回答「视频第 30 秒发生了什么」：模型得知道<strong>人类说的时间</strong>（「30 秒」这串文字）和<strong>位置编码里的时间轴</strong>之间的换算关系。</p>
+<p>Qwen2.5-VL 时代的做法是 T-RoPE：直接把帧的物理时间映射到位置 id。Qwen3-VL 的<strong>文本-时间戳对齐</strong>更进一步（官方表述为「超越静态 T-RoPE」）：在训练数据里，把视频的帧与显式的时间戳文本（如「30.0 秒」「0:30」）配对监督，让模型学会文字里的时间数字 ↔ 位置编码 t 轴坐标之间的双向换算。于是它可以：</p>
+<ul>
+<li><strong>文字 → 时间定位</strong>：问「第 30 秒」，它能 attend 到 t 轴对应区间的帧；</li>
+<li><strong>时间定位 → 文字</strong>：问「猫什么时候跳上桌」，它能输出「约 12.5 秒」这种秒级时间戳答案。</li>
+</ul>
+<div class="box box-why">
+<div class="box-title">为什么这很重要</div>
+<p>视频理解的及格线不是「看懂」，而是「看懂且知道什么时候发生的」。监控告警、体育集锦剪辑、教学视频检索，商业价值全在时间定位上。第 5 章你会看到 Qwen3.5 在长视频 benchmark（MLVU 86.7，表中最高）上的表现——秒级时间定位能力正是长视频任务的核心考察点。没有这个对齐，「256K 上下文装得下两小时视频」也只是一句空话：装得下 ≠ 找得到。</p>
+</div>
+
+<details class="quiz">
+<summary>自测题 3.1：假设把视频的帧顺序随机打乱再喂给模型，但保留每一帧原本的 MRoPE 位置编码。模型的视频理解会崩吗？为什么？这个思想实验说明了注意力和位置编码各自负责什么？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>注意力打分看的是什么？「序列里的先后顺序」和「位置编码给的坐标」，哪个才真正影响计算？</div>
+<div class="ladder"><strong>关键在于：</strong>Transformer 的注意力对序列顺序是置换不敏感的——它只通过位置编码感知位置。</div>
+<div class="ladder"><strong>第一步这样走：</strong>回忆注意力的打分公式：两个 token 的匹配度取决于它们的内容和相对位置（由 RoPE 注入），不取决于它们在内存里排第几。</div>
+<div class="ladder"><strong>完整答案：</strong>基本不会崩（在不考虑因果掩码干扰的编码场景下）。因为打乱的是存储顺序，而模型感知「时间」的唯一通道是位置编码——每个 token 带着自己原来的 (t, h, w)，注意力照旧能算出「这两帧相邻」「那两帧隔了 30 秒」。这个实验说明：序列顺序对 Transformer 只是容器，位置编码才是位置信息的真实载体。附带推论一：这也是为什么 MRoPE 的设计质量直接决定时空建模的上限；附带推论二：文本那边不一样——语言建模有因果掩码（只能看左边），打乱文本顺序会破坏掩码语义，所以文本不能这么玩。</div>
+<div class="variant"><strong>变式：</strong>反过来：帧顺序不动，但把 t 轴位置编码随机重排（h、w 保持正确）。模型会看到什么样的「世界」？它还可能答对「接下来发生了什么」这类题吗？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 3.2：一个任务要求模型「统计视频中球员每次得分的具体秒数」。请拆解这个任务依次用到了本章和上一章的哪些机制（至少四个环节），并指出最可能失败的环节。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>从像素到「12.5 秒、47.0 秒、83.5 秒」这串输出，中间每一步是谁在干活？</div>
+<div class="ladder"><strong>关键在于：</strong>「每次得分」= 事件检测（视觉语义）；「具体秒数」= 时间定位（位置编码 ↔ 文本换算）；「统计」= 不要漏（长序列里多实例召回）。</div>
+<div class="ladder"><strong>第一步这样走：</strong>沿数据流走一遍：帧 → ViT → merger → 混合序列（带 (t,h,w) 编码）→ LLM 推理 → 输出时间戳文本。</div>
+<div class="ladder"><strong>完整答案：</strong>环节拆解：① ViT 提取每帧视觉特征（「这是投篮动作」靠它）；② DeepStack 注入保细节（球进筐的瞬间往往是小区域变化）；③ MRoPE 的 t 轴给每帧打上时间坐标；④ 文本-时间戳对齐让模型把「得分时刻」翻译回秒数文本输出；⑤ 长上下文承载整场比赛（256K~1M token）。最可能失败的环节：④ 和 ⑤ 的交界处——视频一长，抽帧就得变稀（token 预算有限），两秒一帧的采样下「进球瞬间」可能恰好落在两帧之间，时间定位精度被采样率锁死；其次是小目标的快速事件（环节①②），球在小分辨率下只有几个像素。这道题想让你建立的感觉是：视频任务的错误常常不是「模型笨」，而是「采样率 × token 预算」这道物理约束先动了手。</div>
+<div class="variant"><strong>变式：</strong>如果业务允许你预先知道「得分只会发生在进攻回合」，你能用这条先验把同样 token 预算下的时间定位精度提高吗？怎么做？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 3.3：「文本-时间戳对齐」为什么必须在训练阶段完成，而不能靠推理时的 prompt 技巧（比如在 prompt 里写明「每秒 2 帧」）实现？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>prompt 告诉模型的是「规则」，位置编码提供的是「坐标」。知道换算规则，就等于能在坐标系里精确定位吗？</div>
+<div class="ladder"><strong>关键在于：</strong>模型对 t 轴的感知是隐式的（注意力里的相对旋转角），不是一张写着秒数的坐标表。把「第 30 秒」这串文字和正确的 t 区间挂上钩，是需要学出来的连接。</div>
+<div class="ladder"><strong>第一步这样走：</strong>类比：告诉一个从没用过地图的人「比例尺 1:50000」，他懂规则，但手没有在地图上量过的经验，第一次量还是会偏。规则和校准是两回事。</div>
+<div class="ladder"><strong>完整答案：</strong>三个层面。① 表示层面：模型内部没有「t 轴第 60 格」这种显式坐标，只有相对位置编码带来的注意力倾向；让「30 秒」的文字表示与 t≈30s 的帧之间建立稳定注意力通道，只能靠配对数据上的梯度下降学出来。② 精度层面：秒级定位接近回归任务，prompt 规则给的是先验、不是校准——没有任何信号在推理时告诉它「你偏了 3 秒」。③ 输出层面：反向任务（回答「事件发生在 12.5 秒」）更依赖训练——输出格式、数值换算都是学出来的行为。prompt 技巧能做的是「唤起」已训练好的对齐（比如提示它注意时间信息），不能无中生有。这又是「原生多模态」红利的一个例子：对齐做在训练里，推理时才免费。</div>
+<div class="variant"><strong>变式：</strong>如果训练数据里的时间戳监督全是整秒（「12 秒」「13 秒」），推理时问「12.5 秒」会发生什么？模型的回答粒度被什么锁死了？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>文本的一维位置装不下图片的二维结构和视频的三维结构，MRoPE 给每个 token 发一个 (t, h, w) 三元组坐标，文本退化为 t=h=w。交错布局让三个轴平分 RoPE 的频率资源，远近皆可分辨。文本-时间戳对齐在训练端把「30 秒」这串文字和 t 轴坐标绑定，模型因此能双向换算自然语言时间与视频位置——秒级定位是长视频理解从「装得下」走向「找得到」的关键一步。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>视觉侧讲完了。第 4 章进入语言基座：Gated DeltaNet、混合注意力、17B 激活的 MoE、MTP——以及那个抓眼球的「256K 下 19× 吞吐」到底怎么算出来的。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 4 章 ==================== -->
+<h2 id="ch4"><span class="chnum">第 4 章</span>语言基座的效率革命</h2>
+<p class="chapter-intro">Qwen3.5 相对 Qwen3-VL 最大的手术在语言基座：换成 Qwen3-Next 架构——Gated DeltaNet（线性注意力）与 Gated Attention（全注意力）混合、更高稀疏度的 MoE、多 token 预测（MTP）。官方给的效率数字：32K 上下文下解码吞吐是 Qwen3-Max 的 8.6 倍，256K 下是 19.0 倍，且性能相当。这一章讲清楚这三个零件，以及这组数字的来源。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>解释线性注意力「固定大小状态、不存 KV 缓存」的含义和代价</li>
+<li>说明 Gated DeltaNet 的「门」和「delta 规则」分别在解决什么</li>
+<li>论证为什么混合架构（而非全线性）是正确选择</li>
+<li>拆解 8.6× / 19× 吞吐数字的三个来源，并解释为什么倍数随上下文变长而变大</li>
+</ul>
+</div>
+
+<h3 id="ch4-1">4.1 Gated DeltaNet：把记忆做成固定大小的状态</h3>
+<p>回忆第 0 章：全注意力要为每个 token 存一份 K、V（KV 缓存），随长度线性膨胀。线性注意力的替代方案是维护一个固定大小的状态矩阵 S，每读一个 token 就更新一次：</p>
+<div class="formula">S<sub>t</sub> = S<sub>t−1</sub> · （遗忘/衰减项） +  k<sub>t</sub> v<sub>t</sub><sup>⊤</sup>（写入新信息）</div>
+<p>查询时拿当前的 q 去乘状态 S，取回「历史信息的压缩汇总」。不管序列多长，S 的大小不变——这就是「不存 KV 缓存」的含义，也是成本从平方/线性膨胀降为常数占用的根源。</p>
+<p><strong>DeltaNet 的「delta 规则」</strong>解决的是「写入冲突」：朴素线性注意力直接往状态里加新东西，旧信息被越搅越浑。delta 规则先「擦掉」状态里与当前 key 冲突的旧值，再写入新值——像先在白板对应位置擦干净再写，而不是层层叠涂。<strong>Gated（门控）</strong>则给衰减加了可学习的开关：模型自己决定每一步遗忘多少、保留多少，而不是用固定衰减率一刀切。</p>
+
+<figure>
+<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <!-- 全注意力侧 -->
+  <text x="180" y="26" text-anchor="middle" font-size="14" font-weight="800" fill="#b3352b">全注意力：KV 缓存随长度膨胀</text>
+  <g>
+    <rect x="60" y="45" width="26" height="120" fill="#fdeeec" stroke="#b3352b"/>
+    <rect x="96" y="45" width="26" height="120" fill="#fdeeec" stroke="#b3352b"/>
+    <rect x="132" y="45" width="26" height="120" fill="#fdeeec" stroke="#b3352b"/>
+    <rect x="168" y="45" width="26" height="120" fill="#fdeeec" stroke="#b3352b" opacity="0.75"/>
+    <rect x="204" y="45" width="26" height="120" fill="#fdeeec" stroke="#b3352b" opacity="0.55"/>
+    <rect x="240" y="45" width="26" height="120" fill="#fdeeec" stroke="#b3352b" opacity="0.4"/>
+    <rect x="276" y="45" width="26" height="120" fill="#fdeeec" stroke="#b3352b" opacity="0.25"/>
+    <text x="180" y="185" text-anchor="middle" font-size="11" fill="#6d6b78">每个 token 一份 K、V：1 个、2 个、…、n 个</text>
+    <text x="180" y="205" text-anchor="middle" font-size="11.5" fill="#b3352b" font-weight="700">显存 ∝ n，256K 上下文可达数十 GB</text>
+  </g>
+  <!-- 线性注意力侧 -->
+  <text x="540" y="26" text-anchor="middle" font-size="14" font-weight="800" fill="#2e7d4f">Gated DeltaNet：固定大小状态</text>
+  <rect x="470" y="45" width="140" height="120" rx="6" fill="#edf7f1" stroke="#2e7d4f" stroke-width="2"/>
+  <g stroke="#2e7d4f" stroke-width="0.8" opacity="0.5">
+    <line x1="505" y1="45" x2="505" y2="165"/><line x1="540" y1="45" x2="540" y2="165"/><line x1="575" y1="45" x2="575" y2="165"/>
+    <line x1="470" y1="85" x2="610" y2="85"/><line x1="470" y1="125" x2="610" y2="125"/>
+  </g>
+  <text x="540" y="110" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d4f">状态 S</text>
+  <text x="540" y="185" text-anchor="middle" font-size="11" fill="#6d6b78">读 1 个 token 和读 100 万个 token，S 一样大</text>
+  <text x="540" y="205" text-anchor="middle" font-size="11.5" fill="#2e7d4f" font-weight="700">显存 = 常数，与 n 无关</text>
+  <!-- 更新公式 -->
+  <text x="360" y="238" text-anchor="middle" font-size="12" fill="#25232e">每步更新：S ← S · 门控衰减 ＋ 擦除冲突旧值 ＋ 写入新值（k v⊤）</text>
+</svg>
+<figcaption>图 4-1：两种「记忆」的形态对比。左：全注意力逐 token 存 KV，永不缩小；右：线性注意力把所有历史压缩进一个固定大小的状态矩阵。</figcaption>
+</figure>
+
+<div class="viz" id="viz6">
+<div class="viz-title">▶ 交互演示 4-B：上下文越长，KV 缓存越灾难——拖滑块看两种「记忆」的显存曲线</div>
+<div class="viz-row"><label>上下文长度</label><input type="range" class="viz-slider" id="viz6-slider" min="0" max="10" value="8" step="1"><span class="viz-num" id="viz6-len">256K</span></div>
+<div class="viz-row" style="font-size:14px">
+  <span>全注意力 KV 缓存：<span class="viz-num" id="viz6-kvnum" style="color:#b3352b">62.9 GB</span></span>
+  <span>Gated DeltaNet 状态：<span class="viz-num" id="viz6-dsnum" style="color:#2e7d4f">0.004 GB</span></span>
+  <span id="viz6-warn" class="viz8-fit ok">未撞显存红线</span>
+</div>
+<svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" font-family="inherit" role="img" aria-label="KV 缓存随上下文线性增长撞显存红线，线性注意力状态为水平线">
+  <!-- 坐标系：x 对数轴 1K..1M，y 0..260 GB（1GB=1px） -->
+  <line x1="70" y1="290" x2="690" y2="290" stroke="#999"/>
+  <line x1="70" y1="30" x2="70" y2="290" stroke="#999"/>
+  <g font-size="10.5" fill="#6d6b78">
+    <text x="70" y="308" text-anchor="middle">1K</text>
+    <text x="194" y="308" text-anchor="middle">4K</text>
+    <text x="318" y="308" text-anchor="middle">16K</text>
+    <text x="442" y="308" text-anchor="middle">64K</text>
+    <text x="566" y="308" text-anchor="middle">256K</text>
+    <text x="690" y="308" text-anchor="middle">1M</text>
+    <text x="64" y="294" text-anchor="end">0</text>
+    <text x="64" y="194" text-anchor="end">100</text>
+    <text x="64" y="94" text-anchor="end">200</text>
+    <text x="64" y="36" text-anchor="end">GB</text>
+  </g>
+  <g stroke="#e5e2da"><line x1="70" y1="190" x2="690" y2="190"/><line x1="70" y1="90" x2="690" y2="90"/>
+  <line x1="194" y1="30" x2="194" y2="290"/><line x1="318" y1="30" x2="318" y2="290"/><line x1="442" y1="30" x2="442" y2="290"/><line x1="566" y1="30" x2="566" y2="290"/></g>
+  <!-- 141GB 显存红线 -->
+  <line x1="70" y1="149" x2="690" y2="149" stroke="#b3352b" stroke-width="2" stroke-dasharray="7,5"/>
+  <text x="688" y="143" text-anchor="end" font-size="11" fill="#b3352b" font-weight="700">141 GB：一张顶级显卡的显存上限</text>
+  <!-- 两条曲线由 JS 生成 -->
+  <path id="viz6-kv" fill="none" stroke="#b3352b" stroke-width="3"/>
+  <line id="viz6-ds" x1="70" y1="290" x2="690" y2="290" stroke="#2e7d4f" stroke-width="3"/>
+  <circle id="viz6-mark" r="6" fill="#fff" stroke="#b3352b" stroke-width="3" style="transition:cx .15s,cy .15s"/>
+  <text x="300" y="60" font-size="12" fill="#b3352b" font-weight="700">全注意力 KV 缓存：显存 ∝ 长度</text>
+  <text x="420" y="278" font-size="12" fill="#2e7d4f" font-weight="700">Gated DeltaNet 状态：常数（贴地）</text>
+</svg>
+<div class="viz-read"><strong>怎么读这张图：</strong>横轴是对数刻度的上下文长度（每格翻 4 倍），纵轴是显存 GB（沿用自测题 0.2 的假设：60 层全注意力、每 token 每层 4 KB）。拖滑块：红色曲线一路爬升，在 256K~1M 之间撞上 141 GB 虚线——<strong>单个长请求就能把一张卡的显存吃掉大半，这还没算模型权重</strong>。绿色线贴着地面：Gated DeltaNet 每层只维护固定大小状态，1K 和 1M 占用完全一样。两条线之间的「喇叭口」就是第 4.4 节那个倍数随长度变大（8.6× → 19×）的几何解释。数值为教学估算，真实模型因层数/头数/混合比例不同而异，但「线性增长 vs 常数」的定性结论不变。</div>
+</div>
+
+<h3 id="ch4-2">4.2 混合架构：为什么还要保留全注意力</h3>
+<p>第 0 章的自测题 0.2 已经埋伏了答案：固定状态记不住精确的逐 token 历史。精确检索（「文档第 47 页第三行的数字」「视频第 30 秒那帧」）是全注意力的不可替代项。Qwen3-Next 的方案是<strong>层间混合</strong>：大部分层用 Gated DeltaNet（便宜、常数记忆），按固定比例插入 Gated Attention 层（精确、负责检索），同时 Gated Attention 层的输出门让模型学会控制检索结果的使用强度。</p>
+<p>对多模态场景这个设计尤其合身：视觉 token 数量庞大（长视频动辄几十万），让绝大多数层用线性注意力处理它们，成本才压得住；而「在几十万视觉 token 里精确定位某帧某区域」这种活，留给少数全注意力层干。</p>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>混合架构像一家医院的病历系统：大部分科室用「摘要病历」（线性注意力）——固定一页纸，每次就诊更新，翻起来快；但医院保留了一个「原始影像档案室」（全注意力层），任何科室遇到摘要解决不了的疑难，可以申请调原始片子逐张看。全靠摘要会误诊，全靠档案室会拖死，混合才是工作系统。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>「申请调阅」是人的决策，而混合架构里哪层是线性、哪层是全注意力是硬编码的，模型不能临场决定「这层换成全注意力」。它能调的只是注意力权重和门控。另外 DeltaNet 的状态远比「一页摘要」结构化——它是 key×value 维度的矩阵，查询有精确代数形式，不是自由文本摘要。</div>
+</div>
+
+<h3 id="ch4-3">4.3 MoE 稀疏度与 MTP</h3>
+<p>第 0 章讲过 MoE 原理，这里只补这一代的变化：<strong>更高稀疏度</strong>。397B-A17B 意味着每 token 只用约 4.3% 的参数——同样的每 token 成本下，模型能把知识容量堆到更大。35B-A3B（稀疏度约 11.7）则是这个思路在中小规模的复制：官方宣称它已全面超越 Qwen3-235B-A22B 和 Qwen3-VL-235B-A22B。</p>
+<p><strong>MTP（Multi-Token Prediction，多 token 预测）</strong>是第二个加速器：训练时让模型不仅预测下一个 token，还同时预测后面好几个。两个收益：训练信号更密（每个位置提供多个监督），推理时可以投机式地一次猜多个 token 再批量验证——生成速度进一步提升。MTP 不是 Qwen 首创，但与混合注意力、MoE 叠加后，三者共同构成「每 token 更便宜」的完整方案。</p>
+
+<div class="viz" id="viz5">
+<div class="viz-title">▶ 交互演示 4-A：MoE 路由器——token 进来，哪几位专家被点名？</div>
+<div class="viz-row">当前 token：<span class="viz-num" id="viz5-tok">（尚未送入）</span>　→　路由器打分　→　<span id="viz5-pick" style="font-weight:700;color:var(--green)">Top-2 专家点亮</span></div>
+<div class="viz5-experts" id="viz5-experts"></div>
+<div class="viz-controls">
+  <button class="viz-btn" id="viz5-one">送入一个 token</button>
+  <button class="viz-btn ghost" id="viz5-ten">连发 10 个</button>
+  <button class="viz-btn ghost" id="viz5-reset">重置统计</button>
+</div>
+<div style="font-size:13px;color:var(--muted)">各专家累计被选中次数（迷你柱状图）：</div>
+<div class="viz5-bars" id="viz5-bars"></div>
+<div class="viz4-status" id="viz5-status">点「送入一个 token」开始。</div>
+<noscript><p style="font-size:13px;color:var(--muted)">（未启用 JS：本演示模拟 16 位专家的 Top-2 路由；多发几次就会看到少数专家被反复选中——负载不均衡。）</p></noscript>
+<div class="viz-read"><strong>怎么读这张图：</strong>16 个方块是真实模型里几百个专家的缩影（397B-A17B 每层专家数以百计，Top-2 同理是 Top-N 的缩小版）。每送入一个 token，路由器给 16 位专家各打一个分（方块里的数字），得分最高的两位点亮——<strong>只有它们干活，其余 14 位这轮完全休息</strong>，这就是「397B 总参数、17B 激活」的微观现场。重点看下方柱状图：多发几次后柱子会明显参差不齐——热门专家被反复点名，冷门专家几乎闲置。这不是 bug 而是训练动力学（被选中→被训练→更强→更容易被选中）的马太效应，但它会让多卡部署时「有的卡忙死、有的卡闲着」，所以负载均衡是 MoE 论文里的常驻主题。本演示的专家偏好为预设的教学数据。</div>
+</div>
+
+<h3 id="ch4-4">4.4 8.6× / 19× 吞吐数字怎么来的</h3>
+<div class="table-wrap">
+<table>
+<caption>官方效率对比（Qwen3.5 vs Qwen3-Max，性能相当前提下的解码吞吐）</caption>
+<thead><tr><th>上下文长度</th><th class="num">解码吞吐倍数</th><th>倍数变大的原因（本站分析）</th></tr></thead>
+<tbody>
+<tr><td>32K</td><td class="num">8.6×</td><td>主要来自激活参数少（17B vs 稠密大模型全量）+ MTP 投机解码</td></tr>
+<tr class="hl"><td>256K</td><td class="num">19.0×</td><td>上述因素仍在，且 KV 缓存差距开始主导：对方全注意力层缓存随长度膨胀，线性注意力层是常数</td></tr>
+</tbody>
+</table>
+</div>
+<p>注意这个表的读法：<strong>倍数随上下文变长而增大</strong>（8.6 → 19.0），这本身就是混合注意力价值的直接证据。如果差距只来自 MoE 和 MTP，倍数应该大致恒定——因为激活参数比和投机解码收益不随上下文长度变化。多出来的那一截（19.0 / 8.6 ≈ 2.2 倍的额外优势）正是长上下文下「KV 缓存 vs 固定状态」的差距开始咬人的部分（此归因为本站基于架构原理的推断，官方未逐项拆解）。</p>
+
+<div class="box box-misconception">
+<div class="box-title">常见误解</div>
+<p>「激活参数只有 17B，所以一张 24 GB 的消费卡就能跑 Qwen3.5-397B-A17B。」——错。第 0 章的 MoE 类比里强调过：<strong>全部 397B 参数必须常驻显存</strong>（或可随时换入），因为你不知道下一个 token 路由到哪些专家。17B 只决定计算量，不决定显存。397B 参数 BF16 需要约 794 GB 显存（第 8 章详算），单卡无论如何装不下。</p>
+</div>
+
+<details class="quiz">
+<summary>自测题 4.1：官方数据说 32K 下吞吐 8.6×、256K 下 19×。请你写出一个「三因素乘法模型」来定性解释这两个数字，并指出哪个因素随长度变化。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>吞吐 = 单位时间生成的 token 数。每生成一个 token 的成本由哪几件事决定？</div>
+<div class="ladder"><strong>关键在于：</strong>把吞吐优势拆成相互独立的乘法因子：每 token 计算量（激活参数比）、每步有效 token 数（MTP 投机解码）、每 token 记忆访问成本（KV 缓存 vs 固定状态）。</div>
+<div class="ladder"><strong>第一步这样走：</strong>写下 吞吐比 ≈ （计算量比）×（MTP 收益）×（记忆访问比），然后问：三个因子在 32K 和 256K 下各自变不变？</div>
+<div class="ladder"><strong>完整答案：</strong>模型：吞吐比 ≈ A × M × C(n)，其中 A = 激活参数带来的计算量优势（17B vs 对比方，长度无关）；M = MTP 投机解码的一次多 token 收益（长度基本无关）；C(n) = 记忆访问成本比（KV 缓存读取量 ∝ n vs 线性注意力常数），随长度增大而增大。32K 时 C 还小，8.6× ≈ A × M × C(32K)；256K 时 C 膨胀约 2.2 倍，19.0 ≈ 8.6 × 2.2。这个模型的可证伪点：若将来官方公布 1M 上下文的倍数，此模型预言它应显著大于 19×；若反而持平或下降，说明瓶颈已转移（比如被线性层自身的串行状态更新或通信开销接管）。学会「从架构原理推出可证伪的定量预言」，比记住 8.6 和 19 这两个数重要得多。</div>
+<div class="variant"><strong>变式：</strong>如果对比方也换成了混合注意力架构但保持稠密（非 MoE），你预期 256K 下的倍数会落在哪个区间？哪个因子会消失、哪个会保留？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 4.2：Gated DeltaNet 里「门控衰减」和「delta 擦除」听起来都在做「遗忘」。它们的分工有什么不同？各自由什么信号驱动？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>一个是全局性的「随着时间慢慢淡忘」，一个是定向的「把这一条旧记录改掉」。哪个是哪个？</div>
+<div class="ladder"><strong>关键在于：</strong>衰减作用在整个状态上（无差别），delta 擦除作用在与当前 key 相关的特定记忆槽位上（有指向）。</div>
+<div class="ladder"><strong>第一步这样走：</strong>对照公式：S ← S·g（门控衰减，g 是 0~1 的门）发生在写入之前、作用于整个 S；delta 规则是先算「当前 key 在 S 里已存了什么」，把这部分减掉再写入新值。</div>
+<div class="ladder"><strong>完整答案：</strong>门控衰减 = 被动的、均匀的时间性遗忘：每过一步，所有旧信息按门控系数打折。它由学习到的门控信号驱动，回答「多久以前的事还值得留」。delta 擦除 = 主动的、定向的内容性更新：当新信息与状态中某 key 槽位的旧内容冲突时，先把旧值精准减去再写新值。它由当前 token 的 key 驱动，回答「这条具体记录该被哪条新记录替换」。缺了前者，状态被远古信息淤塞；缺了后者，同一槽位的新旧信息互相污染（「他把杯子放在厨房……不，移到客厅了」——模型必须能把「厨房」从「杯子的位置」这个槽位里擦掉）。两者结合才让固定大小的状态具备可用的长期记忆。</div>
+<div class="variant"><strong>变式：</strong>在一个「先听到 A=1，5000 个 token 后听到 A=2，再过 5000 个 token 被问 A 等于几」的测试里，门控衰减太强和太弱分别会导致什么错误？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 4.3：MTP（多 token 预测）为什么既能加速训练又能加速推理？这两个收益的背后机制是同一件事吗？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>训练时被什么限制（每个位置能得到多少监督）？推理时被什么限制（必须串行走多少步）？</div>
+<div class="ladder"><strong>关键在于：</strong>训练的瓶颈是信号密度，推理的瓶颈是串行步数——MTP 恰好各戳一下，但戳的是两个完全不同的点。</div>
+<div class="ladder"><strong>第一步这样走：</strong>分别写出来：训练时每个位置 1 份监督 → MTP 后 k 份；推理时每个前向步出 1 个 token → 投机验证后一步最多接受 k 个。</div>
+<div class="ladder"><strong>完整答案：</strong>不是同一件事，是同一组参数的两份红利。训练侧：普通下一 token 预测每个位置只提供一份监督，MTP 让每个位置同时预测后 k 个 token——监督信号密度成倍增加，模型被迫学习更长期的结构（想猜中后两个词，就得懂句法走向），这是「训练效率/质量」收益。推理侧：生成严格串行，MTP 头一次猜出后续多个候选 token，主模型一次前向并行验证、能接受几个算几个——这是「延迟」收益，本质是内置版投机解码。两者唯一的联系是共享「预测多个未来 token」这组头；瓶颈与收益类型都不同。检验是否真懂的一句话：训练本来就并行，MTP 给训练侧的从来不是并行度——把它也解释成「并行」就说明没分清。</div>
+<div class="variant"><strong>变式：</strong>为什么 MTP 投机解码在「长篇回答」场景收益大，而在「只输出一个 JSON 字段」的场景几乎无感？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>Qwen3-Next 基座的三件套：Gated DeltaNet 用「门控衰减 + 定向擦除」维护固定大小状态，把绝大多数层的记忆成本压成常数；按比例插入的 Gated Attention 层保住精确检索；更高稀疏度 MoE（397B/17B）+ MTP 让每 token 更便宜。三者叠加给出 32K 下 8.6×、256K 下 19× 的解码吞吐；倍数随长度增长这件事本身，就是线性注意力在长上下文下价值的量化证据。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>架构讲完了。第 5 章看它实际会做什么——OCR、空间定位、长视频、GUI 操作四大能力域，配上实打实的 benchmark 数字。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 5 章 ==================== -->
+<h2 id="ch5"><span class="chnum">第 5 章</span>能力全景</h2>
+<p class="chapter-intro">架构是手段，能力是目的。这一章按四个能力域过一遍 Qwen3.5-397B-A17B 的表现，所有数字来自官方博客的评测表（对比对象：GPT-5.2、Claude 4.5 Opus、Gemini-3 Pro、Qwen3-VL-235B-A22B、Kimi K2.5-1T-A32B）。这一章只摆事实，「怎么解读这些数字」是第 6 章的事。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>说出 Qwen3.5 四大能力域各自的代表 benchmark 和分数</li>
+<li>解释 CI（上下文工程/工具辅助）开关对部分分数的影响</li>
+<li>把每个能力域的强势回连到第 2–4 章的架构设计</li>
+<li>说出 201 种语言支持相对上一代的意义</li>
+</ul>
+</div>
+
+<h3 id="ch5-1">5.1 STEM、OCR 与文档理解</h3>
+<div class="table-wrap">
+<table>
+<caption>视觉 STEM / 数学推理（Qwen3.5-397B-A17B，官方博客）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>备注</th></tr></thead>
+<tbody>
+<tr class="hl"><td>MathVision</td><td class="num best">88.6</td><td>超过 Gemini-3 Pro 的 86.6，表中最强</td></tr>
+<tr><td>MMMU</td><td class="num">85.0</td><td>大学学科级多模态理解</td></tr>
+<tr><td>MMMU-Pro</td><td class="num">79.0</td><td>MMMU 的加强版</td></tr>
+<tr><td>MathVista (mini)</td><td class="num">90.3</td><td>数学视觉推理</td></tr>
+<tr><td>We-Math</td><td class="num">87.9</td><td></td></tr>
+<tr class="hl"><td>ZEROBench</td><td class="num best">12</td><td>表中最强；该基准以「接近零分的难度」著称</td></tr>
+<tr class="hl"><td>BabyVision</td><td class="num best">52.3（开 CI）/ 43.3（不开）</td><td>表中最强</td></tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table>
+<caption>OCR 与文档理解（Qwen3.5-397B-A17B，官方博客）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>备注</th></tr></thead>
+<tbody>
+<tr class="hl"><td>OCRBench</td><td class="num best">93.1</td><td>表中最强（GPT-5.2 为 80.7，Gemini-3 Pro 为 90.4）</td></tr>
+<tr class="hl"><td>OmniDocBench 1.5</td><td class="num best">90.8</td><td>表中最强；文档版式解析</td></tr>
+<tr class="hl"><td>CC-OCR</td><td class="num best">82.0</td><td>表中最强</td></tr>
+<tr><td>CharXiv (RQ)</td><td class="num">80.8</td><td>图表理解</td></tr>
+<tr><td>MMLongBench-Doc</td><td class="num">61.5</td><td>长文档理解</td></tr>
+<tr><td>AI2D</td><td class="num">93.9</td><td>科学示意图</td></tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table>
+<caption>通用视觉问答（Qwen3.5-397B-A17B，官方博客）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td>RealWorldQA</td><td class="num">83.9</td><td>真实场景空间问答</td></tr>
+<tr><td>MMStar</td><td class="num">83.8</td><td>防数据泄漏设计的综合评测</td></tr>
+<tr class="hl"><td>HallusionBench</td><td class="num best">71.4</td><td>表中最强；测「视觉证据 vs 语言先验」冲突时的判断力</td></tr>
+<tr><td>SimpleVQA</td><td class="num">67.1</td><td>事实性短答</td></tr>
+</tbody>
+</table>
+</div>
+<p>这两张表是 Qwen3.5 最强的板块。回连架构：细粒度文字识别吃 DeepStack 保住的浅层细节（第 2 章），图表/文档的版式理解吃 MRoPE 的二维空间编码（第 3 章）。HallusionBench 71.4 为表中最强也值得一提——它专门测「视觉错觉与语言先验打架时模型信哪个」，高分说明模型的判断更多锚定在视觉证据上，这正是原生多模态训练想要的效果。</p>
+
+<h3 id="ch5-2">5.2 空间智能与 grounding</h3>
+<div class="table-wrap">
+<table>
+<caption>空间智能（Qwen3.5-397B-A17B，官方博客）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>测什么</th></tr></thead>
+<tbody>
+<tr><td>CountBench</td><td class="num">97.2</td><td>数图里有几个物体</td></tr>
+<tr class="hl"><td>RefCOCO (avg)</td><td class="num best">92.3</td><td>表中最强；按文字描述框出图中物体（grounding）</td></tr>
+<tr class="hl"><td>V*</td><td class="num best">95.8（开 CI）/ 91.1（不开，最强）</td><td>高分辨率图里找小细节</td></tr>
+<tr><td>EmbSpatialBench</td><td class="num">84.5</td><td>具身空间关系</td></tr>
+<tr class="hl"><td>LingoQA</td><td class="num best">81.6</td><td>表中最强；自动驾驶场景问答</td></tr>
+<tr><td>ERQA</td><td class="num">67.5</td><td>具身推理</td></tr>
+</tbody>
+</table>
+</div>
+<p>「Grounding」（定位/指称落地）是把语言描述和像素坐标绑定的能力——「左边第二个红色按钮」→ 输出一个框。它是 GUI 操作（5.4）的前置技能：点不对地方，后面全错。注意表里多次出现的 <strong>CI</strong>（开/不开）：指是否允许模型借助额外的上下文工程/工具辅助（如裁剪放大后再看一次）。开 CI 的分数更接近实际部署中「肯花工程手段」的效果，不开的分数更接近裸模型能力——两个都要看。</p>
+
+<h3 id="ch5-3">5.3 长视频理解</h3>
+<div class="table-wrap">
+<table>
+<caption>视频理解（Qwen3.5-397B-A17B，官方博客）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td>VideoMME（带字幕）</td><td class="num">87.5</td><td>综合视频理解</td></tr>
+<tr class="hl"><td>MLVU</td><td class="num best">86.7</td><td>表中最强；长视频理解</td></tr>
+<tr><td>MVBench</td><td class="num">77.6</td><td>时序理解</td></tr>
+<tr><td>LVBench</td><td class="num">75.5</td><td>超长视频</td></tr>
+<tr><td>VideoMMMU</td><td class="num">84.7</td><td>视频版学科推理</td></tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table>
+<caption>医疗视觉问答（Qwen3.5-397B-A17B，官方博客）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>备注</th></tr></thead>
+<tbody>
+<tr class="hl"><td>PMC-VQA</td><td class="num best">64.2</td><td>表中最强；医学影像问答</td></tr>
+<tr><td>SLAKE</td><td class="num">79.9</td><td>双语医学 VQA</td></tr>
+<tr><td>MedXpertQA-MM</td><td class="num">70.0</td><td>专家级医学多模态推理</td></tr>
+</tbody>
+</table>
+</div>
+<p>长视频是第 3、4 章机制的联合考场：MRoPE 的 t 轴 + 文本-时间戳对齐负责「定位」，混合注意力负责「装得下且算得起」，256K~1M 上下文负责「整段视频进得来」。MLVU 拿到表中最强，可以视作这套组合拳的直接成绩单。</p>
+
+<h3 id="ch5-4">5.4 视觉 Agent 与 201 种语言</h3>
+<div class="table-wrap">
+<table>
+<caption>视觉 Agent（GUI 操作，Qwen3.5-397B-A17B，官方博客）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td>ScreenSpot Pro</td><td class="num">65.6</td><td>高分辨率屏幕上定位 UI 元素</td></tr>
+<tr class="hl"><td>OSWorld-Verified</td><td class="num">62.2</td><td>真实电脑操作；Claude 4.5 Opus 66.3 更高，Gemini-3 Pro 未报</td></tr>
+<tr><td>AndroidWorld</td><td class="num">66.8</td><td>安卓手机操作</td></tr>
+<tr><td>AndroidWorld（上代对照）</td><td class="num">63.7</td><td>Qwen3-VL-235B-A22B 同项成绩，供看代际进步幅度</td></tr>
+</tbody>
+</table>
+</div>
+<p>GUI 操作是「视觉 Agent」最硬的考场：看懂屏幕（OCR + grounding）→ 规划动作（语言推理）→ 输出坐标（精确输出）。Qwen3.5 相对自家上代明显进步（AndroidWorld 63.7 → 66.8），但 OSWorld 上输给 Claude 4.5 Opus——这个事实第 6 章会重点用。</p>
+<p>最后是语言覆盖：<strong>119 → 201 种语言/方言</strong>。对 VLM 这不只是翻译问题——OCR 要认得各语言的文字，文档理解要懂各语言的版式习惯，多语言是视觉能力和语言能力乘起来的工程。</p>
+
+<p class="oneline"><strong>一句话记住：</strong>Qwen3.5 的强项集中在感知层（看得多细、多准），相对弱项在决策层（多步操作与规划）——读它的成绩单要先分清这两层。</p>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>把 Qwen3.5 的能力画像想成一个学生的成绩单：理科（数学/STEM）年级第一，语文的书法与速读（OCR/文档）年级第一，实验课（GUI 操作）优良但输给了隔壁班的 Claude 同学。它是一个「有明确强项」的偏科优等生，不是门门第一的全能神话。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>成绩单暗示这些分数稳定、可复现、评价标准统一。实际上 benchmark 分数受 prompt、采样参数、CI 开关、榜单版本影响很大；且每个 benchmark 只是真实能力的一个有偏采样——「偏科」的轮廓可信，具体小数点不可尽信。这正是第 6 章的主题。</div>
+</div>
+
+<details class="quiz">
+<summary>自测题 5.1：V* 和 BabyVision 都报了「开 CI / 不开 CI」两个分数（如 V*：95.8 / 91.1）。(a) CI 大致指什么？(b) 为什么同一模型两个分数都报比只报一个更诚实？(c) 如果你的应用没有条件做 CI，你该看哪个数？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>CI 改变的是模型本身，还是模型「被使用的方式」？</div>
+<div class="ladder"><strong>关键在于：</strong>CI = 上下文工程/工具辅助（如把高分辨率图裁剪成小块分次看、多轮自查）。模型权重没变，变的是 scaffolding（脚手架）。</div>
+<div class="ladder"><strong>第一步这样走：</strong>把「裸模型能力」和「系统能力」分开：不开的分数 ≈ 裸模型，开的分数 ≈ 模型 + 工程手段的系统。</div>
+<div class="ladder"><strong>完整答案：</strong>(a) CI 指让模型借助额外上下文工程或工具调用完成任务（例如对细节区域裁剪放大后再推理一轮）。(b) 只报开 CI 的高分，会让人以为裸模型就有这个水平，低估自己搭建脚手架的成本；只报不开的低分，又低估了模型在真实部署（通常都肯做工程优化）下的上限。两个都报，把「模型能力」与「工程可挖掘空间」同时透明化。(c) 看不开 CI 的数（V* 91.1），并把它当作你的实际上界——除非你愿意自己实现类似的脚手架。这也是读任何厂商评测表的通用纪律：先确认每个数字是在什么「使用方式」下跑出来的。</div>
+<div class="variant"><strong>变式：</strong>V* 开 CI 后 +4.7 分，BabyVision 开 CI 后 +9.0 分。两个任务里，哪个从脚手架中获益更大？猜一下为什么这类任务更吃 CI？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 5.2：Qwen3.5 在 OCRBench 上以 93.1 领先 GPT-5.2（80.7）达 12.4 分，但在 OSWorld-Verified 上以 62.2 落后 Claude 4.5 Opus（66.3）。请用第 2–4 章的架构知识，给出一个「为什么强项恰好在 OCR/文档」的解释链条。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>OCR/文档任务吃哪几种底层能力？GUI 操作额外多吃哪几种？</div>
+<div class="ladder"><strong>关键在于：</strong>OCR 是「单帧、静态、细粒度」任务；OSWorld 是「多步、动态、需规划与执行闭环」任务。两者对架构的压力点不同。</div>
+<div class="ladder"><strong>第一步这样走：</strong>列映射：OCR/文档 ← DeepStack（细粒度特征分层可达）+ MRoPE 二维空间编码 + 原生多模态训练。OSWorld ← 上述能力（必要）+ 长程规划、动作序列、错误恢复、对未见 UI 的泛化（更多落在后训练/RL 质量上）。</div>
+<div class="ladder"><strong>完整答案：</strong>解释链条：① OCR/文档是架构优势可以直接兑现的地方——DeepStack 保住小字细节，MRoPE 编码版式几何，原生训练让视觉证据主导判断（HallusionBench 最强佐证）。这些是「感知层」能力，架构改进直接转化为分数。② OSWorld 在感知之上还叠加了「决策层」：多步规划、从失败中恢复、把模糊目标拆成动作序列——这些能力主要在后训练（RL 环境与奖励设计）中形成，架构给的底子大家都能用，差距更多由 RL 训练的覆盖度和环境真实性决定。③ 所以「OCR 大赢、OSWorld 小负」的画面是自洽的：Qwen3.5 的架构红利兑现在感知层，而 Agent 决策层是另一场更依赖后训练积累的比赛（官方也承认这一代后训练的主策略是狂扩 RL 环境——说明他们也认为这里是主战场）。</div>
+<div class="variant"><strong>变式：</strong>如果下一代 Qwen 想在 OSWorld 上反超，按你的分析，最该投资的是架构改进还是 RL 环境建设？这能解释官方「大规模扩展几乎所有能想到的 RL 任务与环境」这句话吗？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 5.3：Qwen3.5 在 ZEROBench 上得 12 分，却是「表中最强」。一个 12 分的「最强」说明了什么？它和 OCRBench 93.1 的「最强」含义有何不同？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>分数的「绝对值」和「相对排名」分别回答什么问题？</div>
+<div class="ladder"><strong>关键在于：</strong>看两个榜单离天花板的距离：93.1 离 100 只剩 7 分，12 离 100 还有 88 分——一个任务接近饱和，一个远未解决。</div>
+<div class="ladder"><strong>第一步这样走：</strong>分别描述两个榜单上「头部模型差距」的未来走向：饱和榜上差距会缩小还是拉大？未解决榜上呢？</div>
+<div class="ladder"><strong>完整答案：</strong>两个「最强」含义完全不同。OCRBench 93.1 是「成熟任务上的领先」：任务接近饱和，头部差距会持续收窄，这个榜的区分度正在消失（下一代可能集体 95+，榜单退役）。ZEROBench 12 是「未解决任务上的相对领先」：该榜被设计为「让当前模型接近零分」，12 分说明 Qwen3.5 在超难视觉推理上迈出了别人没迈出的第一步——这个领先更「值钱」（区分度大、代表能力前沿）也更「不值钱」（绝对水平低，离商用远）。读榜纪律：绝对分回答「这个能力现在能用吗」，相对排名回答「这家领先多少」，两者必须同时看。把 ZEROBench 的「最强」当宣传点而隐去 12 分，是典型的一半真话。</div>
+<div class="variant"><strong>变式：</strong>一个榜单上所有模型都在 95 分以上，另一个所有模型都低于 15 分。对「选型」和「研究」两种目的，这两个榜各自还剩什么价值？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>四大能力域的成绩单：OCR/文档是最强板块（OCRBench 93.1、OmniDocBench 90.8、CC-OCR 82.0 均为表中最强）；数学/STEM 强（MathVision 88.6 压过 Gemini-3 Pro）；空间/grounding 强（RefCOCO 92.3 最强）；长视频强（MLVU 86.7 最强）；GUI Agent 进步明显但 OSWorld 输 Claude 4.5 Opus。强项集中处与架构创新（DeepStack、MRoPE、混合注意力、原生训练）一一对应。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>数字都摆出来了。第 6 章学习怎么读它们——哪些比较是公平的，哪些宣称要打折，以及「没有全面碾压，只有场景匹配」这条总原则。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 6 章 ==================== -->
+<h2 id="ch6"><span class="chnum">第 6 章</span>读懂评测表</h2>
+<p class="chapter-intro">厂商评测表是一种文体：每个数字都是真的，但排版方式在引导你的结论。这一章用 Qwen3.5 的官方表格做案例，训练「审稿人式」的读法。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>从一张对比表里区分「最强」「持平」「落后」三类项目</li>
+<li>识别评测表的常见引导手法（选榜、选基线、选口径）</li>
+<li>用「场景匹配」而不是「总分排名」做选型决策</li>
+<li>说出至少三个 Qwen3.5 并非最强的具体项目</li>
+</ul>
+</div>
+
+<h3 id="ch6-1">6.1 它赢在哪里</h3>
+<p>先肯定真实的强。以下项目在官方对比表中（对手含 GPT-5.2、Claude 4.5 Opus、Gemini-3 Pro、Kimi K2.5-1T-A32B），Qwen3.5 是明确的第一：</p>
+<ul>
+<li><strong>OCRBench 93.1</strong>：对手是 GPT-5.2 的 80.7 和 Gemini-3 Pro 的 90.4——领先幅度分别为 12.4 和 2.7 分，这个量级不是噪声。</li>
+<li><strong>MathVision 88.6</strong>：压过以推理见长的 Gemini-3 Pro（86.6）。</li>
+<li><strong>OmniDocBench 1.5 90.8、CC-OCR 82.0、HallusionBench 71.4、RefCOCO 92.3、MLVU 86.7、LingoQA 81.6、PMC-VQA 64.2、ZEROBench 12、BabyVision 52.3（CI）、V* 91.1（无 CI）、NOVA-63 59.1（语言侧）</strong>。</li>
+</ul>
+<p>语言侧代表成绩（官方博客）：MMLU-Pro 87.8、GPQA 88.4、AIME26 91.3、LiveCodeBench v6 83.6、SWE-bench Verified 76.4、BFCL-V4 72.9、BrowseComp 69.0（上下文折叠策略）/ 78.6（discard-all 策略）。</p>
+
+<div class="viz" id="viz7">
+<div class="viz-title">▶ 交互演示 6-A：把评测表画成图——强项、弱项与「缺席」一眼可见</div>
+<div class="viz-controls">
+  <button class="viz-btn" id="viz7-g-ocr">OCR / 文档</button>
+  <button class="viz-btn ghost" id="viz7-g-math">数学视觉</button>
+  <button class="viz-btn ghost" id="viz7-g-agent">视觉 Agent</button>
+</div>
+<div id="viz7-chart"></div>
+<div style="font-size:12.5px;color:var(--muted);margin-top:6px">紫柱 = Qwen3.5-397B-A17B；灰柱 = 对手；「未报告」= 官方对比表中该模型此项无数字。数据全部来自官方博客。</div>
+<noscript><p style="font-size:13px;color:var(--muted)">（未启用 JS：OCRBench 93.1 vs GPT-5.2 80.7 / Gemini-3 Pro 90.4；MathVision 88.6 vs 86.6；OSWorld 62.2 vs Claude 4.5 Opus 66.3。）</p></noscript>
+<div class="viz-read"><strong>怎么读这张图：</strong>三组对照恰好演示第 6 章的三个读表要点。① <strong>OCR/文档</strong>：紫柱明显长于所有已报告的对手——这是代差级的赢。② <strong>数学视觉</strong>：MathVision 上紫柱只比 Gemini-3 Pro 长一小截（88.6 vs 86.6）——这是「领先」，不是「碾压」。③ <strong>视觉 Agent</strong>：OSWorld 上 Claude 的柱子更长（66.3 vs 62.2），如实呈现。最后注意满屏的「未报告」灰条：它们不是美工失误，而是本章说的「警惕缺席」——对比表里没有一家能交出全科成绩。自己读别家发布会的图时，先数有多少根「未报告」。</div>
+</div>
+
+<h3 id="ch6-2">6.2 它输在哪里</h3>
+<p>再诚实看弱点。官方表里 Qwen3.5 不是第一的项目同样醒目：</p>
+<div class="table-wrap">
+<table>
+<caption>Qwen3.5 未领先的代表项目（数字来自官方博客同一张表）</caption>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.5</th><th>更强者</th><th class="num">分数</th></tr></thead>
+<tbody>
+<tr class="hl"><td>OSWorld-Verified</td><td class="num">62.2</td><td>Claude 4.5 Opus</td><td class="num">66.3</td></tr>
+<tr><td>OCRBench 之外的多个通用/推理项</td><td colspan="3">表中 GPT-5.2、Gemini-3 Pro、Kimi K2.5 在若干细分项上各有领先——没有任何模型全表第一</td></tr>
+</tbody>
+</table>
+</div>
+<p>还有两个「结构性注意点」。其一，Gemini-3 Pro 在 OSWorld 上「未报」——缺席本身是一种信息：对比表的覆盖率从来不是全的。其二，官方宣称 35B-A3B「全面超越 Qwen3-235B-A22B 与 Qwen3-VL-235B-A22B」——注意这两个被超越的对象都是<strong>自家上代</strong>，不是别家当代旗舰。这个宣称可信且仍很有价值（效率代际差是真实的），但它回答的是「进步多快」，不是「行业第几」。</p>
+
+<div class="box box-misconception">
+<div class="box-title">常见误解</div>
+<p>「官方表里 Qwen3.5 一半以上的项目是最高分，所以它是当前最强 VLM。」</p>
+<p>两个漏洞。第一，选榜：表里有哪 30 个 benchmark 是发布方定的——每家都会把自己强的项目放进表里，这不是阴谋，是行业惯例，但你得意识到这一点。第二，权重：把「30 项里赢 18 项」当成选型依据，等于默认 30 个 benchmark 对你等权——可你的应用可能只跟其中 2 个相关。<strong>对你的场景而言，99% 的榜单行都是噪声。</strong></p>
+</div>
+
+<h3 id="ch6-3">6.3 如何不被榜单带节奏</h3>
+<p>一套可执行的读表流程：</p>
+<ol>
+<li><strong>先写需求，再看表</strong>。把你的场景翻译成最相近的 2–3 个 benchmark（如「看懂扫描发票」≈ OCRBench + OmniDocBench；「操作网页后台」≈ OSWorld/ScreenSpot）。只看这几行。</li>
+<li><strong>查口径</strong>：开没开 CI？用的什么解码参数？BrowseComp 为什么有两个数（69.0 上下文折叠 / 78.6 discard-all）？——因为那本来就是两种使用方式的成绩。</li>
+<li><strong>看差距的量级</strong>：1–2 分以内的差距基本在同次重跑噪声范围内；5 分以上才可当作稳定结论；12 分（OCRBench 对 GPT-5.2）是代差级。</li>
+<li><strong>警惕缺席</strong>：某家没报某项，大概率不是因为忘了。</li>
+<li><strong>能自测就别只信表</strong>：拿 50–200 条你自己业务的真实样本跑一遍，比任何 benchmark 都更接近你的上线表现。</li>
+</ol>
+
+<div class="box box-why">
+<div class="box-title">为什么「没有全面碾压，只有场景匹配」是本章的核心句</div>
+<p>2026 年的头部模型们在通用能力上已经咬得很紧，代差只出现在<strong>特定结构的能力域</strong>里：Qwen3.5 的代差在 OCR/文档/细粒度视觉（架构红利直接兑现处），Claude 的强项在 Agentic 电脑操作，Gemini 在长上下文与综合推理的均衡性。选型的正确问题不是「哪个模型最强」，而是「哪个模型的强项恰好是我的主场景、弱项恰好我不在乎」。这句话值得写在团队 wiki 上。</p>
+</div>
+
+<p class="oneline"><strong>一句话记住：</strong>先定场景再看榜——和你的应用无关的那几十行分数，无论谁第一，对你都是噪声。</p>
+
+<details class="quiz">
+<summary>自测题 6.1：某竞品发布，宣称「在 25 个 benchmark 中的 17 个上超越 Qwen3.5」。在相信这个结论之前，你会向对方索要哪四样东西？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>「17/25」这个计数里，每个环节都可以被动手脚：25 是怎么选的、17 是怎么赢的、赢多少、怎么跑的。</div>
+<div class="ladder"><strong>关键在于：</strong>对应的四类信息：选榜依据、每个 benchmark 的双方原始分数（而非只给胜负）、评测口径、以及对你场景的映射。</div>
+<div class="ladder"><strong>第一步这样走：</strong>把「17/25」拆回原始数据层：逐榜双方分数表、每榜的 CI/参数/提示词口径、差距的置信度。</div>
+<div class="ladder"><strong>完整答案：</strong>① 完整的逐榜分数对照表（含 Qwen3.5 一侧每个数字的来源与复现方式）——只给胜负计数不给分数，无法判断赢的是 0.5 分还是 15 分。② 25 个榜的选择过程说明——是否包含 OCR/文档这类 Qwen3.5 明显强势的项目？剔除强项后的「17/25」是另一种故事。③ 评测口径：CI 开关、解码参数、prompt 模板、是否使用官方推荐的推理设置——用非默认设置压低对手分数是常见操作。④ 与你的场景最近的那 2–3 个榜上的具体表现。拿到前三个，你自己就能算出第四个。如果对方只能给你「17/25」这个汇总数字，那它的信息量约等于零。</div>
+<div class="variant"><strong>变式：</strong>对方补齐了全部数据，且确实在 17 项上赢得扎实，但这 17 项里没有一项与你的场景（扫描文档解析）相关。你该换模型吗？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 6.2：BrowseComp 报了两个数：69.0（上下文折叠策略）/ 78.6（discard-all 策略）。同一个模型同一个榜，为什么有两个成绩？这给你读「单成绩榜单」什么启示？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>变化的是模型还是策略？BrowseComp 这种浏览类任务的成绩为什么会敏感地依赖上下文管理策略？</div>
+<div class="ladder"><strong>关键在于：</strong>浏览 Agent 会积累超长上下文（几十个网页），「上下文装不下时丢什么」直接决定后段推理质量。两种策略就是两种答案。</div>
+<div class="ladder"><strong>第一步这样走：</strong>把成绩写成 分数 = f（模型， 使用策略）。同一模型，策略不同 → 两个分。</div>
+<div class="ladder"><strong>完整答案：</strong>两个数测量的是两个不同的「系统」：模型 + 上下文折叠策略的系统得 69.0，模型 + discard-all 策略的系统得 78.6。浏览任务里上下文迅速膨胀，怎么裁剪历史几乎和模型本身一样影响结局——discard-all 高 9.6 分说明该任务上「保留原始搜索结果全文」比「折叠压缩」更值（或折叠实现有信息损失）。启示有三：① 任何单成绩榜单都隐含了一个未声明的使用策略，跨厂商比较时这些隐含策略很少对齐；② 「模型能力」和「系统能力」要分开记账，第 5 章 CI 的讨论在这里复现；③ 自己部署时，这类「策略旋钮」（上下文管理、CI、采样参数）是你不花一分钱模型费就能拿到的性能空间——先把旋钮拧对，再谈换模型。</div>
+<div class="variant"><strong>变式：</strong>如果某厂商只报 78.6 而不提策略，你从表格外无法得知用了 discard-all。设计一个你在技术评审会上提的问题，能逼出这个信息？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 6.3：为「HallusionBench 71.4 表中最强」设计一个三问尽调清单，判断这个优势能否迁移到你的「票据审核」场景。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>HallusionBench 测的是「视觉证据 vs 语言先验打架时信谁」。你的票据审核场景里，这种冲突以什么形式出现？</div>
+<div class="ladder"><strong>关键在于：</strong>可迁移性 = 你的场景的主要失败模式，是否恰好是该榜考察的失败模式。</div>
+<div class="ladder"><strong>第一步这样走：</strong>列出票据审核的典型错误：把不存在的税号「脑补」出来（先验压过证据）→ 正是幻觉类错误；但也可能有「小字看不清」（感知类错误）——后者不归这个榜管。</div>
+<div class="ladder"><strong>完整答案：</strong>三问清单：① 失败模式匹配吗？我的错误主要是「幻觉」（按先验编造）还是「看不清」（分辨率不足）？HallusionBench 只覆盖前者；若我的主错误是小字识别，应看 OCRBench / V* 而非此榜。② 数据分布接近吗？该榜的图是什么域（自然图像/图表），我的扫描票据是什么域？域差距会放大或缩小表观差距。③ 口径一致吗？71.4 是在什么设置下跑的（CI、解码参数）？我的部署设置能否复现？结论模板：三问皆匹配 → 把该优势记为「先验加分」，进自建评测集验证；任一问不匹配 → 降权或换榜。这套三问可复用到任何 benchmark 的迁移判断。</div>
+<div class="variant"><strong>变式：</strong>把同样三问套到「AndroidWorld 66.8」对「帮老人自动操作手机挂号」场景的迁移判断上——哪一问最危险、为什么？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>Qwen3.5 的赢面真实且集中（OCR/文档/细粒度视觉/长视频多项表中最强），输面也真实（OSWorld 输 Claude 4.5 Opus 四个点；若干单项各家互有胜负）。读表五步法：先定场景、查口径、看量级、警惕缺席、自行自测。总原则：<strong>没有全面碾压，只有场景匹配</strong>。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>理论部分到此结束。第 7 章开始动手：transformers 加载、vLLM 部署、百炼 API 调用，三段可直接运行的代码。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 7 章 ==================== -->
+<h2 id="ch7"><span class="chnum">第 7 章</span>上手实战</h2>
+<p class="chapter-intro">这一章给三条可直接使用的路径：本地用 transformers 加载、用 vLLM 起服务、直接调百炼托管 API。代码基于 Qwen 官方模型卡的标准写法；Qwen3.5 系列的具体类名/模型 ID 以官方模型卡为准——写法与 Qwen3-VL 完全一致，换模型名即可。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>写出 transformers 加载 Qwen VL 模型并推理一张图的最小代码</li>
+<li>写出 vLLM 起 OpenAI 兼容服务的命令，并说明每个关键参数</li>
+<li>用 curl / Python 调通百炼的 OpenAI 兼容接口</li>
+<li>根据显存预算选择合适的模型规格与量化方案</li>
+</ul>
+</div>
+
+<h3 id="ch7-1">7.1 transformers 加载</h3>
+<p>适合调试与小规模实验。以下以 Qwen3-VL 的标准写法为模板（Qwen3.5 沿用同一套 API；安装最新版 <code>transformers</code> 后把模型 ID 换成对应 Qwen3.5 模型即可）：</p>
+<pre><code><span class="kw">from</span> transformers <span class="kw">import</span> AutoModelForImageTextToText, AutoProcessor
+<span class="kw">import</span> torch
+
+model_id = <span class="str">"Qwen/Qwen3-VL-32B-Instruct"</span>  <span class="cmt"># 换成你的目标模型，如 Qwen3.5 对应 ID</span>
+
+model = AutoModelForImageTextToText.from_pretrained(
+    model_id,
+    dtype=<span class="str">"auto"</span>,          <span class="cmt"># 按权重精度加载（BF16）</span>
+    device_map=<span class="str">"auto"</span>,      <span class="cmt"># 自动切分到可用 GPU</span>
+)
+processor = AutoProcessor.from_pretrained(model_id)
+
+messages = [{
+    <span class="str">"role"</span>: <span class="str">"user"</span>,
+    <span class="str">"content"</span>: [
+        {<span class="str">"type"</span>: <span class="str">"image"</span>, <span class="str">"url"</span>: <span class="str">"https://example.com/invoice.jpg"</span>},
+        {<span class="str">"type"</span>: <span class="str">"text"</span>, <span class="str">"text"</span>: <span class="str">"提取这张发票的抬头、金额和日期，用 JSON 输出。"</span>},
+    ],
+}]
+
+inputs = processor.apply_chat_template(
+    messages, tokenize=<span class="kw">True</span>, add_generation_prompt=<span class="kw">True</span>,
+    return_dict=<span class="kw">True</span>, return_tensors=<span class="str">"pt"</span>,
+).to(model.device)
+
+out = model.generate(**inputs, max_new_tokens=512)
+<span class="kw">print</span>(processor.batch_decode(
+    out[:, inputs[<span class="str">"input_ids"</span>].shape[1]:], skip_special_tokens=<span class="kw">True</span>)[0])</code></pre>
+<p>三个要点：<code>device_map="auto"</code> 会在多卡之间自动切分权重（397B 模型没有 8×80GB 级别的卡就别试了，先换小模型）；<code>apply_chat_template</code> 把图文混排消息编成模型训练时见过的格式，手写拼接容易踩坑；图片可以直接给 URL、本地路径或 PIL 对象。</p>
+
+<h3 id="ch7-2">7.2 vLLM 部署</h3>
+<p>生产环境用 vLLM（连续批处理 + PagedAttention，吞吐高一个量级）。以 35B-A3B 这类中等模型为例：</p>
+<pre><code><span class="cmt"># 安装：pip install -U vllm（按官方文档选择支持 Qwen3.5 的版本）</span>
+vllm serve Qwen/Qwen3.5-35B-A3B \
+  --tensor-parallel-size 2 \        <span class="cmt"># 2 张卡做张量并行</span>
+  --max-model-len 262144 \          <span class="cmt"># 上下文 256K；显存吃紧就调小</span>
+  --gpu-memory-utilization 0.9 \    <span class="cmt"># 显存利用率上限</span>
+  --port 8000</code></pre>
+<p>起服务后就是标准 OpenAI 兼容接口（<code>http://localhost:8000/v1</code>），第 7.3 节的客户端代码改个 <code>base_url</code> 就能用。部署 397B-A17B 时把 <code>--tensor-parallel-size</code> 提到 8（8×80GB 起步，见第 8 章显存表），或先用官方/社区的 FP8、4-bit 量化版本。</p>
+
+<h3 id="ch7-3">7.3 百炼 API 调用（Qwen3.5-Plus）</h3>
+<p>零基础设施的路径：阿里云百炼 Model Studio，OpenAI 兼容协议。模型 ID 以控制台为准（形如 <code>qwen3.5-plus</code>）。</p>
+<pre><code><span class="cmt"># curl 版</span>
+curl -X POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions \
+  -H <span class="str">"Authorization: Bearer $DASHSCOPE_API_KEY"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "model": "qwen3.5-plus",
+    "messages": [{
+      "role": "user",
+      "content": [
+        {"type": "image_url",
+         "image_url": {"url": "https://example.com/invoice.jpg"}},
+        {"type": "text", "text": "提取发票抬头、金额、日期，输出 JSON。"}
+      ]
+    }]
+  }'</span></code></pre>
+<pre><code><span class="cmt"># Python 版（pip install openai）</span>
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="str">"$DASHSCOPE_API_KEY"</span>,  <span class="cmt"># 建议从环境变量读</span>
+    base_url=<span class="str">"https://dashscope.aliyuncs.com/compatible-mode/v1"</span>,
+)
+resp = client.chat.completions.create(
+    model=<span class="str">"qwen3.5-plus"</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: [
+        {<span class="str">"type"</span>: <span class="str">"image_url"</span>,
+         <span class="str">"image_url"</span>: {<span class="str">"url"</span>: <span class="str">"https://example.com/invoice.jpg"</span>}},
+        {<span class="str">"type"</span>: <span class="str">"text"</span>, <span class="str">"text"</span>: <span class="str">"提取发票抬头、金额、日期，输出 JSON。"</span>},
+    ]}],
+)
+<span class="kw">print</span>(resp.choices[0].message.content)</code></pre>
+<p>Plus 版默认 1M token 上下文、内置官方工具与自适应工具调用——长视频、长文档直接整段丢进去，不用自己搭第 8 章那一整套东西。代价：按 token 计费、数据要出你的网络。</p>
+
+<div class="box box-note">
+<div class="box-title">怎么选</div>
+<p>原型验证 → 百炼 API（十分钟跑通）；数据敏感 / 调用量大 → vLLM 自建（35B-A3B 或 122B-A10B 是甜点区）；研究 / 微调 → transformers + 开源权重。三条路径的客户端代码都是 OpenAI 兼容协议，互相迁移只要改 <code>base_url</code> 和模型名。</p>
+</div>
+
+<h3>7.4 从 ModelScope 下载权重</h3>
+<p>国内网络环境下，ModelScope 通常比 Hugging Face 快得多，模型 ID 与 HF 基本一致：</p>
+<pre><code><span class="cmt"># 命令行方式（pip install modelscope）</span>
+modelscope download --model Qwen/Qwen3-VL-32B-Instruct \
+  --local_dir ./models/Qwen3-VL-32B-Instruct
+
+<span class="cmt"># 也可以在 Python 里下载（与 transformers 无缝衔接）</span>
+<span class="kw">from</span> modelscope <span class="kw">import</span> snapshot_download
+path = snapshot_download(<span class="str">"Qwen/Qwen3-VL-32B-Instruct"</span>)
+<span class="kw">print</span>(path)  <span class="cmt"># 之后 from_pretrained(path) 即可</span></code></pre>
+<p>下载到本地目录后，把 7.1 节代码里的 <code>model_id</code> 换成本地路径即可，其余完全一样。Qwen3.5 各型号的准确模型 ID 以官方模型卡为准。</p>
+
+<h3>7.5 常见报错 FAQ</h3>
+<details class="faq"><summary>Q1：加载模型直接 OOM（CUDA out of memory）</summary>
+<div class="quiz-body"><p>先算账再动手：权重显存 = 参数量 × 字节数（第 8 章计算器）。397B BF16 要约 794 GB，单卡绝无可能。三条出路按序尝试：① 降精度（FP8 减半、INT4 再减半，注意细粒度任务先自测掉点）；② 换小模型（35B-A3B 是甜点）；③ 如果是推理中后期才 OOM，多半是 KV 缓存/上下文太长——把 <code>max-model-len</code> 调小、并发调低。</p></div>
+</details>
+<details class="faq"><summary>Q2：transformers 报错不识别模型类型（如 KeyError / "model type not recognized"）</summary>
+<div class="quiz-body"><p>几乎可以确定是 transformers 版本过低，还没有收录这个模型架构。执行 <code>pip install -U transformers</code>（必要时加 <code>--pre</code> 或按模型卡要求装指定版本）。模型卡上会写明最低支持版本，<strong>以官方模型卡为准</strong>。同理，报「处理器/processor 相关错误」时升级 <code>transformers</code> 与 <code>qwen-vl-utils</code>。</p></div>
+</details>
+<details class="faq"><summary>Q3：图像输入报错或模型对图片"视而不见"</summary>
+<div class="quiz-body"><p>九成是消息格式问题。正确做法是用 <code>processor.apply_chat_template</code>，图片放在 <code>content</code> 列表里（<code>{"type": "image", ...}</code>），不要把图片路径拼进纯文本 prompt。本地图片可用绝对路径、<code>file://</code> URL 或 PIL 对象；另外检查图片是否超过处理器的像素上限被静默缩放——OCR 类任务对分辨率敏感，必要时调高 <code>min_pixels/max_pixels</code>。</p></div>
+</details>
+<details class="faq"><summary>Q4：vLLM 启动报 "architecture not supported"</summary>
+<div class="quiz-body"><p>你装的 vLLM 版本还不支持该模型架构。新模型发布初期，支持往往先合入主干再进正式 release——按官方模型卡的部署说明升级到指定版本（有时是 <code>pip install -U vllm</code>，有时是装 nightly），<strong>以官方模型卡为准</strong>。过渡期可以先用 transformers 路径跑通流程，吞吐低一些但功能完整。</p></div>
+</details>
+<details class="faq"><summary>Q5：权重下载慢、频繁中断</summary>
+<div class="quiz-body"><p>国内优先走 ModelScope（7.4 节）；坚持 HF 的话设置镜像环境变量（如 <code>HF_ENDPOINT</code> 指向镜像站）。大模型权重几十上百 GB，务必用支持断点续传的工具（modelscope CLI / <code>huggingface-cli download</code> 均支持），别用浏览器直接下。</p></div>
+</details>
+
+<details class="quiz">
+<summary>自测题 7.1：你在 4×80GB（共 320GB 显存）的机器上 vllm serve 397B-A17B 的 BF16 权重，直接 OOM。列出三条能让它跑起来的路径，并按「保真度损失从小到大」排序。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>397B BF16 要多少显存？（第 8 章有完整表，先自己估。）320GB 差多少？</div>
+<div class="ladder"><strong>关键在于：</strong>参数总量是硬约束：397B × 2 字节 ≈ 794 GB。要么降每个参数的字节数（量化），要么加卡，要么换模型。</div>
+<div class="ladder"><strong>第一步这样走：</strong>量化：FP8 = 397 GB（仍超 320）；INT4 ≈ 200 GB（装得下）。加卡：8×80GB = 640 GB，BF16 也不够，需配合 FP8。换小模型：122B-A10B FP8 ≈ 122 GB，宽裕。</div>
+<div class="ladder"><strong>完整答案：</strong>按保真度损失排序：① 加卡 + FP8 量化：8×80GB 跑 FP8（约 397 GB），官方有 QAT 量化版本时损失最小（需更多硬件，成本最高）。② 4-bit 量化（约 200 GB，现有 4 卡即可）：现代 4-bit（如 AWQ/GPTQ 系）在多数任务上掉点有限，但对 OCR 这类吃细粒度的任务要自测——恰是 Qwen3.5 的强项区，别默认无损。③ 换 122B-A10B：不是「量化损失」而是「能力天花板降低」，但对很多业务 122B 已过剩。共同提醒：weights 装下只是门票，KV 缓存/状态与激活值还要再吃一块——<code>--max-model-len</code> 别开满 256K 再喊 OOM。</div>
+<div class="variant"><strong>变式：</strong>如果业务只需要 32K 上下文，4-bit 量化的 397B 和 BF16 的 122B 你会选哪个？权衡的轴是什么？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 7.2：同一个模型、同一张图、同一句 prompt，transformers 直跑和百炼 API 的结果不完全一样。列出至少四个可能原因。哪些属于「bug 级」（该修），哪些属于「接受即可」？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>从「图像预处理 → tokenize → 解码参数 → 系统 prompt → 模型版本」这条链上逐环想差异来源。</div>
+<div class="ladder"><strong>关键在于：</strong>VLM 的输入不只有文字——图片在进模型前会被缩放/归一化，两端的预处理参数可能不同。</div>
+<div class="ladder"><strong>第一步这样走：</strong>先查解码参数（temperature 是否为 0），再查图片预处理的 min/max pixels，再查隐藏的系统 prompt，最后查模型版本。</div>
+<div class="ladder"><strong>完整答案：</strong>可能原因（常见度从高到低）：① 解码参数不同——temperature 非零时两次运行本来就会不同，先设 temperature=0 再比较；② 图像预处理不同——两端对图片的缩放/分辨率策略（min_pixels/max_pixels）不一致，视觉 token 数和细节保留都不同；③ 隐藏的系统提示词——API 侧往往有默认 system prompt 和工具定义注入；④ 模型版本漂移——托管侧可能已更新到小版本（Plus ≠ 某个固定开源权重）；⑤ 数值路径差异——量化、内核实现、batching 导致的浮点差异（即使 temperature=0，服务端连续批处理也可能引入微小差别）。「bug 级」：①②③——可控且该对齐，尤其是对生产结果做回归测试时。「接受即可」：⑤（硬件/批处理层面的非确定性是大模型服务的固有属性）；④ 属于「管控级」——重要的应用应锁定模型版本并在升级时回归测试。</div>
+<div class="variant"><strong>变式：</strong>你发现 API 版在发票 OCR 上稳定好于本地版。除了上面五条，还有一个很值钱的可能性是什么？（提示：想想 CI。）</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 7.3：把 7.1 节的单张调试脚本改造成「处理一个文件夹里 5000 张发票」的离线批处理作业。列出至少四个必须改动的地方及原因。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>单张调试脚本和批处理作业在哪些维度上完全不同：吞吐、内存、容错、结果保存、可观测性。</div>
+<div class="ladder"><strong>关键在于：</strong>想一个具体故障：第 3700 张图损坏，脚本抛异常退出——前 3699 张的结果在哪？</div>
+<div class="ladder"><strong>第一步这样走：</strong>从「结果何时落盘」这个最致命的问题开始想，再倒推吞吐和容错。</div>
+<div class="ladder"><strong>完整答案：</strong>典型四改（接受其他合理项）：① 批量化/服务化：逐张 generate 无法利用并行，改用 vLLM 离线批量推理或连续批处理服务——吞吐差一个量级。② 流式落盘：每处理完一张就把结果追加写入 JSONL，而不是攒在内存最后一次性保存——崩溃不丢、断点可续。③ 容错与重试：单张失败（坏图、超时、格式错）要捕获并记入失败清单，不能拖死整个作业。④ 资源管理：控制并发与 max-model-len（防缓存 OOM），用完的图像对象及时释放。⑤（加分）可观测性：进度、吞吐、失败率日志——5000 张的作业没有进度显示就是黑盒。底层原则：批处理作业的设计目标是「可恢复、可观测、可持续」，不只是「能跑通一次」。</div>
+<div class="variant"><strong>变式：</strong>如果要求 5000 张在 1 小时内处理完，在决定加卡之前，你应该先做哪一步估算？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>三条路：transformers（调试）、vLLM（自建服务）、百炼 API（零运维，Plus 默认 1M 上下文）。客户端全部 OpenAI 兼容，迁移成本低。动手前先算显存（下一章），先统一解码参数和预处理，再比效果。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>第 8 章把「跑起来要花多少钱」算清楚：显存估算表、预填充 vs 解码的成本性格、长视频为什么便宜不下来——以及线性注意力帮了多少。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 8 章 ==================== -->
+<h2 id="ch8"><span class="chnum">第 8 章</span>部署与成本账</h2>
+<p class="chapter-intro">这一章全是算术。所有数字都是<strong>本站的工程估算</strong>（会标出假设），目的是给你下单买卡、开 API 预算之前的量级感。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>手算任意参数规模在 BF16 / FP8 / INT4 下的权重显存</li>
+<li>区分预填充与解码两个阶段的瓶颈，并据此优化服务</li>
+<li>估算长视频推理的 token 成本，说出线性注意力改变了哪一项</li>
+<li>为一个具体业务量做出「自建 vs API」的粗略成本对比</li>
+</ul>
+</div>
+
+<h3 id="ch8-1">8.1 显存估算表</h3>
+<p>规则只有一条：<strong>权重显存 ≈ 参数量 × 每参数字节数</strong>。BF16 = 2 字节，FP8 = 1 字节，INT4 = 0.5 字节。</p>
+<div class="table-wrap">
+<table>
+<caption>Qwen3.5 家族权重显存估算（本站计算，不含 KV 缓存与激活值）</caption>
+<thead><tr><th>模型</th><th class="num">BF16</th><th class="num">FP8</th><th class="num">INT4</th><th>现实配置（估算）</th></tr></thead>
+<tbody>
+<tr><td>Qwen3.5-9B</td><td class="num">18 GB</td><td class="num">9 GB</td><td class="num">~4.5 GB</td><td>单张消费卡（24GB）可跑 BF16</td></tr>
+<tr><td>Qwen3.5-27B</td><td class="num">54 GB</td><td class="num">27 GB</td><td class="num">~13.5 GB</td><td>单卡 80GB BF16；或单卡 24GB INT4</td></tr>
+<tr><td>Qwen3.5-35B-A3B</td><td class="num">70 GB</td><td class="num">35 GB</td><td class="num">~17.5 GB</td><td>单卡 80GB BF16；激活仅 3B，吞吐高</td></tr>
+<tr><td>Qwen3.5-122B-A10B</td><td class="num">244 GB</td><td class="num">122 GB</td><td class="num">~61 GB</td><td>2×80GB FP8；或单卡 80GB INT4</td></tr>
+<tr class="hl"><td>Qwen3.5-397B-A17B</td><td class="num">794 GB</td><td class="num">397 GB</td><td class="num">~200 GB</td><td>8×80GB FP8 起步；4×80GB INT4</td></tr>
+</tbody>
+</table>
+</div>
+<p>表外三笔附加账（都是估算）：<strong>KV 缓存/线性状态</strong>——混合架构让这项比纯全注意力小一个量级，但 256K 全量上下文 + 高并发时仍是数 GB 到数十 GB 级；<strong>激活值与框架开销</strong>——留 10–20% 余量；<strong>视觉编码器</strong>——ViT 本身不大，但高分辨率长视频的中间特征峰值不可忽视。结论：<code>max-model-len</code> 和并发数是和权重同等重要的显存变量。</p>
+
+<div class="viz" id="viz8">
+<div class="viz-title">▶ 交互工具 8-A：显存 / 部署成本计算器</div>
+<div class="viz-row">
+  <label>模型</label>
+  <select id="viz8-model">
+    <option value="397">Qwen3.5-397B-A17B（MoE）</option>
+    <option value="122">Qwen3.5-122B-A10B（MoE）</option>
+    <option value="35">Qwen3.5-35B-A3B（MoE）</option>
+    <option value="27">Qwen3.5-27B（Dense）</option>
+    <option value="9" selected>Qwen3.5-9B（Dense）</option>
+  </select>
+  <label>精度</label>
+  <select id="viz8-prec">
+    <option value="2">BF16（2 字节）</option>
+    <option value="1">FP8 / INT8（1 字节）</option>
+    <option value="0.5" selected>INT4（0.5 字节）</option>
+  </select>
+  <label>显卡</label>
+  <select id="viz8-gpu">
+    <option value="96">H20（96 GB）</option>
+    <option value="80" selected>H100 / A100（80 GB）</option>
+    <option value="24">RTX 4090（24 GB）</option>
+    <option value="128">M 系列统一内存（128 GB）</option>
+  </select>
+</div>
+<div class="viz8-result" id="viz8-result"></div>
+<div class="viz-read"><strong>怎么读这个计算器：</strong>核心公式只有一行：<strong>权重显存 ≈ 参数量 × 每参数字节数</strong>（十进制 GB，估算口径）。卡数按「权重 + 20% 余量（KV 缓存/线性状态、激活值、框架开销）」除以单卡显存向上取整。试几组就有直觉了：397B 在 BF16 下要 12 张 80GB 卡、FP8 也要 6 张——单卡想都别想；而 35B-A3B 用 INT4 一张 24GB 消费卡就能跑，这正是它在第 1 章被称为「甜点」的原因。两个提醒：① M 系列统一内存装得下不等于跑得快，带宽远低于 HBM；② 这里只算了权重，长上下文 + 高并发时缓存会再吃掉一块——别把 <code>max-model-len</code> 开满再喊 OOM。所有数字为本站估算，实际以推理框架实测为准。</div>
+</div>
+
+<h3 id="ch8-2">8.2 预填充 vs 解码</h3>
+<div class="table-wrap">
+<table>
+<caption>两个阶段的成本性格（通用原理 + 本站针对 Qwen3.5 的分析）</caption>
+<thead><tr><th></th><th>预填充（prefill）</th><th>解码（decode）</th></tr></thead>
+<tbody>
+<tr><td>做什么</td><td>一口气读完全部输入（含所有视觉 token）</td><td>一个一个吐输出 token</td></tr>
+<tr><td>并行性</td><td>高（所有位置同时算）</td><td>低（严格串行）</td></tr>
+<tr><td>瓶颈</td><td>算力（FLOPs）</td><td>显存带宽（每步要读完全部激活路径权重 + 记忆）</td></tr>
+<tr><td>长视频下的角色</td><td>成本大头：几十万视觉 token 的平方/线性注意力计算</td><td>相对小头（答案通常几百 token）</td></tr>
+<tr><td>Qwen3.5 的针对性设计</td><td>线性注意力层把平方项压成线性</td><td>17B 激活 + MTP，每 token 更便宜</td></tr>
+</tbody>
+</table>
+</div>
+<p>运维含义：视频理解类负载是<strong>预填充主导</strong>——优化方向是批处理打满算力、控制单请求 token 量（抽帧策略、分辨率上限）；聊天/Agent 类负载是<strong>解码主导</strong>——优化方向是 MTP、量化（降带宽压力）、并发调度。两类负载最好分开部署（prefill/decode 分离是行业通用做法）。</p>
+
+<div class="box box-analogy">
+<div class="box-title">打个比方</div>
+<p>预填充像考试时的「读题」：题目（输入）越长读得越久，但读题可以同时调动全部脑力（并行）；解码像「写答案」：必须一个字一个字往外写（串行），手速（带宽）决定速度。Qwen3.5 的三件套里，线性注意力让「读长题」不再随题长变贵得离谱，17B 激活 + MTP 让「写字」更快。</p>
+<div class="analogy-limit"><strong>类比失效处：</strong>人读题可以跳读略读，模型预填充必须处理每一个 token（除非做稀疏化/前缀缓存）；且模型「写字」时每写一个字都要重新「搬」一遍 17B 权重——人脑没有这种每字重读的带宽开销。比方只适用于「并行 vs 串行」这一点。</div>
+</div>
+
+<h3 id="ch8-3">8.3 长视频的成本结构</h3>
+<p>把自测题 0.1 的数字接过来算成本（本站估算）：一段 30 分钟视频，2 帧/秒、每帧 256 token ≈ 92 万视觉 token。纯全注意力模型处理它：注意力打分次数 ~n² 级、KV 缓存几十 GB 起步；Qwen3.5 混合架构下：大部分层线性增长，KV 缓存只剩全注意力层那一份。官方「256K 下 19× 吞吐」放在这个语境里读才完整——<strong>长输入场景正是效率优势最大的地方，也是视频理解的典型场景，这两个事实叠在一起就是产品定位。</strong></p>
+<p>但别算漏了：1M token 的预填充，即使用线性注意力也仍是千万亿次级的计算量——按 API 计费时这是一笔按 token 收的账。工程上第一道优化永远是<strong>少喂 token</strong>：降帧率、降分辨率、先做粗筛再精读，然后才轮到架构红利。</p>
+
+<p class="oneline"><strong>一句话记住：</strong>先省 token，再谈架构红利；先对齐口径（上下文 × 阶段 × 推理栈），再外推任何吞吐倍数。</p>
+
+<details class="quiz">
+<summary>自测题 8.1：某业务每天要处理 5000 段监控视频（每段 10 分钟），用 Qwen3.5 判断「是否有异常事件」。粗估每月 API token 费用前，你至少要拿到哪四个数字？并指出哪个数字的可压缩空间最大。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>费用 = 段数 × 每段 token 数 × 单价。每段 token 数由哪几个旋钮决定？</div>
+<div class="ladder"><strong>关键在于：</strong>每段 token = 时长 × 帧率 × 每帧 token。三个因子都是旋钮，不是常数。</div>
+<div class="ladder"><strong>第一步这样走：</strong>列数字：① 每段时长（10 分钟，已知）；② 抽帧率（未定，比如 1 帧/秒）；③ 每帧 token（未定，取决于分辨率与 merger 压缩）；④ 输入/输出单价（查百炼价格页，注意视觉 token 的计费方式）。</div>
+<div class="ladder"><strong>完整答案：</strong>四个数字：抽帧率、每帧 token 数（分辨率 × 压缩率的函数）、输入单价、输出单价（加上已知的段数与时长）。量级演示（估算）：1 帧/秒 × 600 秒 × 256 token ≈ 15.4 万 token/段；5000 段/天 ≈ 7.7 亿 token/天；月 ≈ 230 亿输入 token。可压缩空间最大的是<b>帧率</b>：异常检测多数场景 1 帧/秒甚至更低足够（异常通常持续数秒），从 2 帧/秒降到 0.5 帧/秒直接省 75%——比换便宜模型、比砍价都有效。其次是分辨率/每帧 token（只要不漏关键细节）。工程顺序：先用一段真实视频做「帧率-检出率」曲线，找到检出率开始掉的拐点，拐点左侧就是白扔的钱。</div>
+<div class="variant"><strong>变式：</strong>再加一个旋钮：先用一个 9B 小模型在端侧做「粗筛」，只把可疑片段送大模型精读。这把成本结构改成了什么样？引入了什么新风险？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 8.2：官方说 256K 上下文下解码吞吐是 Qwen3-Max 的 19×。一位工程师据此把自家服务的预期吞吐也按 19× 做容量规划。这个外推至少犯了哪三个错误？</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>19× 的测量条件是什么？他的服务和那些条件差在哪？</div>
+<div class="ladder"><strong>关键在于：</strong>19× 是「256K 上下文、解码阶段、相对特定基线、官方推理栈」的数字。换任何一个条件，倍数都会变。</div>
+<div class="ladder"><strong>第一步这样走：</strong>逐项对照：他的平均上下文是多少？他的负载是 prefill 还是 decode 主导？他的硬件/框架和官方差多少？</div>
+<div class="ladder"><strong>完整答案：</strong>错误一：上下文错配。19× 是 256K 处的值；若他的平均上下文只有 4K，适用的是接近 8.6× 那头的数字，甚至还低（短上下文下固定开销占比更大）。错误二：阶段错配。19× 是解码吞吐；若他的业务是长输入短输出（视频理解），瓶颈在预填充，解码倍数跟他无关。错误三：栈错配。官方数字在官方优化的推理栈上测得；他自建的 vLLM 配置、量化方案、并发策略不同，绝对吞吐和相对倍数都会变。附加错误：容量规划该按「你的负载实测」而不是「厂商的相对倍数」——正确做法是用自己的流量 profile 做压测，把官方倍数只当作「值得投入优化」的先验信号。</div>
+<div class="variant"><strong>变式：</strong>如果他的业务恰好是「256K 长输入、长输出、与官方同款推理栈」，19× 就可以直接用了吗？还剩哪个变量没对齐？</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 8.3：为「日均 2 亿输入 token + 2 千万输出 token」的文档解析业务做选型：自建 vLLM（35B-A3B，INT4，单卡 80GB）vs 百炼 API（Plus）。写出你的决策树和需要收集的数据。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>两种方案的成本性格完全不同：自建是固定成本（机器/卡时），API 是可变成本（按 token）。</div>
+<div class="ladder"><strong>关键在于：</strong>成本不是第一闸——合规和能力不达标时，成本比较根本没机会发生。</div>
+<div class="ladder"><strong>第一步这样走：</strong>先画第一闸：数据能出内网吗？不能 → 直接自建，比较结束。</div>
+<div class="ladder"><strong>完整答案：</strong>决策树：① 合规闸：数据能否出内网？不能 → 自建（唯一解）。② 能力闸：Plus 与自建小模型在自建评测集上的字段级准确率差多少？差距超业务容忍 → 选达标者（可能倒逼自建上更大模型，重算成本）。③ 成本闸：API 月费 = 2 亿×30×输入单价 + 2 千万×30×输出单价（查实时价格页）；自建月费 = 机器/卡时 + 运维人力折算。注意文档解析是 prefill 主导，容量要按实测 prefill 吞吐估——35B-A3B 激活仅 3B，这个量级可能 1–2 台机器就够。④ 弹性闸：流量有尖峰吗？API 天然弹性，自建要为峰值留闲置容量。⑤ 可控闸：模型版本锁定、行为可复现性，自建更强。需收集的数据：实时单价、自建评测集准确率、单机实测吞吐、流量曲线、运维人力成本。口诀：合规优先，能力兜底，成本决胜，弹性修正。</div>
+<div class="variant"><strong>变式：</strong>把业务量改成「日均 200 万输入 token」（降两个数量级），决策树的哪一闸会改变结果？</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">本章小结</div>
+<p>权重显存 = 参数量 × 字节数：397B 旗舰 BF16 约 794 GB、FP8 约 397 GB、INT4 约 200 GB——单卡装不下，需多卡或量化；9B~35B 才是单卡甜区。预填充吃算力、解码吃带宽，优化方向完全不同。长视频成本的第一旋钮永远是「少喂 token」（帧率 × 分辨率），架构红利（线性注意力、17B 激活、MTP）是第二道。所有厂商倍数都要在「上下文 × 阶段 × 栈」三对齐之后才能外推。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>第 9 章收网：一张概念关系图、全篇数字速查表、以及继续深入的学习路线。</div>
+</div>
+
+<hr class="chapter-sep">
+<!-- ==================== 第 9 章 ==================== -->
+<h2 id="ch9"><span class="chnum">第 9 章</span>总结与速查表</h2>
+<p class="chapter-intro">最后一章不引入新内容：把前八章织成一张网，留一份可以打印的速查表，以及继续往下走的路标。</p>
+
+<div class="goals">
+<div class="box-title">学完这一章你应该能做到</div>
+<ul>
+<li>不看材料，画出 Qwen3.5 的完整架构与数据流</li>
+<li>把任意一个 benchmark 强项回连到对应的架构设计</li>
+<li>用速查表在 30 秒内回答「这个数是什么意思」</li>
+<li>为自己的场景写出一份「选型 + 部署 + 验证」的行动清单</li>
+</ul>
+</div>
+
+<h3 id="ch9-1">9.1 一张概念网</h3>
+<figure>
+<svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <defs><marker id="arr2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+    <path d="M0,0 L7,3.5 L0,7 Z" fill="#8a86b8"/></marker></defs>
+  <!-- 中心 -->
+  <rect x="280" y="145" width="160" height="50" rx="10" fill="#615ced"/>
+  <text x="360" y="175" text-anchor="middle" font-size="14" fill="#fff" font-weight="800">Qwen3.5（原生 VLM）</text>
+  <!-- 视觉栈 -->
+  <rect x="30" y="30" width="180" height="46" rx="8" fill="#f0eefe" stroke="#615ced"/>
+  <text x="120" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#4a44c8">视觉栈（继承 Qwen3-VL）</text>
+  <text x="120" y="66" text-anchor="middle" font-size="10.5" fill="#6d6b78">交错 MRoPE · DeepStack · 时间戳对齐</text>
+  <!-- 语言基座 -->
+  <rect x="510" y="30" width="180" height="46" rx="8" fill="#f0eefe" stroke="#615ced"/>
+  <text x="600" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#4a44c8">语言基座（Qwen3-Next）</text>
+  <text x="600" y="66" text-anchor="middle" font-size="10.5" fill="#6d6b78">DeltaNet + 全注意力 · MoE · MTP</text>
+  <!-- 能力 -->
+  <rect x="30" y="264" width="180" height="46" rx="8" fill="#edf7f1" stroke="#2e7d4f"/>
+  <text x="120" y="283" text-anchor="middle" font-size="12" font-weight="700" fill="#2e7d4f">强项能力</text>
+  <text x="120" y="300" text-anchor="middle" font-size="10.5" fill="#6d6b78">OCR/文档 · 空间定位 · 长视频</text>
+  <!-- 效率 -->
+  <rect x="510" y="264" width="180" height="46" rx="8" fill="#edf3fb" stroke="#2f5f9e"/>
+  <text x="600" y="283" text-anchor="middle" font-size="12" font-weight="700" fill="#2f5f9e">效率红利</text>
+  <text x="600" y="300" text-anchor="middle" font-size="10.5" fill="#6d6b78">17B 激活 · 256K 下 19× 吞吐</text>
+  <!-- 后训练 -->
+  <rect x="280" y="20" width="160" height="40" rx="8" fill="#fdf1e7" stroke="#b3541e"/>
+  <text x="360" y="37" text-anchor="middle" font-size="12" font-weight="700" fill="#b3541e">后训练</text>
+  <text x="360" y="52" text-anchor="middle" font-size="10.5" fill="#6d6b78">大规模扩展 RL 任务与环境</text>
+  <!-- 短板 -->
+  <rect x="280" y="280" width="160" height="40" rx="8" fill="#fdeeec" stroke="#b3352b"/>
+  <text x="360" y="297" text-anchor="middle" font-size="12" font-weight="700" fill="#b3352b">已知短板</text>
+  <text x="360" y="312" text-anchor="middle" font-size="10.5" fill="#6d6b78">OSWorld 输 Claude 4.5 Opus</text>
+  <!-- 连线 -->
+  <line x1="210" y1="60" x2="290" y2="140" stroke="#8a86b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="510" y1="60" x2="430" y2="140" stroke="#8a86b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="360" y1="60" x2="360" y2="140" stroke="#8a86b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="290" y1="200" x2="190" y2="262" stroke="#8a86b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="430" y1="200" x2="530" y2="262" stroke="#8a86b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="360" y1="195" x2="360" y2="275" stroke="#8a86b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+</svg>
+<figcaption>图 9-1：全篇概念网。视觉栈与语言基座是两台引擎，后训练是燃料；强项与效率是它们联合兑现的结果，短板指示了下一代的主攻方向（Agent 决策层的 RL）。</figcaption>
+</figure>
+<p>如果用一段话总结全站：<strong>Qwen3.5 把 Qwen3-VL 验证过的视觉栈（交错 MRoPE 管时空、DeepStack 管细节、时间戳对齐管定位）嫁接到 Qwen3-Next 的高效语言基座（混合注意力管成本、高稀疏 MoE 管容量、MTP 管速度）上，再用大规模 RL 环境做后训练，得到一个「感知层代差领先、效率代差领先、Agent 决策层仍在追赶」的原生视觉语言模型。</strong></p>
+
+<h3 id="ch9-2">9.2 数字速查表</h3>
+<div class="table-wrap">
+<table>
+<caption>身份与规模</caption>
+<thead><tr><th>数字</th><th>含义</th></tr></thead>
+<tbody>
+<tr><td class="num">397B / 17B</td><td>旗舰总参数 / 激活参数（MoE，稀疏度约 23）</td></tr>
+<tr><td class="num">201 种</td><td>支持的语言/方言（上代 119 种）</td></tr>
+<tr><td class="num">1M token</td><td>托管版 Qwen3.5-Plus 默认上下文（开源家族原生 256K 起步）</td></tr>
+<tr><td class="num">8.6× / 19×</td><td>32K / 256K 上下文下对 Qwen3-Max 的解码吞吐（性能相当）</td></tr>
+<tr><td class="num">≈794 / 397 / 200 GB</td><td>397B 权重在 BF16 / FP8 / INT4 下的显存（本站估算）</td></tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table>
+<caption>代表性 benchmark（Qwen3.5-397B-A17B，官方博客；加粗为表中最强）</caption>
+<thead><tr><th>领域</th><th>数字</th></tr></thead>
+<tbody>
+<tr><td>OCR/文档</td><td><strong>OCRBench 93.1</strong> · <strong>OmniDocBench 90.8</strong> · <strong>CC-OCR 82.0</strong> · AI2D 93.9</td></tr>
+<tr><td>数学/STEM</td><td><strong>MathVision 88.6</strong> · MMMU 85.0 · MathVista 90.3 · <strong>ZEROBench 12</strong></td></tr>
+<tr><td>空间/grounding</td><td><strong>RefCOCO 92.3</strong> · CountBench 97.2 · <strong>V* 91.1（无 CI）</strong> · <strong>LingoQA 81.6</strong></td></tr>
+<tr><td>视频</td><td><strong>MLVU 86.7</strong> · VideoMME 87.5 · LVBench 75.5 · VideoMMMU 84.7</td></tr>
+<tr><td>Agent</td><td>ScreenSpot Pro 65.6 · OSWorld 62.2（输 Claude 66.3）· AndroidWorld 66.8</td></tr>
+<tr><td>语言侧</td><td>MMLU-Pro 87.8 · GPQA 88.4 · AIME26 91.3 · SWE-bench 76.4 · <strong>NOVA-63 59.1</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table>
+<caption>名词速查</caption>
+<thead><tr><th>名词</th><th>一句话</th><th>复习入口</th></tr></thead>
+<tbody>
+<tr><td>原生 VLM</td><td>视觉能力从基座预训练就内建，非外挂</td><td>0.1 / 1.1</td></tr>
+<tr><td>ViT</td><td>Vision Transformer，把图像 patch 编成视觉特征向量</td><td>0.2 / 2.2</td></tr>
+<tr><td>patch</td><td>图片被切成的规则小方块，视觉 token 的前身</td><td>0.2</td></tr>
+<tr><td>视觉 token</td><td>图片经 ViT + merger 后进入语言模型的基本单位</td><td>0.2</td></tr>
+<tr><td>Naive Dynamic Resolution</td><td>任意分辨率输入：按原图尺寸切 patch，不强行拉伸（Qwen2-VL 起）</td><td>1.3</td></tr>
+<tr><td>merger</td><td>2×2 合并视觉 token 并投影到 LLM 维度，token 数 ÷4</td><td>2.2</td></tr>
+<tr><td>DeepStack</td><td>ViT 多层级特征分层注入 LLM 多个中间层，保细粒度</td><td>2.3</td></tr>
+<tr><td>RoPE</td><td>旋转位置编码：按位置旋转向量，点积自动感知相对距离</td><td>3.2.1</td></tr>
+<tr><td>MRoPE / 交错 MRoPE</td><td>t/h/w 三维位置编码；交错布局让三轴平分频率资源</td><td>3.1 / 3.2</td></tr>
+<tr><td>T-RoPE</td><td>Qwen2.5-VL 的时间轴位置编码，文本-时间戳对齐的前身</td><td>3.3</td></tr>
+<tr><td>文本-时间戳对齐</td><td>自然语言时间 ↔ 视频 t 轴坐标双向换算，秒级定位</td><td>3.3</td></tr>
+<tr><td>全注意力</td><td>每 token 查全部历史：精确检索，代价是平方计算 + KV 缓存</td><td>0.4</td></tr>
+<tr><td>线性注意力</td><td>固定大小状态代替逐 token 缓存：常数记忆，有损压缩</td><td>0.4 / 4.1</td></tr>
+<tr><td>Gated DeltaNet</td><td>门控衰减 + 定向擦除的线性注意力，Qwen3-Next 主力层</td><td>4.1</td></tr>
+<tr><td>KV 缓存</td><td>全注意力逐 token 存下的 K/V，随长度线性膨胀</td><td>0.4 / 4-B</td></tr>
+<tr><td>混合注意力</td><td>大部分层线性 + 少部分层全注意力的层间搭配</td><td>4.2</td></tr>
+<tr><td>MoE</td><td>混合专家：路由器给专家打分，只激活 Top-N</td><td>0.3 / 4-A</td></tr>
+<tr><td>路由器 router</td><td>给当前 token 挑选专家的小网络；负载不均衡的来源</td><td>4.3</td></tr>
+<tr><td>总参数 / 激活参数</td><td>397B 决定容量与显存，17B 决定每 token 成本</td><td>0.3</td></tr>
+<tr><td>稀疏度</td><td>总参数 ÷ 激活参数；397B-A17B ≈ 23</td><td>0.3</td></tr>
+<tr><td>MTP</td><td>多 token 预测：训练信号更密 + 推理投机加速</td><td>4.3</td></tr>
+<tr><td>预填充 / 解码</td><td>读输入（并行、吃算力）vs 吐输出（串行、吃带宽）</td><td>8.2</td></tr>
+<tr><td>grounding</td><td>把语言描述绑定到像素坐标（「左边红按钮」→ 一个框）</td><td>5.2</td></tr>
+<tr><td>CI</td><td>上下文工程/工具辅助开关；读榜先看开没开</td><td>5.2 / 6.3</td></tr>
+<tr><td>量化</td><td>降每参数字节数：BF16 2B → FP8 1B → INT4 0.5B，省显存不换架构</td><td>8.1</td></tr>
+<tr><td>OCRBench</td><td>文字识别综合榜；Qwen3.5 93.1 为表中最强</td><td>5.1</td></tr>
+<tr><td>OmniDocBench</td><td>文档版式解析榜；Qwen3.5 90.8 为表中最强</td><td>5.1</td></tr>
+<tr><td>ScreenSpot / OSWorld</td><td>GUI 元素定位 / 真实电脑操作榜；后者 Qwen3.5 输 Claude</td><td>5.4 / 6.2</td></tr>
+<tr><td>MMMU 系</td><td>大学学科级多模态理解（MMMU / MMMU-Pro / VideoMMMU）</td><td>5.1 / 5.3</td></tr>
+<tr><td>后训练 / RL</td><td>预训练之后的对齐训练；Qwen3.5 主策略是大规模扩展 RL 环境</td><td>1.1</td></tr>
+<tr><td>Agent / 工具调用</td><td>模型输出结构化请求、外部执行、结果回填的多步工作模式</td><td>5.4</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 id="ch9-3">9.3 延伸学习路线</h3>
+<ol>
+<li><strong>读一手材料</strong>：官方博客《Qwen3.5: Towards Native Multimodal Agents》→ Qwen3-VL 技术报告（视觉栈三大创新的完整推导）→ Qwen3-Next 技术报告（混合注意力与 MoE 细节）。</li>
+<li><strong>动手</strong>：用第 7 章的代码跑通 9B/27B 小模型 → 在自己的 50 条真实样本上建评测集 → 复现一次「帧率-检出率」曲线（第 8 章自测题 8.1）。</li>
+<li><strong>补原理</strong>：RoPE 原始论文（理解旋转编码）→ DeltaNet/线性注意力文献（理解状态更新规则）→ MoE 负载均衡文献（理解路由器的难处）。</li>
+<li><strong>跟演进</strong>：关注 Qwen 官方博客——35B-A3B 超越上代 235B 的代际速度说明这个家族的迭代节奏以「月」计，本站的数字半年后就需要刷新。</li>
+</ol>
+
+<details class="quiz">
+<summary>自测题 9.1（综合）：不看前文，用「因为……所以……」句式，把以下五个事实连成一条因果链：DeepStack、OCRBench 93.1、固定大小状态、256K 下 19× 吞吐、MLVU 86.7。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>五个事实分属两层：两个是架构设计（DeepStack、固定大小状态），三个是结果（两个分数、一个倍数）。</div>
+<div class="ladder"><strong>关键在于：</strong>每个结果前面都能找到「让它成立」的设计；注意 19× 和 MLVU 之间还夹着一个中间变量（成本可行性）。</div>
+<div class="ladder"><strong>第一步这样走：</strong>先写两条小链：DeepStack → OCR；固定状态 → 19×。再想 MLVU 该挂在哪条链上。</div>
+<div class="ladder"><strong>完整答案：</strong>示例答案：因为 DeepStack 把 ViT 的多层级特征分层注入语言模型，小字与版式细节在推理各阶段都可达，所以 Qwen3.5 在细粒度文字识别上拿到 OCRBench 93.1（表中最强）。因为 Gated DeltaNet 用固定大小状态替代逐 token 的 KV 缓存，上下文越长记忆成本优势越大，所以 256K 下解码吞吐达到 Qwen3-Max 的 19×（32K 时只有 8.6×——差值正是长上下文红利）。正因为长上下文变得「装得起也算得动」，再加上 MRoPE 时间轴与时间戳对齐提供的定位能力，所以长视频理解（MLVU 86.7，表中最强）从演示变成可用的产品力。链条的核心模式：<strong>架构设计 → 成本/信息结构 → 能力分数</strong>，每个 benchmark 数字都应该能这样回溯到一个设计决策，回溯不了的分数多半是后训练或数据的功劳。</div>
+<div class="variant"><strong>变式：</strong>把「OSWorld 62.2 输 Claude 66.3」也接进这张网——它挂在哪个节点上？（提示：回顾第 5 章自测题 5.2 的「感知层 vs 决策层」分析。）</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 9.2（综合）：你的 CTO 转来一条新闻「Qwen3.5 发布，多项 benchmark 第一」，问你「我们要不要把现有管线（基于某闭源 API）迁过去」。写一份不超过 10 行的决策备忘录，给出你的答复框架（不是结论）。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>你现在的管线服务的是什么场景？这个场景对应哪 2–3 个 benchmark？数据能不能出内网？</div>
+<div class="ladder"><strong>关键在于：</strong>备忘录的结构应该是「我们的场景 → 对应的榜 → Qwen3.5 在那几项上的数字 → 迁移成本 → 验证方式」，而不是「它很强 → 迁」。</div>
+<div class="ladder"><strong>第一步这样走：</strong>先写结论句（「值得在 X 场景上评估，不建议全量迁移」之类），再补三条依据。</div>
+<div class="ladder"><strong>完整答案：</strong>示例备忘录：① 结论：建议在「文档解析」子场景评估 Qwen3.5，其余子场景维持现状，不做全量迁移。② 依据一：我们的核心负载是扫描合同解析，对应 OCRBench/OmniDocBench，Qwen3.5 两项均为表中最强（93.1/90.8），领先现用模型 10 分上下，属代差级而非噪声。③ 依据二：但我们的 Agent 子场景对应 OSWorld 类能力，Qwen3.5 在该项落后 Claude 4.5 Opus（62.2 vs 66.3），迁移反而可能退化。④ 依据三：合同数据有合规要求，托管 API 不可行，需评估自建 35B-A3B（INT4 约 17.5GB 显存）的成本。⑤ 验证方式：取 200 份历史合同建评测集，两周内完成「现管线 vs 自建 Qwen3.5」AB 对比，按字段级准确率而非 demo 效果决策。框架要点：场景切分、按榜对号、区分代差与噪声、合规约束前置、自建评测兜底。</div>
+<div class="variant"><strong>变式：</strong>CTO 追问「评估期间现管线的 API 费用照付，这 200 份合同的 AB 测试本身值多少钱？」——给出评估成本的估算思路和「什么时候不值得评估」的判据。</div>
+</div>
+</details>
+
+<details class="quiz">
+<summary>自测题 9.3（综合·提取练习）：合上页面，默写一张 Qwen3.5 速查卡：型号与参数、三大视觉创新、基座三件套、两个最强能力域、一个已知短板、一个显存数字、一个吞吐数字。写完翻回各章核对，给每项标「记得牢 / 模糊 / 已忘」。</summary>
+<div class="quiz-body">
+<div class="ladder"><strong>先想：</strong>这是提取练习（retrieval practice）——测的不是「读懂过」，而是「能调出来用」。</div>
+<div class="ladder"><strong>关键在于：</strong>写不出来时不要翻书「找感觉」——先老实标「已忘」再核对，标记的真实性才有诊断价值。</div>
+<div class="ladder"><strong>第一步这样走：</strong>按序默写：397B-A17B；交错 MRoPE / DeepStack / 文本-时间戳对齐；Gated DeltaNet + 混合注意力 / 高稀疏 MoE / MTP；OCR 文档 + 空间与长视频；OSWorld 输 Claude；794 GB（BF16）；19×（256K）。</div>
+<div class="ladder"><strong>完整答案：</strong>参考速查卡——型号：Qwen3.5-397B-A17B（397B 总 / 17B 激活 MoE）；视觉三创新：交错 MRoPE（三维位置）、DeepStack（分层注入保细节）、文本-时间戳对齐（秒级定位）；基座三件套：Gated DeltaNet + Gated Attention 混合、高稀疏度 MoE、MTP；最强域：OCR/文档（OCRBench 93.1）与细粒度空间/长视频（RefCOCO 92.3、MLVU 86.7）；短板：OSWorld 62.2 输 Claude 4.5 Opus 66.3；显存：BF16 约 794 GB（估算）；吞吐：256K 下 19× Qwen3-Max。核对之后：对「模糊/已忘」项不要重读整章，只回对应小节读一遍，24 小时后再默写一次——间隔重复一次，胜过当场重读五遍。</div>
+<div class="variant"><strong>变式：</strong>一周后不看任何材料，给同事做一次 3 分钟「Qwen3.5 是什么」口头汇报并录音。回放时专门检查：有没有说出任何你其实并没有把握的数字？那些就是要回炉的地方。</div>
+</div>
+</details>
+
+<div class="chapter-end">
+<div class="summary-box">
+<div class="box-title">全站小结</div>
+<p>九章内容压缩成三句话：<strong>架构上</strong>，Qwen3.5 = Qwen3-VL 视觉栈 + Qwen3-Next 高效基座，原生多模态；<strong>能力上</strong>，感知层（OCR/文档/空间/长视频）代差领先，Agent 决策层仍在追赶，没有全面碾压只有场景匹配；<strong>工程上</strong>，显存按总参数算、成本按激活参数算、选型按你的 2–3 个 benchmark 算、效果按你的自建评测集算。带着这四条，你可以去读一手论文、跑真实模型、并在下一条「震惊发布」的新闻面前保持节奏了。</p>
+</div>
+<div class="next-step"><strong>下一步：</strong>回到 <a href="#ch7">第 7 章</a> 把代码跑起来——理解一个模型最好的方式，永远是让它答错一次你的题。</div>
+</div>
+
+<footer>
+<p><strong>事实来源与免责说明</strong></p>
+<p>本站全部模型事实与 benchmark 数字来自阿里巴巴 Qwen 团队官方博客《Qwen3.5: Towards Native Multimodal Agents》（2026-02-17）及 Qwen3-VL 系列公开资料（Qwen3-VL 于 2025 年 9 月首发，权重 Apache 2.0）。以下内容为<strong>本站自行估算或推断，已在正文原位标注</strong>：① 全部显存数字（794/397/200 GB 等，按 参数量×字节数 计算）；② 稀疏度 23.3、35B-A3B 稀疏度 11.7（由公开参数直接相除）；③ 8.6×/19× 吞吐的三因素归因（官方未逐项拆解）；④ 第 8 章全部成本量级演示；⑤ 图 2-1、3-1、4-1、9-1 均为原理示意图，非官方架构图。官方未披露的实现细节（如混合层具体比例、ViT 规格），本站一律未编造。</p>
+<p>本站立场的边界：Qwen3.5-35B-A3B「全面超越上代 235B」等表述为官方宣称，引用时已注明出处；托管版模型 ID、价格、上下文策略以阿里云百炼控制台实时信息为准。</p>
+<p>学透 Qwen3.5-VL · 单文件静态站 · 无外部依赖 · 双击即可离线阅读</p>
+</footer>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<button id="backTop" title="返回顶部" aria-label="返回顶部">↑</button>
+
+<script>
+(function(){
+  // 移动端菜单
+  var btn = document.getElementById('menuBtn');
+  var sidebar = document.getElementById('sidebar');
+  if (btn) btn.addEventListener('click', function(){ sidebar.classList.toggle('open'); });
+  // 点击导航后在移动端自动收起
+  sidebar.addEventListener('click', function(e){
+    if (e.target.closest('a') && window.innerWidth <= 960) sidebar.classList.remove('open');
+  });
+
+  // 滚动高亮（IntersectionObserver）
+  var links = {};
+  document.querySelectorAll('.sidebar a[href^="#"]').forEach(function(a){
+    links[a.getAttribute('href').slice(1)] = a;
+  });
+  var ids = Object.keys(links);
+  var current = null;
+  function setActive(id){
+    if (current === id) return;
+    current = id;
+    ids.forEach(function(k){ links[k].classList.remove('active'); });
+    if (links[id]) links[id].classList.add('active');
+    // 同步高亮所属章的主链接
+    if (id.match(/^ch\d+-\d+$/)) {
+      var parent = id.split('-')[0];
+      if (links[parent]) links[parent].classList.add('active');
+    }
+  }
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting) setActive(en.target.id);
+    });
+  }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+})();
+</script>
+<script>
+/* 组件 1：图→视觉 token 流水线动画 */
+(function(){
+  var root = document.getElementById('viz1'); if(!root) return;
+  var pkt = document.getElementById('viz1-pkt');
+  var cap = document.getElementById('viz1-cap');
+  var playBtn = document.getElementById('viz1-play');
+  var steps = [
+    {x:67,  y:82,  t:'第 1 步：原图被切成规则的 patch 网格（示意 6×6）'},
+    {x:164, y:82,  t:'第 2 步：每个 patch 被展开成一个向量'},
+    {x:255, y:82,  t:'第 3 步：ViT 把 patch 向量编码成视觉特征'},
+    {x:362, y:82,  t:'第 4 步：merger 做 2×2 合并 + 投影，token 数 ÷4'},
+    {x:525, y:65,  t:'第 5 步：视觉 token 与文本 token 排成同一个序列'},
+    {x:617, y:186, t:'第 6 步：混合序列进入语言模型，逐 token 生成答案'}
+  ];
+  var cur = 0, timer = null;
+  function show(i){
+    cur = i;
+    pkt.style.transform = 'translate(' + steps[i].x + 'px,' + steps[i].y + 'px)';
+    cap.textContent = steps[i].t;
+    for(var k=0;k<6;k++){
+      var g = document.getElementById('viz1-s'+k);
+      if(g) g.style.opacity = (k<=i) ? '1' : '.35';
+    }
+  }
+  function stop(){ if(timer){ clearTimeout(timer); timer=null; } playBtn.textContent='播放'; }
+  function next(){ show((cur+1)%steps.length); }
+  playBtn.addEventListener('click', function(){
+    if(timer){ stop(); return; }
+    playBtn.textContent='暂停';
+    (function loop(){ next(); timer = setTimeout(function(){ if(timer) loop(); }, 1500); })();
+  });
+  document.getElementById('viz1-step').addEventListener('click', function(){ stop(); next(); });
+  document.getElementById('viz1-reset').addEventListener('click', function(){ stop(); show(0); });
+  show(0);
+})();
+</script>
+<script>
+/* 组件 2：DeepStack 对比切换 */
+(function(){
+  var root = document.getElementById('viz2'); if(!root) return;
+  var L = document.getElementById('viz2-left'), R = document.getElementById('viz2-right');
+  function mode(m){
+    L.classList.toggle('viz2-dim', m==='r');
+    R.classList.toggle('viz2-dim', m==='l');
+  }
+  document.getElementById('viz2-b1').addEventListener('click', function(){ mode('l'); });
+  document.getElementById('viz2-b2').addEventListener('click', function(){ mode('r'); });
+  document.getElementById('viz2-both').addEventListener('click', function(){ mode('both'); });
+})();
+</script>
+<script>
+/* 组件 3：MRoPE 三维位置交互 */
+(function(){
+  var root = document.getElementById('viz3'); if(!root) return;
+  var $ = function(id){ return document.getElementById(id); };
+  var pos = {t:2, h:3, w:5};
+  var FREQ = {hi:1.0, lo:0.1}; // 演示用频率（弧度），非官方超参
+  function deg(p, f){ return Math.round((p*f*180/Math.PI) % 360); }
+  function update(){
+    ['t','h','w'].forEach(function(ax){ $('viz3-'+ax+'v').textContent = pos[ax]; });
+    $('viz3-triple').textContent = '(t, h, w) = (' + pos.t + ', ' + pos.h + ', ' + pos.w + ')';
+    // 帧高亮
+    for(var i=0;i<8;i++){
+      var f = $('viz3-f'+i);
+      f.setAttribute('fill', i===pos.t ? '#615ced' : '#f0eefe');
+    }
+    // 网格高亮格：列=w，行=h，cell 20px，原点 (260,40)
+    var cell = $('viz3-cell');
+    cell.setAttribute('x', 260 + pos.w*20);
+    cell.setAttribute('y', 40 + pos.h*20);
+    // 旋转角条：b0..b5 = t高,t低,h高,h低,w高,w低；满宽 150px = 360°
+    var axes = ['t','h','w'];
+    for(var k=0;k<6;k++){
+      var p = pos[axes[Math.floor(k/2)]], f = (k%2===0)?FREQ.hi:FREQ.lo;
+      var d = deg(p,f);
+      $('viz3-b'+k).setAttribute('width', Math.max(2, d/360*150));
+      $('viz3-d'+k).textContent = d + '°';
+    }
+  }
+  ['t','h','w'].forEach(function(ax){
+    $('viz3-'+ax).addEventListener('input', function(e){ pos[ax] = +e.target.value; update(); });
+  });
+  update();
+})();
+</script>
+<script>
+/* 组件 4：注意力打分热力图 */
+(function(){
+  var root = document.getElementById('viz4'); if(!root) return;
+  var toks = ['猫','追','老','鼠','，','它','饿','了'];
+  // 行 token 对列 token 的注意力权重（因果：只看左边），教学示意数据
+  var W = [
+    [1.00,0,0,0,0,0,0,0],
+    [.55,.45,0,0,0,0,0,0],
+    [.30,.35,.35,0,0,0,0,0],
+    [.15,.30,.25,.30,0,0,0,0],
+    [.10,.15,.30,.35,.10,0,0,0],
+    [.62,.08,.10,.12,.03,.05,0,0],
+    [.35,.05,.05,.05,.02,.43,.05,0],
+    [.20,.05,.05,.05,.05,.35,.20,.05]
+  ];
+  var n = toks.length, sel = -1;
+  var grid = document.getElementById('viz4-grid');
+  var status = document.getElementById('viz4-status');
+  grid.style.gridTemplateColumns = 'repeat(' + (n+1) + ', 1fr)';
+  grid.appendChild(document.createElement('div')); // 左上角空格
+  toks.forEach(function(t){
+    var h = document.createElement('div'); h.className='viz4-head'; h.textContent=t;
+    grid.appendChild(h);
+  });
+  var rows = [];
+  toks.forEach(function(t, i){
+    var head = document.createElement('div'); head.className='viz4-head'; head.textContent=t;
+    head.title = '点击高亮「'+t+'」的注意力分布';
+    head.addEventListener('click', function(){
+      sel = (sel===i) ? -1 : i;
+      paint();
+      status.textContent = sel<0 ? '把鼠标移到任意格子上……'
+        : '「'+toks[sel]+'」的注意力分布已高亮（本行即它「查资料」的权重）';
+    });
+    grid.appendChild(head);
+    var rowEls = [head];
+    for(var j=0;j<n;j++){
+      var c = document.createElement('div');
+      if(j<=i){
+        var w = W[i][j];
+        c.className='viz4-cell';
+        c.style.background = 'rgba(97,92,237,' + (0.06 + w*0.94).toFixed(2) + ')';
+        c.textContent = w>0 ? w.toFixed(2) : '';
+        c.dataset.i=i; c.dataset.j=j;
+        c.addEventListener('mouseenter', function(e){
+          var a=+e.target.dataset.i, b=+e.target.dataset.j;
+          status.textContent = '「'+toks[a]+'」关注「'+toks[b]+'」的权重：' + W[a][b].toFixed(2);
+        });
+      }
+      grid.appendChild(c);
+      rowEls.push(c);
+    }
+    rows.push(rowEls);
+  });
+  function paint(){
+    rows.forEach(function(r, i){
+      var dim = (sel>=0 && i!==sel);
+      r.forEach(function(el){ el.style.opacity = dim ? '.3' : '1'; });
+      r[0].classList.toggle('sel', sel===i);
+    });
+  }
+  document.getElementById('viz4-reset').addEventListener('click', function(){
+    sel=-1; paint(); status.textContent='把鼠标移到任意格子上……';
+  });
+})();
+</script>
+<script>
+/* 组件 5：MoE 路由器动画 */
+(function(){
+  var root = document.getElementById('viz5'); if(!root) return;
+  var N = 16, K = 2;
+  var toks = ['猫','发票','函数','第30秒','左边','为什么','JSON','视频','表观','梯度','按钮','翻译'];
+  // 预设专家偏好（制造负载不均衡）：指数衰减的受欢迎度
+  var pref = []; for(var i=0;i<N;i++) pref.push(Math.pow(0.82, i));
+  var counts = new Array(N).fill(0), total = 0, busy = false;
+  var expBox = document.getElementById('viz5-experts');
+  var barsBox = document.getElementById('viz5-bars');
+  var status = document.getElementById('viz5-status');
+  var exps = [], bars = [];
+  for(var i=0;i<N;i++){
+    var d = document.createElement('div'); d.className='viz5-exp';
+    d.innerHTML = '专家' + (i+1) + '<span class="sc"></span>';
+    expBox.appendChild(d); exps.push(d);
+    var b = document.createElement('div'); b.className='viz5-bar'; b.style.height='2px';
+    b.title = '专家' + (i+1);
+    barsBox.appendChild(b); bars.push(b);
+  }
+  function paintBars(){
+    var max = Math.max(1, Math.max.apply(null, counts));
+    for(var i=0;i<N;i++) bars[i].style.height = Math.max(2, counts[i]/max*78) + 'px';
+    var hot = counts.indexOf(Math.max.apply(null, counts));
+    if(total>0) status.textContent = '已处理 ' + total + ' 个 token；最忙的是专家' + (hot+1) +
+      '（被选中 ' + counts[hot] + ' 次，占全部激活的 ' + Math.round(counts[hot]/(total*K)*100) + '%）——注意柱子的参差。';
+  }
+  function fire(){
+    var tk = toks[Math.floor(Math.random()*toks.length)];
+    document.getElementById('viz5-tok').textContent = '「' + tk + '」';
+    var scores = pref.map(function(p){ return p * (0.5 + Math.random()); });
+    for(var i=0;i<N;i++){ exps[i].classList.remove('hot'); exps[i].querySelector('.sc').textContent = scores[i].toFixed(2); }
+    var idx = scores.map(function(s,i){return [s,i];}).sort(function(a,b){return b[0]-a[0];}).slice(0,K).map(function(x){return x[1];});
+    idx.forEach(function(i){ exps[i].classList.add('hot'); counts[i]++; });
+    total++;
+    document.getElementById('viz5-pick').textContent = 'Top-2：专家' + (idx[0]+1) + '、专家' + (idx[1]+1);
+    paintBars();
+  }
+  document.getElementById('viz5-one').addEventListener('click', function(){ if(!busy) fire(); });
+  document.getElementById('viz5-ten').addEventListener('click', function(){
+    if(busy) return; busy = true; var n = 0;
+    (function step(){ fire(); n++; if(n<10){ setTimeout(step, 350); } else { busy=false; } })();
+  });
+  document.getElementById('viz5-reset').addEventListener('click', function(){
+    counts = new Array(N).fill(0); total = 0;
+    for(var i=0;i<N;i++){ exps[i].classList.remove('hot'); exps[i].querySelector('.sc').textContent=''; }
+    document.getElementById('viz5-tok').textContent = '（尚未送入）';
+    document.getElementById('viz5-pick').textContent = 'Top-2 专家点亮';
+    status.textContent = '点「送入一个 token」开始。';
+    paintBars();
+  });
+})();
+</script>
+<script>
+/* 组件 6：KV 缓存 vs 线性注意力状态曲线 */
+(function(){
+  var root = document.getElementById('viz6'); if(!root) return;
+  var $ = function(id){ return document.getElementById(id); };
+  // 假设：60 层全注意力，每层每 token KV 共 4 KB；DeltaNet 每层固定 64 KB 状态
+  var GB_PER_TOK = 4096 * 60 / 1e9;   // ≈0.000246 GB/token
+  var DS_GB = 65536 * 60 / 1e9;       // ≈0.0039 GB，常数
+  function xOf(n){ return 70 + (Math.log2(n) - 10) / 10 * 620; }  // 1K..1M → 70..690
+  function yOf(gb){ return 290 - Math.min(gb, 260); }             // 1GB = 1px，封顶 260
+  // 生成 KV 曲线
+  var d = '';
+  for(var i=0;i<=80;i++){
+    var n = Math.pow(2, 10 + i/8);
+    d += (i===0?'M':'L') + xOf(n).toFixed(1) + ',' + yOf(n*GB_PER_TOK).toFixed(1) + ' ';
+  }
+  $('viz6-kv').setAttribute('d', d);
+  $('viz6-ds').setAttribute('y1', yOf(DS_GB)); $('viz6-ds').setAttribute('y2', yOf(DS_GB));
+  var slider = $('viz6-slider');
+  function fmt(gb){ return gb < 0.01 ? gb.toFixed(3) : gb.toFixed(1); }
+  function fmtLen(n){
+    if(n >= 1048576) return '1M';
+    if(n >= 1024) return (n/1024) + 'K';
+    return '' + n;
+  }
+  function update(){
+    var n = Math.pow(2, 10 + (+slider.value));
+    var kv = n * GB_PER_TOK;
+    $('viz6-len').textContent = fmtLen(n);
+    $('viz6-kvnum').textContent = fmt(kv) + ' GB';
+    $('viz6-dsnum').textContent = fmt(DS_GB) + ' GB';
+    var mark = $('viz6-mark');
+    mark.setAttribute('cx', xOf(n)); mark.setAttribute('cy', yOf(kv));
+    var warn = $('viz6-warn');
+    if(kv > 141){ warn.textContent = '已撞 141GB 红线！'; warn.className = 'viz8-fit no'; }
+    else { warn.textContent = '未撞显存红线'; warn.className = 'viz8-fit ok'; }
+  }
+  slider.addEventListener('input', update);
+  update();
+})();
+</script>
+<script>
+/* 组件 7：benchmark 可视化柱状图 */
+(function(){
+  var root = document.getElementById('viz7'); if(!root) return;
+  var MODELS = [
+    {k:'qwen',   name:'Qwen3.5-397B'},
+    {k:'gpt',    name:'GPT-5.2'},
+    {k:'claude', name:'Claude 4.5 Opus'},
+    {k:'gemini', name:'Gemini-3 Pro'}
+  ];
+  var GROUPS = {
+    ocr: [
+      {name:'OCRBench',        vals:{qwen:93.1, gpt:80.7, claude:null, gemini:90.4}},
+      {name:'OmniDocBench 1.5', vals:{qwen:90.8, gpt:null, claude:null, gemini:null}}
+    ],
+    math: [
+      {name:'MathVision',       vals:{qwen:88.6, gpt:null, claude:null, gemini:86.6}},
+      {name:'MathVista (mini)', vals:{qwen:90.3, gpt:null, claude:null, gemini:null}}
+    ],
+    agent: [
+      {name:'OSWorld-Verified', vals:{qwen:62.2, gpt:null, claude:66.3, gemini:null}},
+      {name:'AndroidWorld',     vals:{qwen:66.8, gpt:null, claude:null, gemini:null}}
+    ]
+  };
+  var chart = document.getElementById('viz7-chart');
+  var btns = {ocr:'viz7-g-ocr', math:'viz7-g-math', agent:'viz7-g-agent'};
+  function render(g){
+    chart.innerHTML = '';
+    GROUPS[g].forEach(function(b){
+      var h = document.createElement('div');
+      h.style.cssText = 'font-weight:700;font-size:14px;margin:12px 0 4px;color:var(--accent-dark)';
+      h.textContent = b.name; chart.appendChild(h);
+      MODELS.forEach(function(m){
+        var v = b.vals[m.k];
+        var row = document.createElement('div'); row.className = 'viz7-bar-row';
+        var lab = document.createElement('div'); lab.className = 'viz7-bar-label'; lab.textContent = m.name;
+        var track = document.createElement('div'); track.className = 'viz7-bar-track';
+        if(v === null){
+          var na = document.createElement('span'); na.className = 'viz7-na'; na.textContent = '官方表未报告';
+          track.appendChild(na);
+        } else {
+          var fill = document.createElement('div');
+          fill.className = 'viz7-bar-fill' + (m.k==='qwen' ? ' qwen' : '');
+          fill.style.width = v + '%';
+          track.appendChild(fill);
+          var val = document.createElement('span');
+          val.className = 'viz7-bar-val'; val.textContent = v.toFixed(1);
+          val.style.left = 'calc(' + v + '% + 6px)';
+          val.style.color = m.k==='qwen' ? 'var(--accent-dark)' : 'var(--muted)';
+          track.appendChild(val);
+        }
+        row.appendChild(lab); row.appendChild(track);
+        chart.appendChild(row);
+      });
+    });
+    Object.keys(btns).forEach(function(k){
+      var el = document.getElementById(btns[k]);
+      el.className = (k===g) ? 'viz-btn' : 'viz-btn ghost';
+    });
+  }
+  Object.keys(btns).forEach(function(k){
+    document.getElementById(btns[k]).addEventListener('click', function(){ render(k); });
+  });
+  render('ocr');
+})();
+</script>
+<script>
+/* 组件 8：显存 / 部署成本计算器 */
+(function(){
+  var root = document.getElementById('viz8'); if(!root) return;
+  var $ = function(id){ return document.getElementById(id); };
+  var mSel = $('viz8-model'), pSel = $('viz8-prec'), gSel = $('viz8-gpu');
+  var out = $('viz8-result');
+  function calc(){
+    var params = +mSel.value;                 // B（十亿参数）
+    var bytes  = +pSel.value;                 // 每参数字节
+    var gpu    = +gSel.value;                 // 单卡 GB
+    var weight = params * bytes;              // GB（十进制，估算）
+    var withOverhead = weight * 1.2;          // +20% 余量
+    var cards = Math.ceil(withOverhead / gpu);
+    var fitOne = withOverhead <= gpu;
+    var gpuName = gSel.options[gSel.selectedIndex].text;
+    var html = '权重显存 ≈ <span class="viz-num">' + params + 'B × ' + bytes + ' B = ' +
+      weight.toFixed(weight < 10 ? 1 : 0) + ' GB</span>（估算：参数量 × 字节数）<br>' +
+      '加 20% 运行余量后 ≈ <span class="viz-num">' + withOverhead.toFixed(0) + ' GB</span><br>' +
+      '配置：<span class="viz-num">' + cards + ' × ' + gpuName + '</span>　';
+    if(fitOne) html += '<span class="viz8-fit ok">✓ 单卡装得下</span>';
+    else if(cards <= 8) html += '<span class="viz8-fit no">✗ 单卡装不下</span>，需 ' + cards + ' 卡张量并行';
+    else html += '<span class="viz8-fit no">✗ 需要 ' + cards + ' 卡</span>，建议降精度或换更小模型';
+    if(params === 397) html += '<br><span style="font-size:13px;color:var(--muted)">提醒：397B-A17B 的「17B」是每 token 激活量，决定速度；显存必须按 397B 全量准备（MoE 省算力不省显存，见第 0 章）。</span>';
+    if(+gSel.value === 128) html += '<br><span style="font-size:13px;color:var(--muted)">提醒：M 系列统一内存容量大但带宽低于 HBM，装得下 ≠ 跑得快，适合低速本地验证。</span>';
+    out.innerHTML = html;
+  }
+  [mSel, pSel, gSel].forEach(function(el){ el.addEventListener('change', calc); });
+  calc();
+})();
+</script>
+<script>
+/* A3：阅读进度条 + 返回顶部 + 代码复制按钮 */
+(function(){
+  var bar = document.getElementById('progressBar');
+  var top = document.getElementById('backTop');
+  function onScroll(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    if(bar) bar.style.width = (max>0 ? (h.scrollTop/max*100) : 0) + '%';
+    if(top) top.classList.toggle('show', h.scrollTop > 600);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  if(top) top.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+  // 代码块复制按钮（clipboard API + execCommand 降级）
+  document.querySelectorAll('pre').forEach(function(pre, idx){
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn'; btn.type = 'button'; btn.textContent = '复制';
+    btn.addEventListener('click', function(){
+      var text = pre.innerText;
+      function done(){ btn.textContent = '已复制 ✓'; setTimeout(function(){ btn.textContent='复制'; }, 1500); }
+      function fallback(){
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch(e) { btn.textContent = '复制失败'; }
+        document.body.removeChild(ta);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else fallback();
+    });
+    pre.appendChild(btn);
+  });
+})();
+</script>
+<script>
+/* A4：深色模式切换（localStorage 记忆 + prefers-color-scheme 默认值） */
+(function(){
+  var KEY = 'qwen35vl-theme';
+  var root = document.documentElement;
+  var btn = document.getElementById('themeToggle');
+  function current(){
+    var s = null;
+    try { s = localStorage.getItem(KEY); } catch(e) {}
+    if(s === 'dark' || s === 'light') return s;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  function apply(t){
+    root.setAttribute('data-theme', t);
+    if(btn){ btn.textContent = (t === 'dark') ? '☀' : '☾'; }
+  }
+  apply(current());
+  if(btn) btn.addEventListener('click', function(){
+    var next = (root.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+    try { localStorage.setItem(KEY, next); } catch(e) {}
+    apply(next);
+  });
+})();
+</script>
+</body>
+</html>
