@@ -1,0 +1,449 @@
+/* ==========================================================================
+   Base — shared by every theme.
+
+   The page content lives once in index.html. A theme is a single CSS file in
+   assets/themes/ that restyles it; all of its rules are scoped with
+   html[data-theme="<id>"]. What lives here is only what every theme builds on:
+   tokens, a light reset, a readable skeleton, the theme switcher and the switch
+   animation. See assets/themes/README.md.
+   ========================================================================== */
+
+/* Token fallbacks, kept at zero specificity so that the [data-theme="<id>"]
+   block of any theme stylesheet overrides them, whatever the load order. */
+:where(:root) {
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #555555;
+    --accent: #0b7285;
+    --accent-2: var(--accent);
+    --surface: #ffffff;
+    --border: rgba(0, 0, 0, 0.15);
+    --radius: 8px;
+    --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    --font-display: var(--font-body);
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", "PingFang SC", "Microsoft YaHei", monospace;
+    --page-width: 880px;
+
+    /* The theme switcher reads these; they default to the theme's own tokens. */
+    --switcher-bg: var(--surface);
+    --switcher-fg: var(--fg);
+    --switcher-muted: var(--muted);
+    --switcher-border: var(--border);
+    --switcher-accent: var(--accent);
+    --switcher-hover: rgba(127, 127, 127, 0.12);
+    --switcher-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* ---- Reset --------------------------------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, p, ol, ul { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+img { max-width: 100%; height: auto; }
+a:focus-visible,
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.icon {
+    flex: none;
+    width: 1em;
+    height: 1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Keeps a name such as "Qwen3.5-VL" on one line in narrow columns. */
+.nowrap { white-space: nowrap; }
+
+.skip-link {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1002;
+    padding: 8px 12px;
+    background: var(--surface);
+    color: var(--fg);
+    border-radius: 6px;
+    transform: translateY(-300%);
+}
+.skip-link:focus { transform: none; }
+
+/* The opening theme's stylesheet and fonts arrive just after the HTML. Stay
+   blank until they are in (1.5 s at most) instead of flashing an unstyled page. */
+html.theme-loading body { visibility: hidden; }
+
+/* Without JavaScript the portrait comes from the <noscript> copy. */
+html:not(.js) img.avatar:not([src]) { display: none; }
+
+/* Fixed full-screen layer a theme may switch on for particles, blobs, grids… */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: none;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* ---- Skeleton ------------------------------------------------------------ */
+.page {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 40px;
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+.hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 32px;
+}
+
+.avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.name {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.name-cn {
+    margin-left: 0.4em;
+    color: var(--muted);
+    font-size: 0.5em;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.role {
+    margin-top: 0.35rem;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.bio p + p { margin-top: 0.75rem; }
+
+.contact,
+.entry-links { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.contact { margin-top: 1.25rem; }
+
+.contact-link,
+.link { display: inline-flex; align-items: center; gap: 0.4em; }
+
+.content { display: grid; gap: 40px; }
+.col { display: contents; }
+
+.block-title {
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+.block-icon { display: none; }
+
+.news-list { display: grid; gap: 0.5rem; }
+.news-item { display: flex; gap: 0.6rem; }
+.news-date { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.honor-list { display: grid; gap: 0.25rem; padding-left: 1.25rem; list-style: disc; }
+
+.entry-list { display: grid; gap: 24px; }
+.entry { display: grid; gap: 0.35rem; }
+
+.entry-badge {
+    justify-self: start;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+.entry-badge.is-highlight {
+    background: color-mix(in srgb, var(--accent-2) 14%, transparent);
+    color: var(--accent-2);
+}
+
+.entry-title { font-size: 1.125rem; font-weight: 600; line-height: 1.35; }
+.entry-authors,
+.entry-desc { color: var(--muted); }
+.entry-links { margin-top: 0.25rem; }
+
+@media (max-width: 640px) {
+    .page { padding: 32px 20px; gap: 32px; }
+    .hero { grid-template-columns: 1fr; gap: 24px; }
+    .avatar { order: -1; }
+    .content { gap: 32px; }
+}
+
+/* ---- Theme switcher ------------------------------------------------------ */
+/* Built by assets/app.js, so it only exists when JavaScript runs. It sticks to
+   system fonts so that it never costs a webfont download. */
+.theme-switcher {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    color: var(--switcher-fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.theme-switcher-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: calc(100vw - 40px);
+    padding: 10px 14px;
+    border: 1px solid var(--switcher-border);
+    border-radius: 999px;
+    background: var(--switcher-bg);
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--switcher-shadow);
+    transition: transform 0.2s ease;
+}
+.theme-switcher-toggle:hover { transform: translateY(-2px); }
+.theme-switcher-toggle .icon { font-size: 16px; color: var(--switcher-accent); }
+/* The palette turns while the next theme's files are still downloading. */
+.theme-switcher.is-switching .theme-switcher-toggle .icon { animation: theme-switcher-spin 0.9s linear infinite; }
+@keyframes theme-switcher-spin { to { transform: rotate(360deg); } }
+.theme-switcher-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.theme-switcher-panel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
+    width: 376px;
+    max-width: calc(100vw - 40px);
+    padding: 12px;
+    border: 1px solid var(--switcher-border);
+    border-radius: 18px;
+    background: var(--switcher-bg);
+    box-shadow: var(--switcher-shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.97);
+    transform-origin: 100% 100%;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.22s;
+}
+.theme-switcher.is-open .theme-switcher-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    pointer-events: auto;
+}
+
+.theme-switcher-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 4px 10px;
+}
+.theme-switcher-title { font-weight: 600; }
+.theme-switcher-title small { margin-left: 6px; color: var(--switcher-muted); font-weight: 400; }
+
+.theme-switcher-shuffle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--switcher-border);
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+.theme-switcher-shuffle:hover { background: var(--switcher-hover); }
+.theme-switcher-shuffle .icon { font-size: 14px; }
+
+.theme-switcher-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    max-height: min(62vh, 520px);
+    padding: 2px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+.theme-switcher-option {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    padding: 6px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.theme-switcher-option:hover { background: var(--switcher-hover); transform: translateY(-1px); }
+.theme-switcher-option[aria-selected="true"] { border-color: var(--switcher-accent); }
+
+.theme-switcher-name {
+    overflow: hidden;
+    color: var(--switcher-muted);
+    font-size: 12px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.theme-switcher-option[aria-selected="true"] .theme-switcher-name { color: inherit; font-weight: 600; }
+
+.theme-switcher-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--switcher-accent);
+    color: var(--switcher-bg);
+}
+.theme-switcher-check .icon {
+    width: 12px;
+    height: 12px;
+    margin: 3px;
+    stroke-width: 3;
+}
+.theme-switcher-option[aria-selected="true"] .theme-switcher-check { display: block; }
+
+.theme-switcher-hint {
+    padding: 8px 4px 0;
+    color: var(--switcher-muted);
+    font-size: 12px;
+}
+
+/* A miniature page wireframe. Its colours are set per option from the theme's
+   own tokens; the fallbacks are the neutral placeholder for unloaded themes. */
+.theme-switcher-swatch {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid var(--sw-border, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background: var(--sw-bg, #e5e7eb);
+}
+.theme-switcher-swatch i {
+    position: absolute;
+    display: block;
+    border-radius: 2px;
+    background: var(--sw-fg, #374151);
+}
+.theme-switcher-swatch .sw-avatar {
+    top: 14%;
+    left: 10%;
+    width: 26%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--sw-accent, #6366f1);
+}
+.theme-switcher-swatch .sw-line-1 { top: 18%; left: 44%; width: 36%; height: 7%; }
+.theme-switcher-swatch .sw-line-2 { top: 32%; left: 44%; width: 46%; height: 7%; opacity: 0.45; }
+.theme-switcher-swatch .sw-card-1 {
+    top: 56%;
+    left: 10%;
+    width: 38%;
+    height: 30%;
+    border: 1px solid var(--sw-border, rgba(0, 0, 0, 0.12));
+    border-radius: 4px;
+    background: var(--sw-surface, #ffffff);
+}
+.theme-switcher-swatch .sw-card-2 {
+    top: 56%;
+    left: 54%;
+    width: 36%;
+    height: 30%;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--sw-accent, #6366f1), var(--sw-accent-2, var(--sw-accent, #6366f1)));
+}
+
+@media (max-width: 480px) {
+    .theme-switcher { right: 12px; bottom: 12px; }
+    .theme-switcher-panel { width: calc(100vw - 24px); }
+}
+
+/* ---- Switch animation ---------------------------------------------------- */
+/* Browsers with the View Transitions API cross-fade the old and the new layout
+   and let every block glide to its new place; the others get a quick fade. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.6, 0, 0.3, 1);
+}
+
+html.vt-blocks .hero { view-transition-name: hero; }
+html.vt-blocks .avatar { view-transition-name: avatar; }
+html.vt-blocks .block[data-block="news"] { view-transition-name: block-news; }
+html.vt-blocks .block[data-block="honors"] { view-transition-name: block-honors; }
+html.vt-blocks .block[data-block="publications"] { view-transition-name: block-publications; }
+html.vt-blocks .block[data-block="projects"] { view-transition-name: block-projects; }
+html.vt-blocks .site-footer { view-transition-name: footer; }
+
+.page,
+.backdrop { transition: opacity 0.32s ease-out; }
+html.theme-fading .page,
+html.theme-fading .backdrop { opacity: 0; transition: opacity 0.16s ease-in; }
+
+@media (prefers-reduced-motion: reduce) {
+    .page,
+    .backdrop,
+    .theme-switcher * { transition: none !important; }
+    .theme-switcher.is-switching .theme-switcher-toggle .icon { animation: none; }
+    ::view-transition-group(*),
+    ::view-transition-image-pair(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) { animation: none !important; }
+}
+
+@media print {
+    .theme-switcher,
+    .backdrop,
+    .skip-link { display: none !important; }
+}

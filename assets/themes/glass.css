@@ -1,0 +1,323 @@
+/* Glass — light glassmorphism: frosted cards on a pale green gradient with a
+   slow particle network drifting behind them. */
+[data-theme="glass"] {
+    --bg: #f8fafc;
+    --fg: #1e293b;
+    --muted: #64748b;
+    --accent: #10b981;
+    --accent-2: #e11d48;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --radius: 16px;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px rgba(16, 185, 129, 0.05);
+    --font-body: "Outfit", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, "PingFang SC", "Microsoft YaHei", monospace;
+    --page-width: 1000px;
+    --switcher-border: #e2e8f0;
+    --switcher-shadow: 0 8px 32px rgba(16, 185, 129, 0.12);
+    color-scheme: light;
+}
+
+/* Backdrop */
+html[data-theme="glass"] .backdrop {
+    display: block;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+html[data-theme="glass"] #particles-js { position: absolute; inset: 0; }
+
+/* Cards */
+html[data-theme="glass"] .hero,
+html[data-theme="glass"] .block {
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    box-shadow: var(--glass-shadow);
+    transition: box-shadow 0.3s ease;
+}
+html[data-theme="glass"] .hero:hover,
+html[data-theme="glass"] .block:hover { box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1); }
+
+html[data-theme="glass"] .page { padding: 40px 20px; gap: 24px; }
+
+/* Intro */
+html[data-theme="glass"] .hero {
+    position: relative;
+    overflow: hidden;
+    gap: 50px;
+    padding: 45px;
+}
+html[data-theme="glass"] .hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+html[data-theme="glass"] .hero-text { min-width: 0; }
+
+html[data-theme="glass"] .avatar {
+    width: 190px;
+    height: 190px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+html[data-theme="glass"] .avatar:hover { transform: scale(1.05) rotate(2deg); }
+
+html[data-theme="glass"] .name {
+    margin-bottom: 5px;
+    font-size: 2.8rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #1e293b, #059669);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+html[data-theme="glass"] .name-cn {
+    margin-left: 12px;
+    color: var(--muted);
+    font-size: 1.5rem;
+    -webkit-text-fill-color: initial;
+}
+
+html[data-theme="glass"] .role {
+    display: inline-block;
+    margin: 0 0 25px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+}
+html[data-theme="glass"] .role::before { content: "> "; }
+html[data-theme="glass"] .role::after { content: "_"; animation: glass-blink 1s step-end infinite; }
+@keyframes glass-blink { 50% { opacity: 0; } }
+
+html[data-theme="glass"] .bio p {
+    margin-bottom: 16px;
+    font-size: 1.05rem;
+    font-weight: 300;
+    letter-spacing: 0.2px;
+}
+html[data-theme="glass"] .bio p + p { margin-top: 0; }
+html[data-theme="glass"] .bio strong { color: #0f172a; font-weight: 500; }
+
+html[data-theme="glass"] .bio a {
+    position: relative;
+    color: var(--accent);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+html[data-theme="glass"] .bio a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background-color: #059669;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s cubic-bezier(0.86, 0, 0.07, 1);
+}
+html[data-theme="glass"] .bio a:hover { color: #059669; }
+html[data-theme="glass"] .bio a:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+
+html[data-theme="glass"] .mark {
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(225, 29, 72, 0.08);
+    color: var(--accent-2);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+html[data-theme="glass"] .contact { gap: 12px; margin-top: 30px; }
+
+html[data-theme="glass"] .contact-link {
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+html[data-theme="glass"] .contact-link .icon { color: var(--accent); font-size: 1rem; transition: color 0.3s ease; }
+html[data-theme="glass"] .contact-link:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+html[data-theme="glass"] .contact-link:hover .icon { color: #ffffff; }
+
+/* Layout: news and honors stack on the left, publications on the right,
+   projects span the full width below. */
+html[data-theme="glass"] .content {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 24px;
+    align-items: start;
+}
+html[data-theme="glass"] .col-side {
+    grid-area: 1 / 1 / 3 / 2;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+html[data-theme="glass"] .col-main { display: contents; }
+html[data-theme="glass"] .block[data-block="publications"] { grid-area: 1 / 2 / 3 / 3; }
+html[data-theme="glass"] .block[data-block="projects"] { grid-area: 3 / 1 / 4 / -1; }
+
+html[data-theme="glass"] .block { padding: 30px; }
+
+html[data-theme="glass"] .block-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    font-size: 1.3rem;
+}
+html[data-theme="glass"] .block-icon { display: block; color: var(--accent); font-size: 1.1rem; }
+html[data-theme="glass"] .block-title span::before { content: "~/"; }
+
+/* News and honors */
+html[data-theme="glass"] .news-list { display: block; }
+
+html[data-theme="glass"] .news-item {
+    position: relative;
+    display: block;
+    margin-bottom: 16px;
+    padding-left: 20px;
+    font-size: 0.95rem;
+    font-weight: 300;
+}
+html[data-theme="glass"] .news-item::before,
+html[data-theme="glass"] .honor-list li::before {
+    content: ">>";
+    position: absolute;
+    top: 2px;
+    left: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+html[data-theme="glass"] .news-date {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+html[data-theme="glass"] .news-date::before { content: "["; }
+html[data-theme="glass"] .news-date::after { content: "]"; }
+html[data-theme="glass"] .news-text strong { font-weight: 500; }
+
+html[data-theme="glass"] .honor-list { display: block; padding: 0; list-style: none; }
+html[data-theme="glass"] .honor-list li {
+    position: relative;
+    margin-bottom: 16px;
+    padding-left: 20px;
+    font-size: 0.95rem;
+    font-weight: 300;
+}
+
+/* Publications and projects */
+html[data-theme="glass"] .entry-list { display: block; }
+
+html[data-theme="glass"] .entry {
+    display: block;
+    margin-bottom: 20px;
+    padding: 24px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+}
+html[data-theme="glass"] .entry:hover {
+    border-color: var(--accent);
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+    transform: translateX(5px);
+}
+
+html[data-theme="glass"] .entry-badge {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+html[data-theme="glass"] .entry-badge.is-highlight { background: rgba(225, 29, 72, 0.08); color: var(--accent-2); }
+
+html[data-theme="glass"] .entry-title { margin-bottom: 10px; font-size: 1.15rem; font-weight: 500; line-height: 1.4; }
+html[data-theme="glass"] .entry-authors { margin-bottom: 8px; font-size: 0.95rem; font-weight: 300; }
+html[data-theme="glass"] .entry-desc { margin-bottom: 15px; font-size: 0.9rem; font-weight: 300; }
+
+html[data-theme="glass"] .entry-links { display: flex; gap: 16px; margin: 0; }
+
+html[data-theme="glass"] .link {
+    color: #059669;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+html[data-theme="glass"] .link:hover { color: var(--accent); }
+html[data-theme="glass"] .link .icon { font-size: 0.9rem; }
+html[data-theme="glass"] .link.is-disabled { color: #94a3b8; cursor: not-allowed; }
+
+html[data-theme="glass"] .block[data-block="projects"] .entry-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+html[data-theme="glass"] .block[data-block="projects"] .entry { margin-bottom: 0; }
+html[data-theme="glass"] .block[data-block="projects"] .entry:hover { transform: translateY(-2px); }
+
+html[data-theme="glass"] .site-footer {
+    padding: 20px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    html[data-theme="glass"] .page { padding: 24px 16px; }
+    html[data-theme="glass"] .hero { gap: 30px; padding: 28px 22px; }
+    html[data-theme="glass"] .hero-text { justify-self: center; }
+    html[data-theme="glass"] .avatar { justify-self: center; }
+    html[data-theme="glass"] .name { font-size: 2.2rem; }
+    html[data-theme="glass"] .bio p { text-align: justify; }
+    html[data-theme="glass"] .content { grid-template-columns: 1fr; }
+    html[data-theme="glass"] .col-side { display: contents; }
+    html[data-theme="glass"] .col-side,
+    html[data-theme="glass"] .block[data-block="publications"],
+    html[data-theme="glass"] .block[data-block="projects"] { grid-area: auto; }
+    html[data-theme="glass"] .block[data-block="projects"] .entry-list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-theme="glass"] .role::after { animation: none; }
+}

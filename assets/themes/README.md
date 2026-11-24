@@ -1,0 +1,117 @@
+# Themes
+
+The homepage has one body of content (`index.html`) and many looks. A theme is a
+single CSS file in this folder that restyles that content. Visitors switch themes
+from the button in the bottom-right corner; a random theme opens the page on every
+visit, and `#theme=<id>` in the address pins one.
+
+`plain.css` is the smallest example and `glass.css` a complete one.
+
+## How a theme is put together
+
+1. `index.html` holds the catalog `window.HOMEPAGE_THEMES`: one line per theme
+   with its `id`, `name`, `note`, the font keys it uses and the portrait it shows.
+2. `assets/styles/base.css` applies to every theme: token fallbacks, a light reset,
+   a readable skeleton, the theme switcher and the switch animation.
+3. `assets/app.js` loads `assets/themes/<id>.css` and that theme's fonts on demand,
+   so a visitor only downloads the theme they are looking at.
+
+## Structure of the content
+
+```
+body
+├─ a.skip-link
+├─ svg.sprite                      icon symbols: #i-mail #i-github #i-scholar #i-rss #i-chat
+│                                  #i-terminal #i-award #i-folder #i-grid #i-globe #i-play
+│                                  #i-code #i-file #i-palette #i-shuffle #i-check
+├─ div.backdrop                    hidden; switch it on for full-screen decoration
+│  └─ #particles-js, i.shape.shape-1 … i.shape.shape-3
+└─ div.page#main
+   ├─ header.hero
+   │  ├─ div.hero-text
+   │  │  ├─ h1.name                "Mingshuo Cai" + span.name-cn
+   │  │  ├─ p.role                 span.study-year + " Master's Student @ Nanjing University"
+   │  │  ├─ div.bio                two p (strong, a, span.mark)
+   │  │  └─ ul.contact             li > a.contact-link > svg.icon + span
+   │  └─ img.avatar
+   ├─ main.content
+   │  ├─ div.col.col-side
+   │  │  ├─ section.block[data-block="news"]
+   │  │  │    h2.block-title + ol.news-list > li.news-item > time.news-date + span.news-text
+   │  │  └─ section.block[data-block="honors"]
+   │  │       h2.block-title + ul.honor-list > li
+   │  └─ div.col.col-main
+   │     ├─ section.block[data-block="publications"]
+   │     └─ section.block[data-block="projects"]       both: h2.block-title + ol.entry-list
+   └─ footer.site-footer            p
+└─ div.theme-switcher              built by assets/app.js
+```
+
+An entry in `ol.entry-list` is `li.entry` containing `p.entry-badge` (add
+`is-highlight` for the special one), `h3.entry-title`, an optional
+`p.entry-authors`, an optional `p.entry-desc` and `ul.entry-links` whose items are
+`a.link` or `span.link.is-disabled`. A `h2.block-title` holds an
+`svg.icon.block-icon` and a `span` with the text.
+
+`.page` is a one-column grid (intro, content, footer) and `.content` a grid whose
+four sections are direct items, because `.col` is `display: contents`. Place them
+with `grid-column`, `grid-row` and `order`, or turn `.col` into a flex column to
+get two independently stacked columns.
+
+## Rules for a theme file
+
+1. Tokens go in `[data-theme="<id>"] { … }`. Every other selector starts with
+   `html[data-theme="<id>"] `. Never style `html`, `body` or a bare class.
+2. Define the tokens: `--bg --fg --muted --accent --accent-2 --surface --border
+   --radius --font-body --font-display --font-mono --page-width`, plus
+   `color-scheme`. The switcher reads them and exposes `--switcher-*` overrides.
+3. Use only fonts from the menu below and add their keys to the catalog line, so
+   they are loaded before the theme appears. No `@import`, no external URLs.
+4. Keep every piece of content visible and readable. Only `.avatar` may be hidden.
+5. Work from 360 px to 1920 px wide without horizontal overflow or overlap.
+6. Under `prefers-reduced-motion: reduce`, stop your animations.
+7. Leave `.theme-switcher` alone except for its `--switcher-*` tokens.
+
+## Fonts
+
+All fonts are self-hosted in `assets/fonts/` (latin subset) and declared in
+`assets/fonts.css`. A weight range belongs to a variable font: one file, any weight.
+
+| Family | Weights |
+| --- | --- |
+| Inter, Public Sans, Roboto, Archivo | 100–900 |
+| Outfit, DM Sans | 100–1000 |
+| Nunito Sans | 200–1000 |
+| Manrope | 200–800 |
+| Open Sans | 300–800 |
+| Space Grotesk | 300–700 |
+| Orbitron | 400–900 |
+| JetBrains Mono | 100–800 |
+| IBM Plex Mono | 400, 600, italic 400 |
+| Lato, PT Sans | 400, 700 |
+| Rajdhani | 500, 700 |
+| Lora, Newsreader | 400–700, italic 400–700 |
+| EB Garamond | 400–800, italic 400–800 |
+| Pixelify Sans | 400–700 |
+| Instrument Serif | 400, italic 400 |
+| CMU Serif (Computer Modern) | 400, 700, italic 400 |
+| CMU Sans, CMU Typewriter | 400 |
+| Abril Fatface, Archivo Black, Press Start 2P, VT323 | 400 |
+
+## Portraits
+
+`images/avatar.webp` is the default: a colourful illustrated portrait, square.
+A theme can ask for another rendering of the same picture through the catalog's
+`avatar` field: `avatar-pixel.png` (head and shoulders, pixel art),
+`avatar-halftone.png` (black and white print dots), `avatar-line.webp` (ink
+drawing on a transparent background), and `avatar-duotone-cyan`, `-pink`, `-amber`,
+`-gold` and `-blue` (two-tone `.webp`). `"none"` hides it.
+
+## Adding a theme
+
+1. Create `assets/themes/<id>.css` following the rules above.
+2. Add a line to `window.HOMEPAGE_THEMES` in `index.html`.
+3. If it needs a font that is not there yet, add the file to `assets/fonts/`, a
+   rule to `assets/fonts.css` and its key to `window.HOMEPAGE_FONT_FILES`.
+
+Check it with `index.html#theme=<id>` on a phone-sized window and a desktop one.

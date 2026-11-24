@@ -1,0 +1,78 @@
+/* Plain HTML — the page as a browser would render it: default fonts and link
+   colours, no cards, no effects. It is also what visitors without JavaScript
+   get (see the <noscript> in index.html). */
+[data-theme="plain"] {
+    --bg: #ffffff;
+    --fg: #000000;
+    --muted: #222222;
+    --accent: #0000ee;
+    --accent-2: #0000ee;
+    --surface: #ffffff;
+    --border: #808080;
+    --font-body: "Times New Roman", Times, "Songti SC", SimSun, serif;
+    --font-display: var(--font-body);
+    --page-width: 820px;
+    --switcher-accent: #1d4ed8;
+    color-scheme: light;
+}
+
+html[data-theme="plain"] body { line-height: 1.4; }
+
+html[data-theme="plain"] .page { display: block; padding: 16px; }
+
+html[data-theme="plain"] .hero { display: flow-root; }
+
+html[data-theme="plain"] .avatar {
+    float: right;
+    width: 200px;
+    height: 200px;
+    margin: 0 0 8px 16px;
+    border-radius: 0;
+}
+
+html[data-theme="plain"] .name {
+    margin: 0.67em 0;
+    font-size: 2em;
+    line-height: 1.2;
+}
+html[data-theme="plain"] .name-cn { color: inherit; }
+html[data-theme="plain"] .role { color: inherit; font-weight: 400; }
+
+html[data-theme="plain"] a { color: #0000ee; }
+html[data-theme="plain"] a:visited { color: #551a8b; }
+html[data-theme="plain"] .icon { display: none; }
+
+html[data-theme="plain"] .contact { display: block; margin: 1em 0 0; }
+html[data-theme="plain"] .contact li { display: inline; }
+html[data-theme="plain"] .contact li + li::before,
+html[data-theme="plain"] .entry-links li + li::before { content: " | "; }
+
+html[data-theme="plain"] .content { display: block; margin-top: 24px; }
+html[data-theme="plain"] .block + .block,
+html[data-theme="plain"] .col + .col { margin-top: 24px; }
+html[data-theme="plain"] .block-title { margin: 0.83em 0; font-size: 1.5em; }
+
+html[data-theme="plain"] .news-list { display: block; padding-left: 2.4rem; }
+html[data-theme="plain"] .news-item { display: list-item; margin-bottom: 0.4em; }
+html[data-theme="plain"] .news-date { color: inherit; }
+html[data-theme="plain"] .news-date::after { content: ":"; }
+
+html[data-theme="plain"] .entry { display: block; }
+html[data-theme="plain"] .entry + .entry { margin-top: 1em; }
+html[data-theme="plain"] .entry-badge {
+    display: inline;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    font-weight: 700;
+}
+html[data-theme="plain"] .entry-badge::before { content: "["; }
+html[data-theme="plain"] .entry-badge::after { content: "]"; }
+html[data-theme="plain"] .entry-title { margin: 0.4em 0; font-size: 1.17em; font-weight: 700; }
+html[data-theme="plain"] .entry-authors,
+html[data-theme="plain"] .entry-desc { margin-bottom: 0.3em; color: inherit; }
+html[data-theme="plain"] .entry-links { display: block; margin: 0; }
+html[data-theme="plain"] .entry-links li { display: inline; }
+
+html[data-theme="plain"] .site-footer { margin-top: 24px; }
