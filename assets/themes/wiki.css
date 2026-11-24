@@ -1,0 +1,130 @@
+/* Wikipedia — a desktop encyclopedia article: sans-serif text, serif headings
+   with a rule beneath, an infobox beside the lead, and external links. */
+[data-theme="wiki"] {
+    --bg: #ffffff;
+    --fg: #202122;
+    --muted: #54595d;
+    --accent: #3366cc;
+    --accent-2: #3366cc;
+    --surface: #f8f9fa;
+    --border: #a2a9b1;
+    --radius: 2px;
+    --font-body: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: Georgia, "Times New Roman", "Songti SC", serif;
+    --page-width: 1180px;
+    color-scheme: light;
+}
+
+html[data-theme="wiki"] body { font-size: 14px; line-height: 1.6; }
+html[data-theme="wiki"] a { color: var(--accent); }
+html[data-theme="wiki"] .page { display: block; padding: 0 24px 32px; }
+html[data-theme="wiki"] .page::before {
+    content: "From Wikipedia, the free encyclopedia";
+    display: block;
+    padding: 6px 0 5px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+    font-style: italic;
+}
+
+/* Narrow screens: title, portrait, caption, lead, external links. */
+html[data-theme="wiki"] .hero { display: flex; flex-direction: column; align-items: flex-start; }
+html[data-theme="wiki"] .hero-text { display: contents; }
+html[data-theme="wiki"] .name { order: 1; width: 100%; margin-bottom: 10px; padding-bottom: 3px; border-bottom: 1px solid var(--border); font-size: 28px; font-weight: 400; line-height: 1.25; }
+html[data-theme="wiki"] .name-cn { color: var(--fg); font-size: 0.6em; }
+html[data-theme="wiki"] .avatar { order: 2; width: 200px; height: 200px; margin-top: 10px; padding: 10px 10px 0; border: 1px solid var(--border); border-radius: 0; background: #f8f9fa; }
+html[data-theme="wiki"] .role { order: 3; width: 200px; margin: 0; padding: 6px 6px 8px; border: 1px solid var(--border); border-top: 1px solid #eaecf0; background: #f8f9fa; color: var(--fg); font-size: 12.4px; font-weight: 400; line-height: 1.4; text-align: center; }
+html[data-theme="wiki"] .bio { order: 4; margin-top: 14px; font-size: 14.5px; }
+html[data-theme="wiki"] .contact { order: 5; display: grid; gap: 4px; margin: 18px 0 0; padding: 0; }
+
+/* Wide screens: the infobox (portrait and caption) stands beside the lead and
+   the external links, so both columns end at about the same height. */
+@media (min-width: 761px) {
+    html[data-theme="wiki"] .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 242px;
+        grid-template-rows: auto auto auto;
+        column-gap: 32px;
+        align-items: start;
+    }
+    html[data-theme="wiki"] .name { grid-column: 1 / -1; grid-row: 1; }
+    html[data-theme="wiki"] .bio { grid-column: 1; grid-row: 2; margin-top: 10px; }
+    html[data-theme="wiki"] .avatar { grid-column: 2; grid-row: 2; width: 242px; height: 242px; margin-top: 10px; }
+    html[data-theme="wiki"] .role { grid-column: 2; grid-row: 3; width: auto; }
+    html[data-theme="wiki"] .contact { grid-column: 1; grid-row: 3; align-self: start; margin: 22px 0 0; }
+}
+
+html[data-theme="wiki"] .contact::before {
+    content: "External links";
+    margin-bottom: 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+}
+html[data-theme="wiki"] .contact-link { color: var(--accent); font-size: 13.5px; text-decoration: none; }
+html[data-theme="wiki"] .contact-link::before { content: "\2197\00a0\00a0"; color: var(--muted); font-size: 12px; }
+html[data-theme="wiki"] .contact-link:hover { text-decoration: underline; }
+html[data-theme="wiki"] .contact-link .icon { display: none; }
+
+html[data-theme="wiki"] .col { display: block; }
+html[data-theme="wiki"] .content { display: block; margin-top: 16px; }
+html[data-theme="wiki"] .block + .block,
+html[data-theme="wiki"] .col + .col { margin-top: 4px; }
+html[data-theme="wiki"] .block-title {
+    margin: 20px 0 8px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.3;
+}
+html[data-theme="wiki"] .block-icon { display: none; }
+
+html[data-theme="wiki"] .news-list { display: grid; gap: 4px; }
+html[data-theme="wiki"] .news-date { color: var(--muted); }
+html[data-theme="wiki"] .news-date::after { content: ":"; }
+html[data-theme="wiki"] .honor-list { display: grid; gap: 3px; padding-left: 22px; list-style: disc; }
+
+html[data-theme="wiki"] .entry-list { display: grid; gap: 10px; padding-left: 30px; list-style: decimal; }
+html[data-theme="wiki"] .entry { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; row-gap: 2px; }
+html[data-theme="wiki"] .entry-title { grid-column: 1 / -1; font-size: 14.5px; font-weight: 700; }
+html[data-theme="wiki"] .entry-authors { grid-column: 1; grid-row: 2; color: var(--fg); font-size: 14px; }
+html[data-theme="wiki"] .entry-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: inherit;
+}
+html[data-theme="wiki"] .entry-badge::before { content: "("; }
+html[data-theme="wiki"] .entry-badge::after { content: ")"; }
+html[data-theme="wiki"] .entry-badge.is-highlight { background: none; color: var(--muted); }
+html[data-theme="wiki"] .entry-desc { grid-column: 1 / -1; font-size: 14px; }
+html[data-theme="wiki"] .entry-links { grid-column: 1 / -1; gap: 10px; margin: 2px 0 0; }
+html[data-theme="wiki"] .link { font-size: 13.5px; text-decoration: none; }
+html[data-theme="wiki"] .link:hover { text-decoration: underline; }
+html[data-theme="wiki"] .link .icon { display: none; }
+html[data-theme="wiki"] .link.is-disabled { color: var(--muted); }
+
+html[data-theme="wiki"] .site-footer {
+    margin-top: 28px;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+}
+
+@media (max-width: 760px) {
+    html[data-theme="wiki"] .entry { grid-template-columns: minmax(0, 1fr); }
+    html[data-theme="wiki"] .entry-badge { grid-column: 1; grid-row: 3; margin-top: 2px; }
+    html[data-theme="wiki"] .entry-desc { grid-row: 4; }
+    html[data-theme="wiki"] .entry-links { grid-row: 5; }
+}

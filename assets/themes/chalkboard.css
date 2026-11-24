@@ -1,0 +1,184 @@
+/* Chalkboard — a lecture board: dark slate in a wooden frame with a chalk
+   tray, and everything on the page written in chalk. */
+[data-theme="chalkboard"] {
+    --bg: #1b2e29;
+    --fg: #f3efe4;
+    --muted: #c9d3c9;
+    --accent: #f6d860; /* yellow chalk */
+    --accent-2: #8fd3ff; /* blue chalk */
+    --surface: #2a4740;
+    --border: rgba(243, 239, 228, 0.4);
+    --radius: 4px;
+    --font-body: "Caveat", "Xingkai SC", "Kaiti SC", STKaiti, KaiTi, "PingFang SC", "Microsoft YaHei", cursive;
+    --font-display: var(--font-body);
+    --page-width: 1080px;
+    --switcher-bg: #2a4740;
+    --switcher-fg: #f3efe4;
+    --switcher-muted: #c9d3c9;
+    --switcher-border: rgba(243, 239, 228, 0.4);
+    --switcher-accent: #f6d860;
+    color-scheme: dark;
+}
+
+html[data-theme="chalkboard"] body { font-size: 25px; line-height: 1.4; }
+
+/* The board: slate inside a wooden frame, with a chalk tray underneath. */
+html[data-theme="chalkboard"] .page {
+    position: relative;
+    gap: 38px;
+    margin: 32px auto 56px;
+    padding: 46px 52px 54px;
+    border: 16px solid transparent;
+    border-radius: 8px;
+    background:
+        radial-gradient(ellipse at 18% 8%, rgba(255, 255, 255, 0.06), transparent 55%),
+        radial-gradient(ellipse at 86% 92%, rgba(255, 255, 255, 0.05), transparent 50%),
+        linear-gradient(#243f37, #1f372f) padding-box,
+        linear-gradient(135deg, #a8703a, #7a4e22 50%, #a8703a) border-box;
+    box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.45), 0 20px 44px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="chalkboard"] .page::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    bottom: -34px;
+    left: 10px;
+    height: 14px;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+    background:
+        linear-gradient(#ffffff, #ffffff) 12% 4px / 46px 5px no-repeat,
+        linear-gradient(#f6d860, #f6d860) 26% 5px / 40px 5px no-repeat,
+        linear-gradient(#8fd3ff, #8fd3ff) 38% 4px / 34px 5px no-repeat,
+        linear-gradient(#b57c45, #8a5a2b);
+}
+
+/* A photograph pinned to the board, the name in yellow chalk beside it. */
+html[data-theme="chalkboard"] .hero {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    column-gap: 34px;
+    align-items: center;
+}
+html[data-theme="chalkboard"] .hero-text { display: contents; }
+html[data-theme="chalkboard"] .avatar {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: 150px;
+    height: 170px;
+    margin-left: 6px;
+    padding: 10px 10px 30px;
+    border: 0;
+    border-radius: 2px;
+    background: #f7f4ea;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
+    transform: rotate(-4deg);
+}
+html[data-theme="chalkboard"] .name { grid-column: 2; grid-row: 1; color: var(--accent); font-size: 48px; font-weight: 700; line-height: 1.1; }
+html[data-theme="chalkboard"] .name-cn { margin-left: 0.3em; color: var(--fg); font-size: 0.65em; }
+html[data-theme="chalkboard"] .role { grid-column: 2; grid-row: 2; margin: 4px 0 10px; color: var(--accent-2); font-size: 28px; font-weight: 600; }
+html[data-theme="chalkboard"] .bio { grid-column: 2; grid-row: 3; }
+html[data-theme="chalkboard"] .bio strong { color: #ffd0de; font-weight: 700; }
+html[data-theme="chalkboard"] .bio a {
+    color: var(--accent-2);
+    text-decoration: underline wavy rgba(143, 211, 255, 0.55) 1.5px;
+    text-underline-offset: 5px;
+}
+html[data-theme="chalkboard"] .contact {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 2px dashed var(--border);
+}
+html[data-theme="chalkboard"] .contact-link { color: var(--fg); font-size: 25px; text-decoration: none; }
+html[data-theme="chalkboard"] .contact-link .icon { color: var(--accent); font-size: 22px; }
+
+/* Section titles underlined with a slightly wavy chalk stroke. */
+html[data-theme="chalkboard"] .content { display: grid; gap: 40px; }
+html[data-theme="chalkboard"] .block-title {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 0 10px 4px;
+    border-bottom: 3px solid var(--border);
+    border-radius: 0 0 70% 40% / 0 0 10px 8px;
+    color: var(--accent);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    transform: rotate(-0.6deg);
+}
+html[data-theme="chalkboard"] .block-icon { display: none; }
+
+html[data-theme="chalkboard"] .news-list { display: grid; gap: 8px; }
+html[data-theme="chalkboard"] .news-item { display: flex; gap: 14px; }
+html[data-theme="chalkboard"] .news-item::before { content: "\2013"; color: var(--fg); }
+html[data-theme="chalkboard"] .news-date { min-width: 96px; padding-top: 3px; color: var(--accent-2); font-size: 22px; }
+html[data-theme="chalkboard"] .news-text strong { color: var(--accent); font-weight: 700; }
+html[data-theme="chalkboard"] .honor-list { display: grid; gap: 8px; padding: 0; list-style: none; }
+html[data-theme="chalkboard"] .honor-list li::before { content: "\2605"; margin-right: 12px; color: var(--accent); font-size: 20px; }
+
+/* Circled venues, as a lecturer would mark them. */
+html[data-theme="chalkboard"] .entry-list { display: grid; gap: 26px; }
+html[data-theme="chalkboard"] .entry { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 16px; row-gap: 2px; }
+html[data-theme="chalkboard"] .entry-title {
+    grid-column: 1 / -1;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-decoration: underline wavy rgba(243, 239, 228, 0.35) 1.5px;
+    text-underline-offset: 7px;
+}
+html[data-theme="chalkboard"] .entry-authors { grid-column: 1; grid-row: 2; padding-top: 3px; color: var(--muted); font-size: 23px; }
+html[data-theme="chalkboard"] .entry-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    margin-left: 10px;
+    padding: 0 18px;
+    border: 2.5px solid var(--accent);
+    border-radius: 52% 46% 55% 48% / 64% 56% 48% 52%;
+    background: none;
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.4;
+    transform: rotate(-2deg);
+}
+html[data-theme="chalkboard"] .entry-badge.is-highlight { border-color: #ff9ec0; background: none; color: #ff9ec0; }
+html[data-theme="chalkboard"] .entry-desc { grid-column: 1 / -1; color: var(--muted); font-size: 23px; }
+html[data-theme="chalkboard"] .entry-links { grid-column: 1 / -1; gap: 22px; margin-top: 4px; }
+html[data-theme="chalkboard"] .link {
+    color: var(--accent-2);
+    font-size: 24px;
+    text-decoration: none;
+    border-bottom: 2px dashed rgba(143, 211, 255, 0.55);
+}
+html[data-theme="chalkboard"] .link .icon { display: none; }
+html[data-theme="chalkboard"] .link.is-disabled { color: var(--muted); border-bottom-color: transparent; }
+
+html[data-theme="chalkboard"] .site-footer { color: var(--muted); font-size: 22px; text-align: right; transform: rotate(-0.8deg); }
+
+@media (max-width: 640px) {
+    html[data-theme="chalkboard"] body { font-size: 23px; }
+    html[data-theme="chalkboard"] .page { gap: 30px; margin: 14px 10px 48px; padding: 28px 22px 36px; border-width: 10px; }
+    html[data-theme="chalkboard"] .hero { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+    html[data-theme="chalkboard"] .avatar { grid-column: 1; grid-row: 1; width: 112px; height: 128px; margin: 0 0 14px 6px; }
+    html[data-theme="chalkboard"] .name { grid-column: 1; grid-row: 2; font-size: 40px; }
+    html[data-theme="chalkboard"] .role { grid-column: 1; grid-row: 3; font-size: 26px; }
+    html[data-theme="chalkboard"] .bio { grid-column: 1; grid-row: 4; }
+    html[data-theme="chalkboard"] .contact { grid-row: 5; gap: 6px 20px; }
+    html[data-theme="chalkboard"] .contact-link { font-size: 23px; }
+    html[data-theme="chalkboard"] .block-title { font-size: 32px; }
+    html[data-theme="chalkboard"] .news-item { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 10px; }
+    html[data-theme="chalkboard"] .news-item::before { display: none; }
+    html[data-theme="chalkboard"] .news-date { min-width: 0; padding-top: 0; }
+    html[data-theme="chalkboard"] .entry { grid-template-columns: minmax(0, 1fr); }
+    html[data-theme="chalkboard"] .entry-badge { grid-column: 1; grid-row: 3; justify-self: start; margin: 6px 0 0; }
+    html[data-theme="chalkboard"] .entry-desc { grid-row: 4; }
+    html[data-theme="chalkboard"] .entry-links { grid-row: 5; }
+}

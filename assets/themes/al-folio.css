@@ -1,0 +1,129 @@
+/* al-folio — the academic theme of the same name: Roboto on white, round icon
+   buttons, news along a wine-red rule and small buttons for every link. */
+[data-theme="al-folio"] {
+    --bg: #ffffff;
+    --fg: #212529;
+    --muted: #6c757d;
+    --accent: #8b0000;
+    --accent-2: #8b0000;
+    --surface: #ffffff;
+    --border: #e9ecef;
+    --radius: 6px;
+    --font-body: "Roboto", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: var(--font-body);
+    --page-width: 928px;
+    --switcher-accent: #8b0000;
+    color-scheme: light;
+}
+
+html[data-theme="al-folio"] body { font-size: 15.5px; line-height: 1.6; }
+html[data-theme="al-folio"] .page { padding: 48px 24px 40px; gap: 36px; }
+
+html[data-theme="al-folio"] .hero {
+    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    column-gap: 36px;
+    align-items: start;
+}
+html[data-theme="al-folio"] .hero-text { display: contents; }
+html[data-theme="al-folio"] .avatar { grid-column: 1; grid-row: 1 / span 3; width: 150px; height: 150px; border-radius: 8px; }
+html[data-theme="al-folio"] .name { grid-column: 2; grid-row: 1; font-size: 32px; font-weight: 500; }
+html[data-theme="al-folio"] .name-cn { color: var(--muted); font-size: 0.5em; }
+html[data-theme="al-folio"] .role { grid-column: 2; grid-row: 2; margin: 2px 0 12px; color: var(--muted); font-size: 17px; font-weight: 400; }
+html[data-theme="al-folio"] .contact { grid-column: 2; grid-row: 3; flex-wrap: nowrap; gap: 10px; margin: 0; }
+html[data-theme="al-folio"] .bio { grid-column: 1 / -1; grid-row: 4; margin-top: 18px; font-size: 16px; }
+
+/* Icon-only round buttons; the label stays for screen readers and tooltips. */
+html[data-theme="al-folio"] .contact-link {
+    position: relative;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid #dcdcdc;
+    border-radius: 50%;
+    color: var(--fg);
+    font-size: 16px;
+}
+html[data-theme="al-folio"] .contact-link span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+html[data-theme="al-folio"] .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+html[data-theme="al-folio"] a { color: var(--accent); }
+html[data-theme="al-folio"] .content { display: block; }
+html[data-theme="al-folio"] .col { display: block; }
+html[data-theme="al-folio"] .block + .block,
+html[data-theme="al-folio"] .col + .col { margin-top: 36px; }
+html[data-theme="al-folio"] .block-title { margin-bottom: 16px; font-size: 20px; font-weight: 600; }
+html[data-theme="al-folio"] .block-icon { display: none; }
+
+html[data-theme="al-folio"] .news-list { display: grid; gap: 12px; padding-left: 18px; border-left: 3px solid var(--accent); }
+html[data-theme="al-folio"] .news-item { display: block; }
+html[data-theme="al-folio"] .news-date {
+    display: block;
+    margin-bottom: 1px;
+    color: var(--fg);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+html[data-theme="al-folio"] .honor-list { display: grid; gap: 6px; padding: 0; list-style: none; }
+html[data-theme="al-folio"] .honor-list li::before { content: "\2605"; margin-right: 8px; color: var(--accent); font-size: 13px; }
+
+html[data-theme="al-folio"] .entry-list { display: grid; gap: 22px; }
+html[data-theme="al-folio"] .entry { display: grid; grid-template-columns: auto auto 1fr; column-gap: 10px; row-gap: 3px; }
+html[data-theme="al-folio"] .entry-title { grid-column: 1 / -1; font-size: 17px; font-weight: 600; line-height: 1.4; }
+html[data-theme="al-folio"] .entry-authors { grid-column: 1; grid-row: 2; color: var(--fg); font-size: 14.5px; }
+html[data-theme="al-folio"] .entry-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 14.5px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: inherit;
+}
+html[data-theme="al-folio"] .entry-badge.is-highlight { background: none; color: var(--accent); font-style: normal; font-weight: 600; }
+html[data-theme="al-folio"] .entry-desc { grid-column: 1 / -1; font-size: 14.5px; }
+html[data-theme="al-folio"] .entry-links { grid-column: 3; grid-row: 2; gap: 8px; margin: 0; }
+html[data-theme="al-folio"] .link {
+    padding: 3px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    color: var(--fg);
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+}
+html[data-theme="al-folio"] .link .icon { font-size: 12px; }
+html[data-theme="al-folio"] .link:hover { border-color: var(--accent); color: var(--accent); }
+html[data-theme="al-folio"] .link.is-disabled { border-style: dashed; color: #aaaaaa; }
+
+html[data-theme="al-folio"] .site-footer {
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    html[data-theme="al-folio"] .hero { display: flex; flex-direction: column; gap: 4px; }
+    html[data-theme="al-folio"] .avatar { order: -1; width: 120px; height: 120px; margin-bottom: 10px; }
+    html[data-theme="al-folio"] .contact { flex-wrap: wrap; margin: 10px 0 14px; }
+    html[data-theme="al-folio"] .bio { margin-top: 0; }
+    html[data-theme="al-folio"] .entry { grid-template-columns: auto 1fr; }
+    html[data-theme="al-folio"] .entry-badge { grid-column: 1 / -1; grid-row: 3; margin-top: 2px; }
+    html[data-theme="al-folio"] .entry-desc { grid-row: 4; }
+    html[data-theme="al-folio"] .entry-links { grid-column: 1 / -1; grid-row: 5; margin-top: 8px; }
+}

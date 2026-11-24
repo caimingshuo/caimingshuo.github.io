@@ -1,0 +1,403 @@
+/* Academic — Hugo Blox "Academic CV": a friendly, modern profile on a very
+   light gray page. A round portrait beside the name, navy buttons, section
+   headings with a short accent bar, a news timeline and white cards with crisp
+   borders. Set in Inter. */
+
+[data-theme="academic"] {
+    --bg: #f7f9fb;
+    --fg: #1b2b3c;
+    --muted: #56677c;
+    --accent: #1f5f99;
+    --accent-2: #8a5a00;
+    --surface: #ffffff;
+    --border: #e3e8ee;
+    --radius: 8px;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    --font-display: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", "PingFang SC", "Microsoft YaHei", monospace;
+    --page-width: 1200px;
+
+    --accent-dark: #174a7a;
+    --accent-tint: #eaf1f8;
+    --highlight-tint: #fcf2d9;
+    --body: #2a3b4e;
+    --line: #cfd9e4;
+    --outline: #b9cde2;
+    --card-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+
+    --switcher-hover: #eef3f8;
+    --switcher-shadow: 0 4px 16px rgba(16, 24, 40, 0.08);
+    color-scheme: light;
+}
+
+/* ---- Page ----------------------------------------------------------------- */
+html[data-theme="academic"] .page { padding: 56px 40px 48px; gap: 56px; }
+
+/* ---- Hero: portrait on the left, everything else beside it --------------- */
+html[data-theme="academic"] .hero {
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 48px;
+    align-items: center;
+}
+html[data-theme="academic"] .avatar {
+    grid-column: 1;
+    grid-row: 1;
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--surface), 0 0 0 5px var(--border), 0 10px 30px rgba(16, 24, 40, 0.1);
+}
+html[data-theme="academic"] .hero-text {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+}
+
+html[data-theme="academic"] .name {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+}
+html[data-theme="academic"] .name-cn {
+    margin-left: 0.45em;
+    color: var(--muted);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
+
+html[data-theme="academic"] .role {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-wrap: balance;
+}
+html[data-theme="academic"] .study-year {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 0 9px;
+    border-radius: 999px;
+    background: var(--accent-tint);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 22px;
+    vertical-align: 2px;
+}
+html[data-theme="academic"] .study-year:empty { display: none; }
+
+html[data-theme="academic"] .bio { max-width: 72ch; margin-top: 20px; color: var(--body); line-height: 1.65; }
+html[data-theme="academic"] .bio p { text-wrap: pretty; }
+html[data-theme="academic"] .bio strong { color: var(--fg); font-weight: 600; }
+html[data-theme="academic"] .bio a {
+    color: var(--accent);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+html[data-theme="academic"] .bio a:hover {
+    color: var(--accent-dark);
+    text-decoration-color: currentColor;
+}
+html[data-theme="academic"] .mark {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--accent-tint);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Contact buttons: outlined by default, the first two solid navy. */
+html[data-theme="academic"] .contact { gap: 10px; margin-top: 28px; }
+html[data-theme="academic"] .contact-link {
+    gap: 8px;
+    padding: 9px 15px;
+    border: 1px solid var(--outline);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+html[data-theme="academic"] .contact-link .icon { font-size: 16px; }
+html[data-theme="academic"] .contact li:nth-child(-n + 2) .contact-link {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
+}
+html[data-theme="academic"] .contact-link:hover {
+    border-color: var(--accent);
+    background: var(--accent-tint);
+    color: var(--accent-dark);
+    transform: translateY(-1px);
+}
+html[data-theme="academic"] .contact li:nth-child(-n + 2) .contact-link:hover {
+    border-color: var(--accent-dark);
+    background: var(--accent-dark);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(31, 95, 153, 0.28);
+}
+html[data-theme="academic"] .contact-link:active { transform: none; box-shadow: none; }
+
+/* ---- Layout: news and honors beside the publications, projects across the
+   full width below. On narrow screens everything stacks in reading order. --- */
+html[data-theme="academic"] .content {
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    gap: 56px 64px;
+    align-items: start;
+}
+html[data-theme="academic"] .col-side {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    min-width: 0;
+}
+html[data-theme="academic"] .col-main { display: contents; }
+html[data-theme="academic"] .block[data-block="publications"] { grid-column: 2; grid-row: 1; min-width: 0; }
+html[data-theme="academic"] .block[data-block="projects"] { grid-column: 1 / -1; grid-row: 2; min-width: 0; }
+
+/* ---- Section headings: bold, with a short accent bar -------------------- */
+html[data-theme="academic"] .block-title {
+    margin-bottom: 20px;
+    color: var(--fg);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+html[data-theme="academic"] .block-title span {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 8px;
+}
+html[data-theme="academic"] .block-title span::after {
+    content: "";
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--accent);
+}
+
+/* ---- News: a timeline of navy dots on a thin line ------------------------ */
+html[data-theme="academic"] .news-list { gap: 0; margin-left: 4px; padding-left: 24px; }
+html[data-theme="academic"] .news-item {
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0 0 18px;
+}
+html[data-theme="academic"] .news-item:last-child { padding-bottom: 0; }
+html[data-theme="academic"] .news-item::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 6px;
+    left: -24px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--bg);
+}
+/* Each item carries the line from its own dot down to the next one. */
+html[data-theme="academic"] .news-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    bottom: -28px;
+    left: -23px;
+    width: 2px;
+    background: var(--line);
+}
+html[data-theme="academic"] .news-date {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: 0.02em;
+}
+html[data-theme="academic"] .news-text { display: block; color: var(--body); font-size: 15px; line-height: 1.5; }
+html[data-theme="academic"] .news-text strong { color: var(--fg); font-weight: 600; }
+
+/* ---- Honors -------------------------------------------------------------- */
+html[data-theme="academic"] .honor-list { gap: 10px; padding: 0; list-style: none; }
+html[data-theme="academic"] .honor-list li { position: relative; padding-left: 24px; color: var(--body); font-size: 15px; line-height: 1.5; }
+html[data-theme="academic"] .honor-list li::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+/* ---- Publications and projects: white cards ------------------------------ */
+html[data-theme="academic"] .entry-list { gap: 18px; }
+html[data-theme="academic"] .block[data-block="projects"] .entry-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+
+html[data-theme="academic"] .entry {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+html[data-theme="academic"] .entry:hover {
+    border-color: #cdd8e4;
+    box-shadow: 0 2px 4px rgba(16, 24, 40, 0.04), 0 6px 18px rgba(16, 24, 40, 0.08);
+}
+
+html[data-theme="academic"] .entry-badge {
+    align-self: flex-start;
+    margin-bottom: 4px;
+    padding: 3px 10px;
+    background: var(--accent-tint);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    letter-spacing: 0.01em;
+}
+html[data-theme="academic"] .entry-badge.is-highlight { background: var(--highlight-tint); color: var(--accent-2); }
+
+html[data-theme="academic"] .entry-title {
+    color: var(--fg);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+html[data-theme="academic"] .entry-authors { color: var(--muted); font-size: 14px; line-height: 1.5; }
+html[data-theme="academic"] .entry-authors strong { color: var(--fg); font-weight: 600; }
+html[data-theme="academic"] .entry-desc { color: var(--body); font-size: 15px; line-height: 1.55; }
+
+html[data-theme="academic"] .entry-links {
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 10px;
+}
+html[data-theme="academic"] .link {
+    gap: 6px;
+    padding: 5px 11px;
+    border: 1px solid var(--outline);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+html[data-theme="academic"] .link .icon { font-size: 14px; }
+html[data-theme="academic"] a.link { text-decoration: none; }
+html[data-theme="academic"] a.link:hover {
+    border-color: var(--accent);
+    background: var(--accent-tint);
+    color: var(--accent-dark);
+}
+html[data-theme="academic"] .link.is-disabled {
+    border-style: dashed;
+    background: transparent;
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+/* ---- Footer -------------------------------------------------------------- */
+html[data-theme="academic"] .site-footer {
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* ---- Narrower ------------------------------------------------------------- */
+@media (max-width: 1100px) {
+    html[data-theme="academic"] .page { padding: 48px 32px 40px; gap: 48px; }
+    html[data-theme="academic"] .hero { gap: 36px; }
+    html[data-theme="academic"] .content { grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: 48px 40px; }
+    html[data-theme="academic"] .col-side { gap: 48px; }
+    html[data-theme="academic"] .block[data-block="projects"] .entry-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 860px) {
+    html[data-theme="academic"] .content { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+    html[data-theme="academic"] .col-side { display: contents; }
+    html[data-theme="academic"] .block[data-block="publications"],
+    html[data-theme="academic"] .block[data-block="projects"] { grid-column: 1; grid-row: auto; }
+    html[data-theme="academic"] .bio { max-width: none; }
+}
+
+/* Too narrow for all five buttons on one line: three, then two. */
+@media (min-width: 641px) and (max-width: 860px) {
+    html[data-theme="academic"] .contact {
+        display: grid;
+        grid-template-columns: repeat(3, max-content);
+    }
+}
+
+@media (max-width: 700px) {
+    html[data-theme="academic"] .block[data-block="projects"] .entry-list { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+    html[data-theme="academic"] .page { padding: 36px 20px 88px; gap: 40px; }
+    html[data-theme="academic"] .hero {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        gap: 24px;
+        text-align: center;
+    }
+    html[data-theme="academic"] .avatar {
+        grid-column: 1;
+        grid-row: 1;
+        width: 150px;
+        height: 150px;
+    }
+    html[data-theme="academic"] .hero-text { grid-column: 1; grid-row: 2; }
+    html[data-theme="academic"] .name { font-size: 32px; }
+    html[data-theme="academic"] .name-cn { font-size: 20px; }
+    html[data-theme="academic"] .role { margin-top: 8px; font-size: 17px; }
+    html[data-theme="academic"] .bio { margin-top: 16px; text-align: center; }
+    html[data-theme="academic"] .contact { justify-content: center; margin-top: 22px; }
+    html[data-theme="academic"] .contact-link { padding: 10px 15px; }
+    html[data-theme="academic"] .content { gap: 40px; }
+    html[data-theme="academic"] .block-title { font-size: 22px; margin-bottom: 18px; }
+    html[data-theme="academic"] .entry { padding: 18px 18px; }
+    html[data-theme="academic"] .entry-title { font-size: 17px; }
+    html[data-theme="academic"] .entry-links { gap: 6px; }
+    html[data-theme="academic"] .link { gap: 5px; padding: 6px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-theme="academic"] .bio a,
+    html[data-theme="academic"] .contact-link,
+    html[data-theme="academic"] .link,
+    html[data-theme="academic"] .entry { transition: none; }
+    html[data-theme="academic"] .contact-link:hover { transform: none; }
+}

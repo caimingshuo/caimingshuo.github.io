@@ -99,15 +99,18 @@
         }));
     }
 
+    // A theme without a portrait variant shows the default one, so the picture
+    // always follows the theme.
     function loadAvatar(file) {
-        if (!file || file === 'none') return Promise.resolve();
+        var shown = document.querySelector('.avatar');
+        if (!shown) return Promise.resolve();
+        var target = file && file !== 'none' ? file : 'images/avatar.webp';
+        if (shown.getAttribute('src') === target) return Promise.resolve();
         return new Promise(function (resolve) {
-            var shown = document.querySelector('.avatar');
-            if (!shown || shown.getAttribute('src') === file) return resolve();
             var probe = new Image();
-            probe.onload = function () { shown.src = file; resolve(); };
+            probe.onload = function () { shown.src = target; resolve(); };
             probe.onerror = resolve;
-            probe.src = file;
+            probe.src = target;
         });
     }
 
@@ -131,40 +134,42 @@
         var spec = theme(id);
         if (!spec) return;
         root.setAttribute('data-theme', id);
-        root.classList.toggle('vt-blocks', spec.morph !== false);
         updateSwitcher(id);
         syncBackdrop(id);
     }
 
-    function switchTheme(id) {
+    function switchTheme(id, origin) {
         if (!theme(id) || id === current() || switching) return;
         switching = true;
         switcher.classList.add('is-switching');
-        var settle = function () {
-            switching = false;
-            switcher.classList.remove('is-switching');
-        };
         var run = function () {
             return loadTheme(id).then(function () {
+                // While the rules change from one theme to the next, nothing may animate.
+                root.classList.remove('theme-settled');
                 applyTheme(id);
                 syncUrl(id);
             });
         };
+        var settle = function () {
+            switching = false;
+            switcher.classList.remove('is-switching');
+            // Style the new theme once while transitions are still off, then let them run.
+            void document.body.offsetWidth;
+            root.classList.add('theme-settled');
+        };
 
         if (!reduceMotion.matches && document.startViewTransition) {
-            // Old and new layout cross-fade while every block glides into place.
+            // The new theme sweeps in as a circle growing from the chosen swatch.
+            revealFrom(origin);
             document.startViewTransition(run).finished.then(settle, settle);
         } else if (!reduceMotion.matches) {
+            // No View Transitions here: fade out, swap, fade back in.
             root.classList.add('theme-fading');
             setTimeout(function () {
-                run().then(function () {
-                    void document.body.offsetWidth; // flush, so the fade-in starts from transparent
-                    root.classList.remove('theme-fading');
-                    settle();
-                });
+                run().then(settle, settle).then(function () { root.classList.remove('theme-fading'); });
             }, 170);
         } else {
-            run().then(settle);
+            run().then(settle, settle);
         }
     }
 
@@ -173,6 +178,18 @@
     function syncUrl(id) {
         if (!window.history || !history.replaceState) return;
         history.replaceState(null, '', location.pathname + location.search + '#theme=' + id);
+    }
+
+    // Centre and radius of the circle the next theme sweeps in from: where the
+    // visitor clicked, or the switcher button itself.
+    function revealFrom(origin) {
+        var box = toggle.getBoundingClientRect();
+        var x = origin ? origin.x : box.left + box.width / 2;
+        var y = origin ? origin.y : box.top + box.height / 2;
+        var radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+        root.style.setProperty('--vt-x', Math.round(x) + 'px');
+        root.style.setProperty('--vt-y', Math.round(y) + 'px');
+        root.style.setProperty('--vt-r', Math.ceil(radius) + 'px');
     }
 
     /* ---- Particle network behind the Glass theme ------------------------ */
@@ -237,6 +254,7 @@
             option.className = 'theme-switcher-option';
             option.setAttribute('role', 'option');
             option.setAttribute('aria-selected', 'false');
+            option.dataset.themeId = item.id;
             option.title = item.name + ' — ' + item.note;
             option.innerHTML =
                 '<span class="theme-switcher-swatch" aria-hidden="true"><i class="sw-avatar"></i><i class="sw-line-1"></i>' +
@@ -244,7 +262,14 @@
                 '<span class="theme-switcher-name"></span>' +
                 '<span class="theme-switcher-check" aria-hidden="true">' + icon('i-check') + '</span>';
             option.querySelector('.theme-switcher-name').textContent = item.name;
-            option.addEventListener('click', function () { close(); switchTheme(item.id); });
+            option.addEventListener('click', function (event) {
+                // Sweep in from the point that was clicked (keyboard: the option's centre).
+                var box = option.getBoundingClientRect();
+                var origin = event.clientX || event.clientY ? { x: event.clientX, y: event.clientY }
+                    : { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+                close();
+                switchTheme(item.id, origin);
+            });
             // Fetch a theme's files as soon as the visitor points at it.
             var peek = function () { loadSheet(item.id); loadFonts(item.fonts || []); };
             option.addEventListener('pointerenter', peek);

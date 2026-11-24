@@ -1,0 +1,151 @@
+/* Paper — a printed résumé: a white sheet on a grey desk with a tinted side
+   column for the portrait and contact details, and the record beside it. */
+[data-theme="paper"] {
+    --bg: #eef0f3;
+    --fg: #1f2933;
+    --muted: #52606d;
+    --accent: #1f4e79;
+    --accent-2: #9b2c2c;
+    --surface: #f4f5f7;
+    --border: #e1e5ea;
+    --radius: 4px;
+    --font-body: "Lora", Georgia, "Songti SC", serif;
+    --font-display: var(--font-body);
+    --page-width: 930px;
+    --switcher-accent: #1f4e79;
+    color-scheme: light;
+}
+
+html[data-theme="paper"] body { font-size: 15px; line-height: 1.55; }
+
+/* The sheet: side column 32 %, record on the right, footer across the bottom. */
+html[data-theme="paper"] .page {
+    display: grid;
+    grid-template-columns: 32% minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    max-width: 880px;
+    margin: 40px auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: 0 12px 32px rgba(31, 41, 51, 0.1);
+}
+html[data-theme="paper"] .page::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 32%;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+}
+html[data-theme="paper"] .content,
+html[data-theme="paper"] .col { display: contents; }
+
+html[data-theme="paper"] .hero {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 40px 28px 30px;
+}
+html[data-theme="paper"] .avatar { order: -1; width: 150px; height: 150px; margin-bottom: 10px; border-radius: 4px; }
+html[data-theme="paper"] .name { font-size: 26px; font-weight: 700; line-height: 1.2; }
+html[data-theme="paper"] .name-cn { display: block; margin: 4px 0 0; color: var(--muted); font-size: 16px; }
+html[data-theme="paper"] .role { margin: 0 0 14px; color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+html[data-theme="paper"] .contact { display: grid; gap: 8px; margin: 0 0 18px; }
+html[data-theme="paper"] .contact-link { color: var(--fg); font-size: 13.5px; text-decoration: none; overflow-wrap: anywhere; }
+html[data-theme="paper"] .contact-link .icon { color: var(--accent); font-size: 15px; }
+html[data-theme="paper"] .contact-link:hover { color: var(--accent); text-decoration: underline; }
+html[data-theme="paper"] .bio { padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+
+html[data-theme="paper"] .block[data-block="honors"] { grid-column: 1; grid-row: 2; padding: 4px 28px 40px; }
+html[data-theme="paper"] .block[data-block="news"] { grid-column: 2; grid-row: 1; }
+html[data-theme="paper"] .block[data-block="publications"] { grid-column: 2; grid-row: 2; }
+html[data-theme="paper"] .block[data-block="projects"] { grid-column: 2; grid-row: 3; }
+html[data-theme="paper"] .block[data-block="news"],
+html[data-theme="paper"] .block[data-block="publications"],
+html[data-theme="paper"] .block[data-block="projects"] { position: relative; padding: 40px 40px 14px; }
+
+html[data-theme="paper"] a { color: var(--accent); }
+html[data-theme="paper"] .block-title {
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+html[data-theme="paper"] .block-icon { display: none; }
+
+html[data-theme="paper"] .news-list { display: grid; gap: 10px; padding-left: 14px; border-left: 2px solid #d9dee5; }
+html[data-theme="paper"] .news-item { display: block; }
+html[data-theme="paper"] .news-date {
+    display: block;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+html[data-theme="paper"] .news-text { font-size: 14px; }
+html[data-theme="paper"] .honor-list { display: grid; gap: 6px; padding-left: 16px; list-style: disc; font-size: 13.5px; }
+html[data-theme="paper"] .honor-list li::marker { color: var(--accent); }
+
+html[data-theme="paper"] .entry-list { display: grid; gap: 18px; }
+html[data-theme="paper"] .entry { display: block; }
+html[data-theme="paper"] .entry-title { font-size: 15px; font-weight: 700; line-height: 1.35; }
+html[data-theme="paper"] .entry-badge {
+    display: inline-block;
+    margin: 2px 0 2px;
+    padding: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-style: italic;
+    font-weight: 400;
+}
+html[data-theme="paper"] .entry-badge.is-highlight { background: none; color: var(--accent-2); }
+html[data-theme="paper"] .entry-authors { margin-bottom: 3px; color: var(--muted); font-size: 13.5px; }
+html[data-theme="paper"] .entry-desc { margin-bottom: 6px; color: var(--muted); font-size: 13.5px; }
+html[data-theme="paper"] .entry-links { display: flex; gap: 12px; margin: 0; }
+html[data-theme="paper"] .link {
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+html[data-theme="paper"] .link .icon { display: none; }
+html[data-theme="paper"] .link:hover { text-decoration: underline; }
+html[data-theme="paper"] .link.is-disabled { color: #9aa5b1; }
+
+html[data-theme="paper"] .site-footer {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    padding: 18px 28px 22px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+@media (max-width: 760px) {
+    html[data-theme="paper"] .page { grid-template-columns: minmax(0, 1fr); margin: 0; border: 0; box-shadow: none; }
+    html[data-theme="paper"] .page::before { display: none; }
+    html[data-theme="paper"] .hero { padding: 28px 24px 26px; border-bottom: 1px solid var(--border); }
+    html[data-theme="paper"] .avatar { width: 110px; height: 110px; }
+    html[data-theme="paper"] .block[data-block="honors"] { grid-row: 2; padding: 24px 24px 8px; }
+    html[data-theme="paper"] .block[data-block="news"] { grid-row: 3; }
+    html[data-theme="paper"] .block[data-block="publications"] { grid-row: 4; }
+    html[data-theme="paper"] .block[data-block="projects"] { grid-row: 5; }
+    html[data-theme="paper"] .site-footer { grid-row: 6; }
+}

@@ -1,0 +1,128 @@
+/* arXiv — an abstract page of the preprint server: red wordmark, a title in
+   Times, a box of tools on the right, and sections named as on arxiv.org. */
+[data-theme="arxiv"] {
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #555555;
+    --accent: #b31b1b;
+    --accent-2: #b31b1b;
+    --surface: #ffffff;
+    --border: #cccccc;
+    --radius: 0;
+    --font-body: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: "Times New Roman", Times, "Songti SC", SimSun, serif;
+    --font-mono: "Courier New", Courier, monospace;
+    --page-width: 1000px;
+    --switcher-accent: #b31b1b;
+    color-scheme: light;
+}
+
+html[data-theme="arxiv"] body { font-size: 15px; line-height: 1.45; }
+html[data-theme="arxiv"] .page { display: block; padding: 16px 24px 40px; }
+
+/* Narrow screens: header, title, authors, abstract, then the portrait and
+   the tools box underneath. */
+html[data-theme="arxiv"] .hero { display: flex; flex-direction: column; align-items: flex-start; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+html[data-theme="arxiv"] .hero::before {
+    content: "arXiv.org";
+    margin-bottom: 12px;
+    color: var(--accent);
+    font-family: "Arial Black", "Helvetica Neue", Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+html[data-theme="arxiv"] .hero-text { display: contents; }
+html[data-theme="arxiv"] .name { order: 1; font-family: var(--font-display); font-size: 26px; font-weight: 700; line-height: 1.2; }
+html[data-theme="arxiv"] .name-cn { color: inherit; font-size: 0.6em; }
+html[data-theme="arxiv"] .role { order: 2; margin: 6px 0 14px; color: var(--fg); font-weight: 400; }
+html[data-theme="arxiv"] .bio { order: 3; margin-bottom: 16px; }
+html[data-theme="arxiv"] .avatar { order: 4; width: 150px; height: 150px; margin: 0; padding: 9px 9px 0; border: 1px solid var(--border); border-radius: 0; }
+html[data-theme="arxiv"] .contact { order: 5; display: grid; gap: 4px; width: 150px; margin: 0; padding: 8px 9px 9px; border: 1px solid var(--border); border-top: 0; }
+
+/* Wide screens: the portrait and the tools box hang in the right margin. */
+@media (min-width: 761px) {
+    html[data-theme="arxiv"] .hero { position: relative; display: block; padding-right: 270px; }
+    html[data-theme="arxiv"] .avatar { position: absolute; top: 48px; right: 0; width: 200px; height: 200px; }
+    html[data-theme="arxiv"] .contact { position: absolute; top: 248px; right: 0; width: 200px; }
+    html[data-theme="arxiv"] .bio { text-align: justify; }
+}
+
+html[data-theme="arxiv"] .bio a { color: var(--accent); text-decoration: none; }
+html[data-theme="arxiv"] .bio a:hover { text-decoration: underline; }
+html[data-theme="arxiv"] .bio p { display: inline; }
+html[data-theme="arxiv"] .bio::before {
+    content: "Abstract:";
+    margin-right: 6px;
+    font-variant: small-caps;
+    font-weight: 700;
+}
+html[data-theme="arxiv"] .bio p + p::before { content: " "; }
+html[data-theme="arxiv"] .contact::before {
+    content: "Tools";
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-variant: small-caps;
+    font-weight: 700;
+}
+html[data-theme="arxiv"] .contact-link { color: var(--accent); font-size: 13.5px; font-weight: 700; text-decoration: none; }
+html[data-theme="arxiv"] .contact-link:hover { text-decoration: underline; }
+html[data-theme="arxiv"] .contact-link .icon { font-size: 12px; }
+
+html[data-theme="arxiv"] .col { display: block; }
+html[data-theme="arxiv"] .content { display: block; }
+html[data-theme="arxiv"] .block { margin-top: 20px; }
+html[data-theme="arxiv"] .block-title { margin-bottom: 8px; font-size: 15px; font-weight: 700; }
+html[data-theme="arxiv"] .block-title span,
+html[data-theme="arxiv"] .block-icon { display: none; }
+html[data-theme="arxiv"] .block[data-block="news"] .block-title::before { content: "Submission history"; }
+html[data-theme="arxiv"] .block[data-block="honors"] .block-title::before { content: "Subjects"; }
+html[data-theme="arxiv"] .block[data-block="publications"] .block-title::before { content: "References"; }
+html[data-theme="arxiv"] .block[data-block="projects"] .block-title::before { content: "Code, Data, Media"; }
+
+html[data-theme="arxiv"] .news-list { display: grid; gap: 4px; }
+html[data-theme="arxiv"] .news-date { color: var(--fg); font-weight: 700; }
+html[data-theme="arxiv"] .news-date::before { content: "[v1] "; color: var(--accent); }
+html[data-theme="arxiv"] .honor-list { display: block; padding: 0; list-style: none; }
+html[data-theme="arxiv"] .honor-list li { display: inline; }
+html[data-theme="arxiv"] .honor-list li + li::before { content: "; "; }
+html[data-theme="arxiv"] .honor-list li:last-child::after { content: "."; }
+
+html[data-theme="arxiv"] .entry-list { display: grid; gap: 10px; padding-left: 34px; list-style: decimal; }
+html[data-theme="arxiv"] .entry { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; row-gap: 2px; }
+html[data-theme="arxiv"] .entry-title { grid-column: 1 / -1; font-family: var(--font-display); font-size: 15.5px; font-weight: 700; }
+html[data-theme="arxiv"] .entry-authors { grid-column: 1; grid-row: 2; color: var(--fg); font-size: 14px; }
+html[data-theme="arxiv"] .entry-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: inherit;
+}
+html[data-theme="arxiv"] .entry-badge.is-highlight { background: none; color: var(--accent); font-style: normal; }
+html[data-theme="arxiv"] .entry-desc { grid-column: 1 / -1; font-size: 14px; }
+html[data-theme="arxiv"] .entry-links { grid-column: 1 / -1; gap: 10px; margin: 2px 0 0; }
+html[data-theme="arxiv"] .link { color: var(--accent); font-size: 13.5px; font-weight: 700; text-decoration: none; }
+html[data-theme="arxiv"] .link:hover { text-decoration: underline; }
+html[data-theme="arxiv"] .link.is-disabled { color: #999999; font-weight: 400; }
+html[data-theme="arxiv"] .link .icon { display: none; }
+
+html[data-theme="arxiv"] .site-footer {
+    margin-top: 28px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+}
+
+@media (max-width: 760px) {
+    html[data-theme="arxiv"] .entry { grid-template-columns: minmax(0, 1fr); }
+    html[data-theme="arxiv"] .entry-badge { grid-column: 1; grid-row: 3; margin-top: 2px; }
+    html[data-theme="arxiv"] .entry-desc { grid-row: 4; }
+    html[data-theme="arxiv"] .entry-links { grid-row: 5; }
+}

@@ -1,0 +1,142 @@
+/* Swiss — the International Typographic Style: Helvetica only, a strict
+   twelve-column grid, a headline flush to the margin, hairline rules and a
+   single red. */
+[data-theme="swiss"] {
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #5c5c5c;
+    --accent: #e8112d;
+    --accent-2: #e8112d;
+    --surface: #f4f4f4;
+    --border: #111111;
+    --radius: 0;
+    --font-body: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: var(--font-body);
+    --font-mono: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --page-width: 1300px;
+    color-scheme: light;
+}
+
+html[data-theme="swiss"] body { font-size: 15px; line-height: 1.45; }
+html[data-theme="swiss"] .hero,
+html[data-theme="swiss"] .hero-text,
+html[data-theme="swiss"] .content,
+html[data-theme="swiss"] .col { display: contents; }
+
+html[data-theme="swiss"] .page {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 20px;
+    padding: 40px 32px 56px;
+    counter-reset: section;
+}
+
+/* Headline flush to the left margin, red subline, a rule under the masthead. */
+html[data-theme="swiss"] .name {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin: 0 -0.04em 0 -0.05em;
+    font-size: clamp(56px, 9.4vw, 132px);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 0.92;
+}
+html[data-theme="swiss"] .name-cn { display: block; margin: 14px 0 0 0.05em; color: var(--muted); font-size: 18px; font-weight: 400; letter-spacing: 0.4em; }
+html[data-theme="swiss"] .role {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 26px 0 12px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--fg);
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+html[data-theme="swiss"] .avatar { grid-column: 1 / span 3; grid-row: 3; width: 100%; height: auto; aspect-ratio: 1; border-radius: 0; filter: grayscale(1) contrast(1.05); }
+html[data-theme="swiss"] .bio { grid-column: 4 / span 5; grid-row: 3; font-size: 16px; line-height: 1.55; }
+html[data-theme="swiss"] .bio strong { font-weight: 700; }
+html[data-theme="swiss"] .bio a { color: var(--fg); text-decoration: none; box-shadow: inset 0 -1px 0 var(--accent); }
+html[data-theme="swiss"] .bio a:hover { color: var(--accent); }
+html[data-theme="swiss"] .contact { grid-column: 10 / span 3; grid-row: 3; display: grid; align-content: start; gap: 0; margin: 0; padding-top: 3px; border-top: 3px solid var(--fg); }
+html[data-theme="swiss"] .contact-link { padding: 10px 0; border-bottom: 1px solid var(--fg); color: var(--fg); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-decoration: none; text-transform: uppercase; }
+html[data-theme="swiss"] .contact-link .icon { display: none; }
+html[data-theme="swiss"] .contact-link:hover { color: var(--accent); }
+
+html[data-theme="swiss"] .block[data-block="news"] { grid-column: 1 / span 7; grid-row: 4; }
+html[data-theme="swiss"] .block[data-block="honors"] { grid-column: 8 / span 5; grid-row: 4; }
+html[data-theme="swiss"] .block[data-block="publications"] { grid-column: 1 / -1; grid-row: 5; }
+html[data-theme="swiss"] .block[data-block="projects"] { grid-column: 1 / -1; grid-row: 6; }
+html[data-theme="swiss"] .block { margin-top: 56px; counter-increment: section; }
+html[data-theme="swiss"] .block-title {
+    display: flex;
+    gap: 14px;
+    margin: 0 0 0;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--fg);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+html[data-theme="swiss"] .block-title::before { content: counter(section); color: var(--accent); letter-spacing: 0; }
+html[data-theme="swiss"] .block-icon { display: none; }
+
+html[data-theme="swiss"] .news-list { display: grid; }
+html[data-theme="swiss"] .news-item { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-bottom: 1px solid #c9c9c9; }
+html[data-theme="swiss"] .news-date { padding-top: 1px; color: var(--accent); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+html[data-theme="swiss"] .news-text strong { font-weight: 700; }
+html[data-theme="swiss"] .honor-list { display: grid; padding: 0; list-style: none; }
+html[data-theme="swiss"] .honor-list li { position: relative; padding: 11px 0 11px 22px; border-bottom: 1px solid #c9c9c9; font-weight: 500; }
+html[data-theme="swiss"] .honor-list li::before { content: ""; position: absolute; top: 17px; left: 0; width: 9px; height: 9px; background: var(--accent); }
+
+/* Papers and projects as an index: a red number, a bold title, authors, links. */
+html[data-theme="swiss"] .entry-list { display: grid; counter-reset: item; }
+html[data-theme="swiss"] .entry {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 5fr) minmax(0, 4fr) minmax(0, 3fr);
+    column-gap: 20px;
+    row-gap: 4px;
+    padding: 16px 0;
+    border-top: 1px solid var(--fg);
+    counter-increment: item;
+}
+html[data-theme="swiss"] .entry:last-child { border-bottom: 1px solid var(--fg); }
+html[data-theme="swiss"] .entry::before { content: counter(item, decimal-leading-zero); grid-row: 1 / span 3; color: var(--accent); font-size: 15px; font-weight: 700; }
+html[data-theme="swiss"] .entry-title { grid-column: 2; grid-row: 1; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+html[data-theme="swiss"] .entry-desc { grid-column: 2; grid-row: 2; font-size: 14px; }
+html[data-theme="swiss"] .entry-authors { grid-column: 3; grid-row: 1; color: var(--fg); font-size: 14px; }
+html[data-theme="swiss"] .entry-badge { grid-column: 3; grid-row: 2; justify-self: start; padding: 0; background: none; color: var(--accent); font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em; line-height: 1.6; text-transform: uppercase; }
+html[data-theme="swiss"] .entry-badge.is-highlight { background: none; color: var(--accent); }
+html[data-theme="swiss"] .entry-links { grid-column: 4; grid-row: 1 / span 2; display: grid; align-content: start; gap: 3px; margin: 0; }
+html[data-theme="swiss"] .link { color: var(--fg); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; }
+html[data-theme="swiss"] .link .icon { display: none; }
+html[data-theme="swiss"] .link:hover { color: var(--accent); }
+html[data-theme="swiss"] .link.is-disabled { color: #8c8c8c; }
+
+html[data-theme="swiss"] .site-footer { grid-column: 1 / -1; margin-top: 56px; padding-top: 10px; border-top: 3px solid var(--fg); color: var(--muted); font-size: 12px; letter-spacing: 0.04em; }
+
+@media (max-width: 960px) {
+    html[data-theme="swiss"] .page { display: flex; flex-direction: column; padding: 24px 20px 40px; }
+    /* One column, the portrait between the subline and the bio. */
+    html[data-theme="swiss"] .name { order: 1; font-size: clamp(48px, 15vw, 96px); }
+    html[data-theme="swiss"] .role { order: 2; margin-top: 18px; }
+    html[data-theme="swiss"] .avatar { order: 3; width: 42%; margin: 22px 0 18px; }
+    html[data-theme="swiss"] .bio { order: 4; }
+    html[data-theme="swiss"] .contact { order: 5; }
+    html[data-theme="swiss"] .block[data-block="news"] { order: 6; }
+    html[data-theme="swiss"] .block[data-block="honors"] { order: 7; }
+    html[data-theme="swiss"] .block[data-block="publications"] { order: 8; }
+    html[data-theme="swiss"] .block[data-block="projects"] { order: 9; }
+    html[data-theme="swiss"] .site-footer { order: 10; }
+    html[data-theme="swiss"] .contact { margin-bottom: 8px; }
+    html[data-theme="swiss"] .block { margin-top: 40px; }
+    html[data-theme="swiss"] .entry { grid-template-columns: 40px minmax(0, 1fr); }
+    html[data-theme="swiss"] .entry-title,
+    html[data-theme="swiss"] .entry-desc { grid-column: 2; }
+    html[data-theme="swiss"] .entry-authors { grid-column: 2; grid-row: 3; }
+    html[data-theme="swiss"] .entry-badge { grid-column: 2; grid-row: 4; margin-top: 2px; }
+    html[data-theme="swiss"] .entry-links { grid-column: 2; grid-row: 5; display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
+    html[data-theme="swiss"] .entry::before { grid-row: 1; }
+}

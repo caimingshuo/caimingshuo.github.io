@@ -1,0 +1,181 @@
+/* Notes — the page as a document in a note-taking app: a light grey sidebar
+   with the workspace and its links, a big page title with an emoji icon, a
+   callout, and toggled headings over plain blocks. */
+[data-theme="notes"] {
+    --bg: #ffffff;
+    --fg: #37352f;
+    --muted: #6f6e6b;
+    --accent: #2383e2;
+    --accent-2: #eb5757;
+    --surface: #f1f1ef;
+    --border: #e9e9e7;
+    --radius: 4px;
+    --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: var(--font-body);
+    --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "PingFang SC", monospace;
+    --page-width: 1240px;
+    color-scheme: light;
+}
+
+html[data-theme="notes"] body { font-size: 16px; line-height: 1.55; }
+
+/* Sidebar column and document column. */
+html[data-theme="notes"] .page { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 0; padding: 0; }
+html[data-theme="notes"] .page::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1; /* behind the workspace name and the links */
+    width: 260px;
+    background: #f7f7f5;
+}
+html[data-theme="notes"] .hero,
+html[data-theme="notes"] .hero-text,
+html[data-theme="notes"] .content,
+html[data-theme="notes"] .col { display: contents; }
+
+html[data-theme="notes"] .avatar { grid-column: 1; grid-row: 1; align-self: start; justify-self: start; width: 18px; height: 18px; margin: 15px 0 0 16px; border-radius: 4px; }
+html[data-theme="notes"] .name { grid-column: 1; grid-row: 1; align-self: start; margin: 0; padding: 11px 12px 11px 44px; font-size: 14px; font-weight: 600; line-height: 26px; }
+html[data-theme="notes"] .name-cn { color: var(--muted); font-size: 0.9em; font-weight: 400; }
+html[data-theme="notes"] .contact { grid-column: 1; grid-row: 2 / span 6; display: grid; align-self: start; gap: 1px; margin: 6px 8px; padding: 0; }
+html[data-theme="notes"] .contact::before {
+    content: "Links";
+    grid-column: 1 / -1;
+    padding: 10px 8px 4px;
+    color: #6f6e6b;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+html[data-theme="notes"] .contact li { display: contents; }
+html[data-theme="notes"] .contact-link { padding: 5px 8px; border-radius: var(--radius); color: var(--fg); font-size: 14px; font-weight: 500; text-decoration: none; }
+html[data-theme="notes"] .contact-link .icon { width: 18px; height: 18px; margin-right: 6px; color: var(--muted); }
+html[data-theme="notes"] .contact-link:hover { background: #efefed; }
+
+/* Page icon and title, then the introduction as a callout. */
+html[data-theme="notes"] .role {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: 800px;
+    margin: 0;
+    padding: 48px 96px 0 0;
+    color: var(--fg);
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+html[data-theme="notes"] .role::before { content: "\1F393"; display: block; margin-bottom: 14px; font-size: 78px; line-height: 1; }
+html[data-theme="notes"] .study-year { color: inherit; }
+html[data-theme="notes"] .bio {
+    grid-column: 2;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 10px;
+    max-width: 800px;
+    margin-top: 20px;
+    padding: 16px 16px 16px 12px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--fg);
+}
+html[data-theme="notes"] .bio::before { content: "\1F44B"; grid-row: 1 / span 2; font-size: 20px; line-height: 1.6; }
+html[data-theme="notes"] .bio p { margin: 0; }
+html[data-theme="notes"] .bio p + p { margin-top: 4px; }
+html[data-theme="notes"] .bio strong { font-weight: 600; }
+html[data-theme="notes"] .bio a { color: var(--fg); text-decoration: none; border-bottom: 1px solid rgba(55, 53, 47, 0.25); }
+html[data-theme="notes"] .bio a:hover { border-bottom-color: var(--accent); }
+
+/* Headings with a toggle arrow, then blocks that highlight like the app's. */
+html[data-theme="notes"] .block,
+html[data-theme="notes"] .site-footer { grid-column: 2; max-width: 800px; padding-right: 96px; }
+html[data-theme="notes"] .block { margin-top: 36px; }
+html[data-theme="notes"] .block-title {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0 0 8px;
+    padding-left: 4px;
+    color: var(--fg);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+html[data-theme="notes"] .block-title::before { content: "\25BE"; color: #9b9a97; font-size: 15px; }
+html[data-theme="notes"] .block-icon { display: none; }
+
+html[data-theme="notes"] .news-list { display: grid; padding: 2px 0; }
+html[data-theme="notes"] .news-item { display: grid; grid-template-columns: 24px 76px minmax(0, 1fr); column-gap: 4px; padding: 3px 2px; border-radius: var(--radius); }
+html[data-theme="notes"] .news-item:hover,
+html[data-theme="notes"] .honor-list li:hover,
+html[data-theme="notes"] .entry:hover { background: var(--surface); }
+html[data-theme="notes"] .news-item::before { content: "\2022"; padding-left: 8px; font-weight: 700; line-height: 1.6; }
+html[data-theme="notes"] .news-date { padding-top: 2px; color: #6f6e6b; font-size: 14px; font-variant-numeric: tabular-nums; }
+html[data-theme="notes"] .news-text strong { font-weight: 600; }
+
+/* Honors as ticked to-dos. */
+html[data-theme="notes"] .honor-list { display: grid; padding: 0; list-style: none; }
+html[data-theme="notes"] .honor-list li { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 2px; padding: 3px 2px; border-radius: var(--radius); }
+html[data-theme="notes"] .honor-list li::before {
+    content: "\2713";
+    width: 16px;
+    height: 16px;
+    margin: 5px 0 0 3px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+
+/* Publications and projects as sub-pages; badges as inline code. */
+html[data-theme="notes"] .entry-list { display: grid; gap: 2px; }
+html[data-theme="notes"] .entry { display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 4px; row-gap: 2px; padding: 3px 2px; border-radius: var(--radius); }
+html[data-theme="notes"] .entry::before { content: "\1F4C4"; grid-column: 1; grid-row: 1 / span 5; font-size: 18px; line-height: 1.5; }
+html[data-theme="notes"] .entry > * { grid-column: 2; }
+html[data-theme="notes"] .entry-title { font-size: 16px; font-weight: 600; line-height: 1.5; }
+html[data-theme="notes"] .entry-authors,
+html[data-theme="notes"] .entry-desc { margin-top: 2px; font-size: 14px; }
+html[data-theme="notes"] .entry-badge,
+html[data-theme="notes"] .entry-badge.is-highlight {
+    justify-self: start;
+    margin-top: 4px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(135, 131, 120, 0.15);
+    color: var(--accent-2);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+html[data-theme="notes"] .entry-links { gap: 12px; margin-top: 4px; }
+html[data-theme="notes"] .link { color: var(--fg); font-size: 14px; font-weight: 500; text-decoration: none; border-bottom: 1px solid rgba(55, 53, 47, 0.2); }
+html[data-theme="notes"] .link .icon { display: none; }
+html[data-theme="notes"] .link:hover { border-bottom-color: var(--accent); }
+html[data-theme="notes"] .link.is-disabled { color: var(--muted); border-bottom-color: transparent; }
+
+html[data-theme="notes"] .site-footer { margin-top: 48px; padding-bottom: 40px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 900px) {
+    /* The sidebar folds into a band above the page. */
+    html[data-theme="notes"] .page { display: block; padding: 0 20px 32px; }
+    html[data-theme="notes"] .page::before { display: none; }
+    html[data-theme="notes"] .avatar { display: block; margin: 14px 0 0; }
+    html[data-theme="notes"] .name { display: block; padding: 8px 0 4px; }
+    html[data-theme="notes"] .contact { display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0 0; padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    html[data-theme="notes"] .contact::before { display: none; }
+    html[data-theme="notes"] .contact-link { background: var(--surface); }
+    html[data-theme="notes"] .role { padding: 20px 0 0; font-size: 32px; }
+    html[data-theme="notes"] .role::before { font-size: 60px; }
+    html[data-theme="notes"] .bio { margin-top: 16px; }
+    html[data-theme="notes"] .block,
+    html[data-theme="notes"] .site-footer { padding-right: 0; }
+    html[data-theme="notes"] .block { margin-top: 28px; }
+}

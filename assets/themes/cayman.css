@@ -1,0 +1,371 @@
+/* Cayman — the GitHub Pages theme: a full-width band in the green-to-blue
+   gradient carrying the name and the role, then one centred 820 px column of
+   plain Open Sans text on white, small outlined buttons and a quiet footer. */
+
+[data-theme="cayman"] {
+    --bg: #ffffff;
+    --fg: #2e2e2e;
+    --muted: #606c71;
+    --accent: #1e6bb8;
+    --accent-2: #159957;
+    --surface: #ffffff;
+    --border: rgba(0, 0, 0, 0.2);
+    --radius: 4px;
+    --font-body: "Open Sans", "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --font-display: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --font-mono: "SFMono-Regular", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --page-width: 820px;
+
+    --cayman-content: 820px;
+    --cayman-gutter: 20px;
+    --cayman-portrait: 130px;
+    --cayman-hairline: #eff0f1;
+    --cayman-soft: #6b7780;
+    --switcher-hover: rgba(30, 107, 184, 0.08);
+    color-scheme: light;
+}
+
+html[data-theme="cayman"] body {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+html[data-theme="cayman"] a { color: var(--accent); text-decoration: none; }
+html[data-theme="cayman"] a:hover { text-decoration: underline; }
+html[data-theme="cayman"] a:focus-visible { border-radius: 3px; }
+html[data-theme="cayman"] ::selection { background: #159957; color: #ffffff; }
+
+/* The page spans the full width so that the band can; everything else centres
+   itself on the same 820 px column. */
+html[data-theme="cayman"] .page {
+    gap: 0;
+    max-width: none;
+    padding: 0;
+}
+
+/* ---- Header band and introduction ---------------------------------------- */
+
+/* .hero is the grid everything in the introduction is placed on: columns 2–3
+   are the 820 px column (portrait, then bio), columns 1 and 4 the margins.
+   .hero-text opens up so that the name, role, bio and contact list become
+   grid items next to the portrait. */
+html[data-theme="cayman"] .hero {
+    grid-template-columns:
+        minmax(var(--cayman-gutter), 1fr)
+        var(--cayman-portrait)
+        minmax(0, calc(var(--cayman-content) - var(--cayman-portrait)))
+        minmax(var(--cayman-gutter), 1fr);
+    gap: 0;
+    align-items: start;
+}
+html[data-theme="cayman"] .hero-text { display: contents; }
+
+/* The band is a grid item of its own behind the name and the role, so it is
+   exactly as tall as the two lines it carries, at every width. */
+html[data-theme="cayman"] .hero::before {
+    content: "";
+    grid-column: 1 / -1;
+    grid-row: 1 / 3;
+    align-self: stretch;
+    background: linear-gradient(20deg, #159957, #155799);
+}
+
+html[data-theme="cayman"] .name {
+    z-index: 1;
+    grid-column: 2 / 4;
+    grid-row: 1;
+    padding: 56px 0 0;
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-align: center;
+}
+html[data-theme="cayman"] .name-cn {
+    margin-left: 0.35em;
+    color: inherit;
+    font-family: var(--font-body);
+    font-size: 0.48em;
+    font-weight: 400;
+}
+
+/* More room below the role than above the name: it keeps the light subtitle
+   over the bluer part of the gradient (white on #159957 is only 3.7:1). */
+html[data-theme="cayman"] .role {
+    z-index: 1;
+    grid-column: 2 / 4;
+    grid-row: 2;
+    margin: 10px 0 0;
+    padding: 0 0 80px;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1.4;
+    text-align: center;
+    text-wrap: balance;
+}
+
+html[data-theme="cayman"] .avatar {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: center;
+    width: var(--cayman-portrait);
+    height: var(--cayman-portrait);
+    margin-top: 48px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="cayman"] .bio {
+    grid-column: 3;
+    grid-row: 3;
+    align-self: center;
+    min-width: 0;
+    margin-top: 48px;
+    padding-left: 36px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.65;
+}
+html[data-theme="cayman"] .bio p + p { margin-top: 12px; }
+html[data-theme="cayman"] .bio strong { color: var(--fg); font-weight: 600; }
+html[data-theme="cayman"] .bio a {
+    text-decoration: underline;
+    text-decoration-color: rgba(30, 107, 184, 0.35);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s ease;
+}
+html[data-theme="cayman"] .bio a:hover { text-decoration-color: currentColor; }
+html[data-theme="cayman"] .mark {
+    color: var(--fg);
+    font-weight: 600;
+    background: linear-gradient(transparent 64%, #e2ecf7 64%);
+}
+
+html[data-theme="cayman"] .contact {
+    grid-column: 2 / 4;
+    grid-row: 4;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 28px 0 0;
+}
+html[data-theme="cayman"] .contact-link {
+    gap: 0;
+    padding: 7px 12px;
+    color: rgba(0, 0, 0, 0.75);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+html[data-theme="cayman"] .contact-link .icon { margin-right: 6px; font-size: 14px; }
+html[data-theme="cayman"] .contact-link:hover {
+    color: var(--accent);
+    background: #f6f9fd;
+    border-color: rgba(30, 107, 184, 0.5);
+    text-decoration: none;
+}
+
+/* ---- Sections ------------------------------------------------------------ */
+
+/* News and honors are short lists, so they share a row, with a little more
+   room for the dated one; publications and projects take the full column. */
+html[data-theme="cayman"] .content {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    column-gap: 48px;
+    row-gap: 64px;
+    align-items: start;
+    width: 100%;
+    max-width: calc(var(--cayman-content) + 2 * var(--cayman-gutter));
+    margin: 0 auto;
+    padding: 64px var(--cayman-gutter) 0;
+}
+html[data-theme="cayman"] .col { display: contents; }
+html[data-theme="cayman"] .block[data-block="news"] { grid-column: 1; grid-row: 1; }
+html[data-theme="cayman"] .block[data-block="honors"] { grid-column: 2; grid-row: 1; }
+html[data-theme="cayman"] .block[data-block="publications"] { grid-column: 1 / -1; grid-row: 2; }
+html[data-theme="cayman"] .block[data-block="projects"] { grid-column: 1 / -1; grid-row: 3; }
+
+html[data-theme="cayman"] .block-title {
+    margin: 0 0 22px;
+    font-family: var(--font-body);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--fg);
+    text-align: center;
+    text-wrap: balance;
+}
+
+/* News: a dated list */
+html[data-theme="cayman"] .news-list { gap: 12px; }
+html[data-theme="cayman"] .news-item {
+    display: grid;
+    grid-template-columns: 3.7em minmax(0, 1fr);
+    gap: 0 12px;
+    font-size: 16px;
+    line-height: 1.55;
+    text-wrap: pretty;
+}
+html[data-theme="cayman"] .news-date {
+    padding-top: 4px;
+    color: var(--cayman-soft);
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+}
+html[data-theme="cayman"] .news-text strong { color: var(--fg); font-weight: 600; }
+
+/* Honors: bullets */
+html[data-theme="cayman"] .honor-list {
+    gap: 9px;
+    padding-left: 1.3em;
+    font-size: 16px;
+    line-height: 1.5;
+}
+html[data-theme="cayman"] .honor-list li::marker { color: var(--accent); }
+
+/* Publications and projects: a small blue label over a bold title, gray
+   authors, then the links in brackets. Projects are short, so they pair up. */
+html[data-theme="cayman"] .entry-list { gap: 36px; }
+html[data-theme="cayman"] .block[data-block="projects"] .entry-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 48px;
+}
+html[data-theme="cayman"] .entry { gap: 0; }
+
+html[data-theme="cayman"] .entry-badge,
+html[data-theme="cayman"] .entry-badge.is-highlight {
+    justify-self: start;
+    padding: 0;
+    background: none;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+html[data-theme="cayman"] .entry-title {
+    margin-top: 4px;
+    color: var(--fg);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-wrap: balance;
+}
+html[data-theme="cayman"] .entry-authors {
+    margin-top: 4px;
+    color: var(--cayman-soft);
+    font-size: 14px;
+    line-height: 1.5;
+}
+html[data-theme="cayman"] .entry-authors strong { color: var(--fg); font-weight: 700; }
+html[data-theme="cayman"] .entry-desc {
+    max-width: 68ch;
+    margin-top: 6px;
+    font-size: 16px;
+    line-height: 1.55;
+    text-wrap: pretty;
+}
+
+html[data-theme="cayman"] .entry-links {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+html[data-theme="cayman"] .link { gap: 0; white-space: nowrap; }
+html[data-theme="cayman"] .link::before { content: "["; }
+html[data-theme="cayman"] .link::after { content: "]"; }
+html[data-theme="cayman"] .link .icon { margin: 0 5px 0 3px; font-size: 14px; }
+html[data-theme="cayman"] a.link:hover { text-underline-offset: 3px; }
+html[data-theme="cayman"] .link.is-disabled { color: var(--cayman-soft); cursor: default; }
+
+/* ---- Footer -------------------------------------------------------------- */
+
+html[data-theme="cayman"] .site-footer {
+    width: 100%;
+    max-width: calc(var(--cayman-content) + 2 * var(--cayman-gutter));
+    margin: 0 auto;
+    padding: 56px var(--cayman-gutter) 72px;
+}
+html[data-theme="cayman"] .site-footer p {
+    padding-top: 24px;
+    border-top: 1px solid var(--cayman-hairline);
+    color: var(--cayman-soft);
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* ---- Narrow screens ------------------------------------------------------ */
+
+@media (max-width: 760px) {
+    html[data-theme="cayman"] .content {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 48px;
+        padding-top: 48px;
+    }
+    html[data-theme="cayman"] .block[data-block="news"],
+    html[data-theme="cayman"] .block[data-block="honors"],
+    html[data-theme="cayman"] .block[data-block="publications"],
+    html[data-theme="cayman"] .block[data-block="projects"] { grid-column: 1; }
+    html[data-theme="cayman"] .block[data-block="honors"] { grid-row: 2; }
+    html[data-theme="cayman"] .block[data-block="publications"] { grid-row: 3; }
+    html[data-theme="cayman"] .block[data-block="projects"] { grid-row: 4; }
+    html[data-theme="cayman"] .block[data-block="projects"] .entry-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    html[data-theme="cayman"] .name { padding-top: 40px; font-size: 36px; }
+    html[data-theme="cayman"] .role {
+        margin-top: 8px;
+        padding-bottom: 80px;
+        font-size: 18px;
+        font-weight: 400;
+    }
+    html[data-theme="cayman"] .avatar {
+        grid-column: 2 / 4;
+        justify-self: center;
+        margin-top: 36px;
+    }
+    html[data-theme="cayman"] .bio {
+        grid-column: 2 / 4;
+        grid-row: 4;
+        margin-top: 22px;
+        padding-left: 0;
+    }
+    html[data-theme="cayman"] .contact {
+        grid-row: 5;
+        justify-content: center;
+        margin-top: 24px;
+    }
+    html[data-theme="cayman"] .block-title { margin-bottom: 18px; font-size: 21px; }
+    html[data-theme="cayman"] .entry-title { font-size: 18px; }
+    html[data-theme="cayman"] .site-footer { padding: 40px var(--cayman-gutter) 72px; }
+}
+
+@media (max-width: 440px) {
+    html[data-theme="cayman"] .role { font-size: 17px; }
+}
+
+@media (max-width: 340px) {
+    html[data-theme="cayman"] .name { font-size: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-theme="cayman"] .contact-link,
+    html[data-theme="cayman"] .bio a { transition: none; }
+}

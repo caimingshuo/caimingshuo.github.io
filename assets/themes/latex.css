@@ -1,0 +1,406 @@
+/* LaTeX — the homepage as an article typeset with pdfLaTeX: Computer Modern,
+   black on a white sheet that lies on a grey desk. The title block is
+   \maketitle, the portrait is Figure 1, the first bio paragraph is the
+   abstract, the second starts the body, the four blocks are sections 1–4 and
+   publications and projects are their numbered subsections. */
+
+[data-theme="latex"] {
+    --bg: #ececec;
+    --fg: #000000;
+    --muted: #595959;
+    --accent: #000000;
+    --accent-2: #000000;
+    --surface: #ffffff;
+    --border: #d4d4d4;
+    --radius: 0px;
+    /* Only Computer Modern and CMU Typewriter are loaded; the rest of the
+       stack supplies a serif if they fail and the Chinese glyphs they lack. */
+    --font-body: "CMU Serif", "Times New Roman", Times, "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+    --font-display: var(--font-body);
+    --font-mono: "CMU Typewriter", "CMU Serif", ui-monospace, Menlo, Consolas, monospace;
+    --page-width: 780px;
+    --switcher-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    color-scheme: light;
+}
+
+/* Desk and sheet ---------------------------------------------------------- */
+
+html[data-theme="latex"] body {
+    padding: 40px 20px 64px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+html[data-theme="latex"] .page {
+    gap: 0;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 56px;
+    overflow-wrap: break-word;
+    background: var(--surface);
+    border: 1px solid #d4d4d4;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.07);
+}
+
+/* Running text is justified and hyphenated, as TeX sets it. On narrow screens
+   it goes ragged right instead: see the end of this file. */
+html[data-theme="latex"] .bio p,
+html[data-theme="latex"] .news-item,
+html[data-theme="latex"] .honor-list li,
+html[data-theme="latex"] .entry-authors,
+html[data-theme="latex"] .entry-desc {
+    text-align: justify;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 7 3 3;
+}
+
+/* Title block --------------------------------------------------------------
+   The two wrappers are opened up, so the name, the author line, the contact
+   details, the portrait, its caption and the two bio paragraphs form one
+   centred column, in the order \maketitle, the figure and the abstract give. */
+
+html[data-theme="latex"] .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+html[data-theme="latex"] .hero-text,
+html[data-theme="latex"] .bio { display: contents; }
+
+html[data-theme="latex"] .name {
+    order: 1;
+    font-size: 22px;
+    line-height: 1.2;
+    text-align: center;
+    hyphens: manual;
+}
+html[data-theme="latex"] .name-cn {
+    display: block;
+    margin: 0.25em 0 0;
+    color: inherit;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+html[data-theme="latex"] .role {
+    order: 2;
+    margin-top: 1.1em;
+    color: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* Contact details: one centred line of \url{} under the author. */
+html[data-theme="latex"] .contact {
+    order: 3;
+    display: block;
+    margin-top: 0.6em;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    text-align: center;
+}
+html[data-theme="latex"] .contact li { display: inline; }
+html[data-theme="latex"] .contact li + li::before { content: "·"; margin: 0 0.8em; }
+
+/* Figure 1. The caption is the ::after of the column and follows the portrait:
+   an img cannot carry generated content itself. */
+html[data-theme="latex"] .avatar {
+    order: 4;
+    width: 84px;
+    height: 84px;
+    margin-top: 1.5em;
+    border-radius: 0;
+}
+html[data-theme="latex"] .hero::after {
+    order: 5;
+    content: "Figure 1: The author.";
+    margin-top: 0.45em;
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* Abstract */
+html[data-theme="latex"] .bio p:first-child {
+    order: 6;
+    width: 80%;
+    margin-top: 1.7em;
+    font-size: 12px;
+    line-height: 1.42;
+}
+html[data-theme="latex"] .bio p:first-child::before {
+    content: "Abstract";
+    display: block;
+    margin-bottom: 0.55em;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Body: the first paragraph after the abstract. */
+html[data-theme="latex"] .bio p + p {
+    order: 7;
+    width: 100%;
+    margin-top: 1.5em;
+    font-size: 14px;
+    line-height: 1.5;
+    text-indent: 1.5em;
+}
+html[data-theme="latex"] .mark { white-space: nowrap; }
+
+/* Links --------------------------------------------------------------------
+   \url{}: typewriter, dark, no underline. The underline is painted only on
+   hover and keyboard focus. */
+html[data-theme="latex"] .contact-link,
+html[data-theme="latex"] .link {
+    display: inline;
+    gap: 0;
+    padding: 0.3em 0;
+    color: inherit;
+    font-weight: 400;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: text-decoration-color 0.15s ease;
+}
+html[data-theme="latex"] .contact .icon,
+html[data-theme="latex"] .entry-links .icon { display: none; }
+html[data-theme="latex"] .contact-link:hover,
+html[data-theme="latex"] .contact-link:focus-visible,
+html[data-theme="latex"] .link:hover,
+html[data-theme="latex"] .link:focus-visible { text-decoration-color: currentColor; }
+html[data-theme="latex"] .link.is-disabled { color: var(--muted); }
+
+/* A link inside running text keeps the text face: the thin box hyperref draws
+   around it is what marks it as a link. */
+html[data-theme="latex"] .bio a {
+    padding: 0 0.2em;
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    outline: 1px solid #7a7a7a;
+    outline-offset: 0;
+    transition: outline-color 0.15s ease;
+}
+html[data-theme="latex"] .bio a:hover { outline-color: var(--fg); }
+html[data-theme="latex"] .bio a:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+}
+
+/* Sections ----------------------------------------------------------------- */
+
+html[data-theme="latex"] .content {
+    display: block;
+    counter-reset: section 0;
+}
+html[data-theme="latex"] .block {
+    counter-increment: section;
+    counter-reset: entry;
+}
+html[data-theme="latex"] .block-title {
+    margin: 2.3em 0 0.8em;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    hyphens: manual;
+}
+html[data-theme="latex"] .block-title::before {
+    content: counter(section);
+    margin-right: 1em;
+}
+
+/* News and honors: itemize, the label flush right before a \labelsep. */
+html[data-theme="latex"] .news-list,
+html[data-theme="latex"] .honor-list {
+    display: block;
+    padding: 0;
+    list-style: none;
+}
+html[data-theme="latex"] .news-item,
+html[data-theme="latex"] .honor-list li {
+    position: relative;
+    display: block;
+    padding-left: 2.2em;
+    font-size: 14px;
+    line-height: 1.5;
+}
+html[data-theme="latex"] .news-item::before,
+html[data-theme="latex"] .honor-list li::before {
+    content: "•";
+    content: "•" / "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.7em;
+    text-align: right;
+}
+html[data-theme="latex"] .news-date {
+    display: inline;
+    margin-right: 0.75em;
+    color: inherit;
+    font-weight: 700;
+}
+
+/* Publications and projects: subsections. An entry is a wrapping row of
+   heading, authors, description and links. A paper's badge follows its
+   authors like a venue; a project has no authors, so its badge follows the
+   heading in parentheses. */
+html[data-theme="latex"] .entry-list { display: block; }
+html[data-theme="latex"] .entry {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.6em;
+    row-gap: 0.4em;
+    counter-increment: entry;
+}
+html[data-theme="latex"] .entry + .entry { margin-top: 1.6em; }
+
+html[data-theme="latex"] .entry-title {
+    order: 1;
+    flex: 0 0 100%;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    hyphens: manual;
+}
+html[data-theme="latex"] .entry-title::before {
+    content: counter(section) "." counter(entry);
+    margin-right: 1em;
+}
+
+html[data-theme="latex"] .entry-authors {
+    order: 2;
+    flex: 0 1 auto;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+}
+html[data-theme="latex"] .entry-badge {
+    order: 3;
+    flex: 0 0 auto;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.5;
+}
+html[data-theme="latex"] .entry-badge::after { content: "."; }
+html[data-theme="latex"] .entry-badge.is-highlight {
+    background: none;
+    color: inherit;
+    font-style: normal;
+    font-weight: 700;
+}
+
+html[data-theme="latex"] .entry-desc {
+    order: 4;
+    flex: 0 0 100%;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+html[data-theme="latex"] .entry-links {
+    order: 5;
+    flex: 0 0 100%;
+    display: block;
+    gap: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.7;
+}
+html[data-theme="latex"] .entry-links li { display: inline; }
+html[data-theme="latex"] .entry-links li + li::before { content: "·"; margin: 0 0.8em; }
+
+html[data-theme="latex"] [data-block="projects"] .entry-title { flex: 0 1 auto; }
+html[data-theme="latex"] [data-block="projects"] .entry-badge { order: 2; }
+html[data-theme="latex"] [data-block="projects"] .entry-badge::before { content: "("; }
+html[data-theme="latex"] [data-block="projects"] .entry-badge::after { content: ")"; }
+
+/* Footnote and page number -------------------------------------------------
+   The footer line is set as a footnote under LaTeX's 2 in, 0.4 pt rule; the
+   page number sits centred below it, as \thispagestyle{plain} leaves it. */
+
+html[data-theme="latex"] .site-footer {
+    position: relative;
+    margin-top: 1.6em;
+    padding-bottom: 3.2em;
+}
+html[data-theme="latex"] .site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 192px;
+    height: 0.4pt;
+    background: var(--fg);
+}
+html[data-theme="latex"] .site-footer p {
+    margin-top: 0.5em;
+    font-size: 12px;
+    line-height: 1.45;
+}
+html[data-theme="latex"] .site-footer::after {
+    content: "1";
+    content: "1" / "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Narrow screens ---------------------------------------------------------- */
+
+/* Below 768 px the sheet's measure is too short for a greedy justifier: bold
+   Computer Modern is wide, and an unbreakable name stretches the line before
+   it into rivers (measured at up to seven times the normal word space). There
+   running text goes ragged right, and `pretty` then only keeps a paragraph
+   from ending on a single word. */
+@media (max-width: 767px) {
+    html[data-theme="latex"] .bio p,
+    html[data-theme="latex"] .news-item,
+    html[data-theme="latex"] .honor-list li,
+    html[data-theme="latex"] .entry-authors,
+    html[data-theme="latex"] .entry-desc {
+        text-align: left;
+        text-wrap: pretty;
+    }
+}
+
+@media (max-width: 640px) {
+    html[data-theme="latex"] body { padding: 12px 10px 48px; }
+    html[data-theme="latex"] .page { padding: 32px 22px 40px; }
+}
+
+/* On paper the desk, the border and the shadow go. */
+@media print {
+    html[data-theme="latex"] body { padding: 0; background: #ffffff; }
+    html[data-theme="latex"] .page {
+        max-width: none;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+    }
+    html[data-theme="latex"] .entry,
+    html[data-theme="latex"] .hero { break-inside: avoid; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-theme="latex"] .contact-link,
+    html[data-theme="latex"] .link,
+    html[data-theme="latex"] .bio a { transition: none; }
+}

@@ -1,0 +1,883 @@
+/* ==========================================================================
+   Retro OS — a Windows 95/98 desktop, kept tidy enough to read as an academic
+   page: a teal desktop, beveled windows with navy title bars, sunken list boxes
+   and a taskbar along the bottom. Every icon is painted with CSS gradients.
+
+   The page grid is the desktop. The intro window and the News/Honors column
+   share the first row, Publications and Projects follow as full-width windows,
+   and the footer becomes a status bar above the taskbar.
+   ========================================================================== */
+
+[data-theme="retro"] {
+    --bg: #008080;
+    --fg: #000000;
+    --muted: #404040;
+    --accent: #0000ee;
+    --accent-2: #000080;
+    --surface: #c0c0c0;
+    --border: #808080;
+    --radius: 0px;
+    --font-body: Tahoma, "MS Sans Serif", Verdana, system-ui, "PingFang SC", sans-serif;
+    --font-display: "Pixelify Sans", Tahoma, "MS Sans Serif", Verdana, system-ui, "PingFang SC", sans-serif;
+    --font-mono: "Lucida Console", "Courier New", ui-monospace, Menlo, monospace;
+    --page-width: 1080px;
+
+    --switcher-bg: #c0c0c0;
+    --switcher-fg: #000000;
+    --switcher-muted: #404040;
+    --switcher-border: #808080;
+    --switcher-accent: #000080;
+    --switcher-hover: rgba(0, 0, 0, 0.1);
+    --switcher-shadow: 0 0 0 1px #000000;
+
+    /* Colours of the desktop's own chrome, and the height of its taskbar. */
+    --os-silver: #c0c0c0;
+    --os-light: #dfdfdf;
+    --os-shadow: #808080;
+    --os-dark: #404040;
+    --os-navy: #000080;
+    --os-blue: #1084d0;
+    --os-bar: 28px;
+
+    color-scheme: light;
+}
+
+/* ---- Desktop and page grid ---------------------------------------------- */
+
+html[data-theme="retro"] .page {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "hero" "news" "honors" "pubs" "projs" "foot";
+    gap: 10px;
+    padding: 10px 8px calc(var(--os-bar) + 14px);
+    font-size: 14px;
+    line-height: 1.55;
+}
+html[data-theme="retro"] .content,
+html[data-theme="retro"] .col-side,
+html[data-theme="retro"] .col-main { display: contents; }
+html[data-theme="retro"] .hero { grid-area: hero; }
+html[data-theme="retro"] .block[data-block="news"] { grid-area: news; }
+html[data-theme="retro"] .block[data-block="honors"] { grid-area: honors; }
+html[data-theme="retro"] .block[data-block="publications"] { grid-area: pubs; }
+html[data-theme="retro"] .block[data-block="projects"] { grid-area: projs; }
+html[data-theme="retro"] .site-footer { grid-area: foot; }
+
+/* ---- Window frames ------------------------------------------------------
+   A 1 px black outline, a raised bevel (white top and left; #808080 then
+   #404040 bottom and right) and a 3 px silver margin around the contents. */
+
+html[data-theme="retro"] .hero,
+html[data-theme="retro"] .block {
+    min-width: 0;
+    padding: 3px;
+    background-color: var(--os-silver);
+    border: 1px solid;
+    border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
+    outline: 1px solid #000000;
+    box-shadow: inset -1px 0 0 var(--os-shadow), inset 0 -1px 0 var(--os-shadow);
+}
+
+/* ---- Title bars --------------------------------------------------------- */
+
+html[data-theme="retro"] .name,
+html[data-theme="retro"] .block-title {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    margin: 0;
+    padding: 0 0 0 2px;
+    /* Navy to blue, held dark until 60% so that white titles keep at least
+       8:1 wherever they reach, even on a 320 px screen. */
+    background: linear-gradient(90deg, var(--os-navy) 0%, #074a9c 60%, var(--os-blue) 100%);
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+html[data-theme="retro"] .name { font-size: 16px; }
+html[data-theme="retro"] .block-title { font-size: 15px; }
+
+/* The window's icon, 16 x 16 px. */
+html[data-theme="retro"] .name::before,
+html[data-theme="retro"] .block-title::before {
+    content: "";
+    flex: none;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+}
+html[data-theme="retro"] .name::before {
+    /* @begin profile */
+    background-image:
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#1084d0,#1084d0),
+        linear-gradient(#000000,#000000), linear-gradient(#f6c9a0,#f6c9a0),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#f6c9a0,#f6c9a0), linear-gradient(#f6c9a0,#f6c9a0),
+        linear-gradient(#f6c9a0,#f6c9a0), linear-gradient(#4a3018,#4a3018),
+        linear-gradient(#4a3018,#4a3018), linear-gradient(#4a3018,#4a3018),
+        linear-gradient(#4a3018,#4a3018), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000);
+    background-position: 9px 13px, 6px 13px, 7px 12px, 13px 14px, 2px 14px, 12px 13px, 3px 13px, 3px 13px, 4px 12px, 7px 10px, 6px 11px, 5px 10px, 9px 7px, 6px 7px, 5px 9px, 4px 7px, 5px 5px, 11px 5px, 4px 5px, 4px 3px, 5px 2px, 4px 9px, 4px 2px, 3px 3px, 5px 1px;
+    background-size: 1px 2px, 1px 2px, 2px 3px, 1px 2px, 1px 2px, 1px 1px, 1px 1px, 10px 3px, 8px 1px, 2px 2px, 4px 1px, 6px 1px, 1px 1px, 1px 1px, 6px 1px, 8px 2px, 6px 4px, 1px 2px, 1px 2px, 8px 2px, 6px 7px, 8px 1px, 8px 1px, 10px 6px, 6px 10px;
+    /* @end */
+}
+html[data-theme="retro"] .block[data-block="news"] .block-title::before {
+    /* @begin news */
+    background-image:
+        linear-gradient(#c0c0c0,#c0c0c0), linear-gradient(#000000,#000000),
+        linear-gradient(#c0c0c0,#c0c0c0), linear-gradient(#000000,#000000),
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#ffffff,#ffffff),
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#ffffff,#ffffff),
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#ffffff,#ffffff),
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#000000,#000000),
+        linear-gradient(#c0c0c0,#c0c0c0), linear-gradient(#000000,#000000);
+    background-position: 4px 14px, 3px 13px, 6px 11px, 5px 11px, 10px 7px, 4px 7px, 11px 6px, 9px 6px, 8px 5px, 4px 5px, 4px 4px, 3px 3px, 2px 2px, 1px 1px;
+    background-size: 8px 1px, 10px 3px, 2px 2px, 4px 2px, 3px 1px, 3px 1px, 2px 1px, 1px 1px, 1px 1px, 1px 2px, 4px 1px, 10px 6px, 12px 8px, 14px 10px;
+    /* @end */
+}
+html[data-theme="retro"] .block[data-block="honors"] .block-title::before {
+    /* @begin honors */
+    background-image:
+        linear-gradient(#c0c0c0,#c0c0c0), linear-gradient(#c0c0c0,#c0c0c0),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#ffd11a,#ffd11a),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#000000,#000000),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#000000,#000000),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#000000,#000000),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#000000,#000000),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#ffd11a,#ffd11a),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#ffd11a,#ffd11a),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000);
+    background-position: 4px 14px, 5px 13px, 3px 14px, 4px 13px, 5px 12px, 7px 10px, 6px 10px, 6px 9px, 7px 8px, 5px 8px, 6px 7px, 4px 7px, 5px 6px, 3px 6px, 4px 5px, 2px 5px, 13px 3px, 2px 3px, 4px 3px, 2px 2px, 14px 3px, 1px 2px, 2px 1px;
+    background-size: 7px 1px, 5px 1px, 9px 2px, 7px 1px, 5px 1px, 1px 2px, 3px 2px, 3px 1px, 2px 1px, 5px 1px, 4px 1px, 8px 1px, 6px 1px, 10px 1px, 8px 1px, 12px 1px, 1px 1px, 1px 1px, 8px 2px, 11px 1px, 1px 2px, 13px 3px, 11px 1px;
+    /* @end */
+}
+html[data-theme="retro"] .block[data-block="publications"] .block-title::before {
+    /* @begin pubs */
+    background-image:
+        linear-gradient(#808080,#808080), linear-gradient(#808080,#808080),
+        linear-gradient(#808080,#808080), linear-gradient(#000080,#000080),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#c0c0c0,#c0c0c0), linear-gradient(#c0c0c0,#c0c0c0),
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#ffffff,#ffffff),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000);
+    background-position: 4px 13px, 4px 9px, 4px 6px, 4px 4px, 9px 3px, 10px 1px, 10px 2px, 9px 1px, 3px 1px, 3px 2px, 2px 2px, 2px 1px, 2px 0px;
+    background-size: 6px 1px, 6px 3px, 6px 2px, 6px 1px, 2px 1px, 1px 1px, 1px 1px, 1px 2px, 6px 1px, 8px 13px, 10px 14px, 1px 1px, 8px 1px;
+    /* @end */
+}
+html[data-theme="retro"] .block[data-block="projects"] .block-title::before {
+    /* @begin projects */
+    background-image:
+        linear-gradient(#ffe98a,#ffe98a), linear-gradient(#000000,#000000),
+        linear-gradient(#b8860b,#b8860b), linear-gradient(#ffd11a,#ffd11a),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000);
+    background-position: 2px 6px, 1px 6px, 3px 5px, 3px 3px, 3px 2px, 14px 5px, 13px 3px, 8px 2px, 2px 2px, 2px 1px;
+    background-size: 12px 9px, 14px 10px, 11px 1px, 10px 2px, 5px 1px, 1px 1px, 1px 2px, 6px 1px, 1px 4px, 7px 1px;
+    /* @end */
+}
+
+/* The three caption buttons (minimize, maximize, close) as one 48 x 16 strip:
+   glyphs on top, then the inner shadow lines, then the outer edges. */
+html[data-theme="retro"] .name::after,
+html[data-theme="retro"] .block-title::after {
+    content: "";
+    flex: none;
+    align-self: flex-end;
+    width: 48px;
+    height: 16px;
+    margin-left: auto;
+    background-repeat: no-repeat;
+    background-image:
+        linear-gradient(#000000, #000000),
+        linear-gradient(#000000, #000000),
+        linear-gradient(var(--os-silver), var(--os-silver)),
+        linear-gradient(45deg, transparent 43%, #000000 43% 57%, transparent 57%),
+        linear-gradient(-45deg, transparent 43%, #000000 43% 57%, transparent 57%),
+        repeating-linear-gradient(90deg, transparent 0 14px, var(--os-shadow) 14px 15px, transparent 15px 16px),
+        repeating-linear-gradient(90deg, var(--os-shadow) 0 14px, transparent 14px 16px),
+        linear-gradient(#ffffff, #ffffff),
+        linear-gradient(#000000, #000000),
+        linear-gradient(90deg, #ffffff 0 1px, var(--os-silver) 1px 15px, #000000 15px 16px,
+            #ffffff 16px 17px, var(--os-silver) 17px 31px, #000000 31px 32px,
+            #ffffff 32px 33px, var(--os-silver) 33px 47px, #000000 47px 48px);
+    background-position:
+        3px 10px, 19px 3px, 20px 5px, 40px 4px, 40px 4px,
+        0 1px, 0 14px, 0 0, 0 15px, 0 0;
+    background-size:
+        6px 2px, 10px 9px, 8px 6px, 7px 7px, 7px 7px,
+        48px 14px, 48px 1px, 48px 1px, 48px 1px, 48px 16px;
+}
+
+html[data-theme="retro"] .block-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+html[data-theme="retro"] .name-cn {
+    margin-left: 10px;
+    color: inherit;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ---- Intro window -------------------------------------------------------
+   The name is the title bar; the portrait, role, bio and contact buttons sit
+   in the white client area below it. */
+
+/* The base sheet gives .hero a 32 px gap and centres its items; both are
+   replaced here by the paddings of the rows themselves. */
+html[data-theme="retro"] .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas: "name" "avatar" "role" "bio" "contact";
+    gap: 0;
+    align-items: start;
+    background-image: linear-gradient(var(--os-silver) 27px, #ffffff 27px);
+    background-repeat: no-repeat;
+}
+html[data-theme="retro"] .hero-text { display: contents; }
+html[data-theme="retro"] .name { grid-area: name; }
+html[data-theme="retro"] .avatar { grid-area: avatar; }
+html[data-theme="retro"] .role { grid-area: role; }
+html[data-theme="retro"] .bio { grid-area: bio; }
+html[data-theme="retro"] .contact { grid-area: contact; }
+
+/* Portrait in a sunken picture frame. */
+html[data-theme="retro"] .avatar {
+    align-self: start;
+    justify-self: start;
+    width: 110px;
+    height: 110px;
+    box-sizing: content-box;
+    margin: 12px 0 0 12px;
+    padding: 2px;
+    object-fit: cover;
+    border: 1px solid;
+    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
+    border-radius: 0;
+    background-color: #ffffff;
+    background-image:
+        linear-gradient(var(--os-dark), var(--os-dark)),
+        linear-gradient(var(--os-dark), var(--os-dark)),
+        linear-gradient(var(--os-light), var(--os-light)),
+        linear-gradient(var(--os-light), var(--os-light));
+    background-repeat: no-repeat;
+    background-position: 0 0, 0 0, 100% 0, 0 100%;
+    background-size: 100% 1px, 1px 100%, 1px 100%, 100% 1px;
+    image-rendering: pixelated;
+}
+
+html[data-theme="retro"] .role {
+    margin: 0;
+    padding: 10px 12px 0;
+    color: #000000;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+/* The year of study as a small bevelled label. */
+html[data-theme="retro"] .study-year,
+html[data-theme="retro"] .entry-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid;
+    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
+    border-radius: 0;
+    background: var(--os-silver);
+    color: #000000;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
+}
+html[data-theme="retro"] .study-year {
+    margin-right: 6px;
+    font-weight: 700;
+    vertical-align: 1px;
+}
+html[data-theme="retro"] .study-year:empty { display: none; }
+
+html[data-theme="retro"] .bio { padding: 8px 12px 0; }
+html[data-theme="retro"] .bio p + p { margin-top: 8px; }
+html[data-theme="retro"] .bio a {
+    color: var(--accent);
+    white-space: nowrap;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+html[data-theme="retro"] .bio a:visited { color: var(--accent); }
+/* "Top 1%" in the pale yellow of a tooltip. */
+html[data-theme="retro"] .mark {
+    padding: 0 4px;
+    border: 1px solid #000000;
+    background: #ffffe1;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ---- Push buttons (contact links and entry links) -----------------------
+   Raised: white and #dfdfdf on top and left, #808080 and #404040 at the
+   bottom and right. Pressing inverts the bevel and moves the label by 1 px. */
+
+html[data-theme="retro"] .contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 12px 12px 14px;
+}
+html[data-theme="retro"] .contact li,
+html[data-theme="retro"] .entry-links li { display: contents; }
+
+html[data-theme="retro"] .contact-link,
+html[data-theme="retro"] .link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    padding: 0 12px;
+    background: var(--os-silver);
+    border: 1px solid;
+    border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
+    border-radius: 0;
+    box-shadow: inset -1px 0 0 var(--os-shadow), inset 0 -1px 0 var(--os-shadow),
+        inset 1px 0 0 var(--os-light), inset 0 1px 0 var(--os-light);
+    color: #000000;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+html[data-theme="retro"] .contact-link { height: 26px; }
+html[data-theme="retro"] .contact-link .icon,
+html[data-theme="retro"] .link .icon { display: none; }
+
+html[data-theme="retro"] .contact-link:active,
+html[data-theme="retro"] .link:active {
+    padding: 1px 11px 0 13px;
+    border-color: var(--os-dark) #ffffff #ffffff var(--os-dark);
+    box-shadow: inset -1px 0 0 var(--os-light), inset 0 -1px 0 var(--os-light),
+        inset 1px 0 0 var(--os-shadow), inset 0 1px 0 var(--os-shadow);
+}
+/* A disabled button keeps its bevel and gets an engraved, grey label. */
+html[data-theme="retro"] .link.is-disabled {
+    padding: 0 12px;
+    color: var(--os-dark);
+    text-shadow: 1px 1px 0 #ffffff;
+    cursor: default;
+}
+
+/* ---- Section windows: a sunken list box on white ------------------------ */
+
+html[data-theme="retro"] .block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+html[data-theme="retro"] .news-list,
+html[data-theme="retro"] .honor-list,
+html[data-theme="retro"] .entry-list {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 0;
+    margin: 0;
+    padding: 2px;
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid;
+    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
+    box-shadow: inset 1px 0 0 var(--os-dark), inset 0 1px 0 var(--os-dark),
+        inset -1px 0 0 var(--os-light), inset 0 -1px 0 var(--os-light);
+}
+
+/* News: a details list with the date in its own column. */
+html[data-theme="retro"] .news-item {
+    display: grid;
+    grid-template-columns: 4.6em minmax(0, 1fr);
+    gap: 8px;
+    padding: 5px 6px;
+}
+html[data-theme="retro"] .news-item + .news-item,
+html[data-theme="retro"] .honor-list li + li,
+html[data-theme="retro"] .entry + .entry { border-top: 1px solid #d9d9d9; }
+html[data-theme="retro"] .news-date {
+    color: var(--os-navy);
+    font-weight: 700;
+}
+
+/* Honors: one row each, with a medal. */
+html[data-theme="retro"] .honor-list li {
+    position: relative;
+    padding: 6px 6px 6px 30px;
+}
+html[data-theme="retro"] .honor-list li::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 7px;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    /* @begin medal */
+    background-image:
+        linear-gradient(#b8860b,#b8860b), linear-gradient(#b8860b,#b8860b),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#ffd11a,#ffd11a),
+        linear-gradient(#ffd11a,#ffd11a), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#1084d0,#1084d0),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000);
+    background-position: 7px 7px, 6px 8px, 12px 7px, 3px 7px, 4px 6px, 4px 12px, 3px 11px, 2px 7px, 3px 6px, 9px 5px, 4px 5px, 6px 2px, 5px 2px, 6px 1px;
+    background-size: 2px 4px, 4px 2px, 1px 4px, 1px 4px, 8px 6px, 8px 1px, 10px 1px, 12px 4px, 10px 1px, 3px 1px, 3px 1px, 4px 4px, 6px 4px, 4px 1px;
+    /* @end */
+}
+
+/* Publications and projects: list rows. */
+html[data-theme="retro"] .entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "badge" "title" "auth" "desc" "links";
+    gap: 0;
+    padding: 10px 12px;
+}
+html[data-theme="retro"] .entry-badge {
+    grid-area: badge;
+    justify-self: start;
+    max-width: 100%;
+}
+html[data-theme="retro"] .entry-badge.is-highlight {
+    border-color: var(--os-blue) #000040 #000040 var(--os-blue);
+    background: var(--os-navy);
+    color: #ffffff;
+}
+html[data-theme="retro"] .entry-title {
+    grid-area: title;
+    margin-top: 6px;
+    color: #000000;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+html[data-theme="retro"] .entry-title,
+html[data-theme="retro"] .entry-authors,
+html[data-theme="retro"] .entry-desc,
+html[data-theme="retro"] .news-text,
+html[data-theme="retro"] .bio { overflow-wrap: anywhere; }
+html[data-theme="retro"] .entry-authors,
+html[data-theme="retro"] .entry-desc {
+    color: var(--muted);
+    line-height: 1.5;
+}
+html[data-theme="retro"] .entry-authors { grid-area: auth; margin-top: 3px; }
+html[data-theme="retro"] .entry-desc { grid-area: desc; margin-top: 3px; }
+html[data-theme="retro"] .entry-links {
+    grid-area: links;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 10px;
+}
+
+/* ---- Status bar (the footer) -------------------------------------------- */
+
+html[data-theme="retro"] .site-footer {
+    display: flex;
+    padding: 3px;
+    background: var(--os-silver);
+    border: 1px solid;
+    border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
+}
+html[data-theme="retro"] .site-footer p {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 1px 6px;
+    background: #ffffff;
+    border: 1px solid;
+    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
+    color: #000000;
+    font-size: 14px;
+    line-height: 1.4;
+}
+/* The resize grip of a status bar. */
+html[data-theme="retro"] .site-footer::after {
+    content: "";
+    flex: none;
+    align-self: flex-end;
+    width: 14px;
+    height: 14px;
+    margin: 1px 1px 1px 3px;
+    background: repeating-linear-gradient(135deg, #ffffff 0 1px, var(--os-shadow) 1px 2px, transparent 2px 4px);
+}
+
+/* ---- Desktop icons ------------------------------------------------------
+   Only where the desktop has room beside the windows: three icons pinned to
+   the top-left corner. They are scenery (the backdrop is aria-hidden and
+   ignores the pointer), each a 32 x 32 picture with a label under it. */
+
+@media (min-width: 1400px) {
+    html[data-theme="retro"] .backdrop { display: block; }
+    html[data-theme="retro"] .backdrop .shape {
+        position: absolute;
+        left: 14px;
+        display: block;
+        width: 76px;
+        padding-top: 38px;
+        color: #ffffff;
+        font-family: var(--font-body);
+        font-size: 14px;
+        font-style: normal;
+        line-height: 1.3;
+        text-align: center;
+        text-shadow: 1px 1px 0 #000000;
+        white-space: pre;
+        user-select: none;
+    }
+    /* Each label is two lines; "\A " is a newline (the space ends the escape). */
+    html[data-theme="retro"] .backdrop .shape::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 22px;
+        width: 32px;
+        height: 32px;
+        background-repeat: no-repeat;
+    }
+    html[data-theme="retro"] .backdrop .shape::after { display: block; }
+    html[data-theme="retro"] .backdrop .shape-1 { top: 14px; }
+    html[data-theme="retro"] .backdrop .shape-2 { top: 96px; }
+    html[data-theme="retro"] .backdrop .shape-3 { top: 178px; }
+    html[data-theme="retro"] .backdrop .shape-1::before {
+        /* @begin computer */
+    background-image:
+        linear-gradient(#c0c0c0,#c0c0c0), linear-gradient(#000000,#000000),
+        linear-gradient(#c0c0c0,#c0c0c0), linear-gradient(#000000,#000000),
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#008080,#008080),
+        linear-gradient(#000000,#000000), linear-gradient(#c0c0c0,#c0c0c0),
+        linear-gradient(#000000,#000000);
+    background-position: 8px 28px, 6px 26px, 12px 22px, 10px 22px, 8px 6px, 8px 6px, 6px 6px, 4px 4px, 2px 2px;
+    background-size: 16px 2px, 20px 6px, 4px 4px, 8px 4px, 2px 2px, 16px 10px, 20px 12px, 24px 16px, 28px 20px;
+        /* @end */
+    }
+    html[data-theme="retro"] .backdrop .shape-1::after {
+        content: "My\A Computer";
+        content: "My\A Computer" / "";
+    }
+    html[data-theme="retro"] .backdrop .shape-2::before {
+        /* @begin briefcase */
+    background-image:
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#b5732f,#b5732f),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000);
+    background-position: 14px 16px, 12px 14px, 4px 12px, 6px 8px, 4px 6px, 18px 4px, 12px 4px, 12px 2px;
+    background-size: 4px 2px, 8px 6px, 24px 2px, 20px 16px, 24px 20px, 2px 2px, 2px 2px, 8px 2px;
+        /* @end */
+    }
+    html[data-theme="retro"] .backdrop .shape-2::after {
+        content: "My\A Briefcase";
+        content: "My\A Briefcase" / "";
+    }
+    html[data-theme="retro"] .backdrop .shape-3::before {
+        /* @begin bin */
+    background-image:
+        linear-gradient(#808080,#808080), linear-gradient(#808080,#808080),
+        linear-gradient(#808080,#808080), linear-gradient(#c0c0c0,#c0c0c0),
+        linear-gradient(#000000,#000000), linear-gradient(#c0c0c0,#c0c0c0),
+        linear-gradient(#000000,#000000), linear-gradient(#000000,#000000);
+    background-position: 22px 10px, 16px 10px, 10px 10px, 6px 10px, 4px 8px, 8px 6px, 6px 6px, 8px 4px;
+    background-size: 2px 14px, 2px 14px, 2px 14px, 20px 14px, 24px 18px, 16px 2px, 20px 2px, 16px 2px;
+        /* @end */
+    }
+    html[data-theme="retro"] .backdrop .shape-3::after {
+        content: "Recycle\A Bin";
+        content: "Recycle\A Bin" / "";
+    }
+}
+
+/* ---- Taskbar ------------------------------------------------------------
+   Fixed chrome along the bottom, built from pseudo-elements: the bar and the
+   Start button hang off .page, each window adds its own task button, and the
+   footer adds the clock. It is scenery, not navigation: nothing in it takes
+   the pointer, and the clock is a fixed string because CSS cannot read the
+   time. The empty alternative text keeps the labels out of screen readers. */
+
+html[data-theme="retro"] .page::before {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    height: var(--os-bar);
+    background: var(--os-silver);
+    box-shadow: inset 0 1px 0 #ffffff, inset 0 2px 0 var(--os-light);
+    pointer-events: none;
+}
+html[data-theme="retro"] .page::after {
+    content: "Start";
+    content: "Start" / "";
+    position: fixed;
+    left: 2px;
+    bottom: 3px;
+    z-index: 41;
+    width: 70px;
+    height: 22px;
+    padding: 0 0 0 24px;
+    background-color: var(--os-silver);
+    background-repeat: no-repeat;
+    /* @begin start */
+    background-image:
+        linear-gradient(#ffffff,#ffffff), linear-gradient(#000080,#000080),
+        linear-gradient(#000000,#000000);
+    background-position: 1px 3px, 1px 1px, 0px 0px;
+    background-size: 10px 8px, 10px 2px, 12px 12px;
+    /* @end */
+    border: 1px solid;
+    border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
+    box-shadow: inset -1px 0 0 var(--os-shadow), inset 0 -1px 0 var(--os-shadow),
+        inset 1px 0 0 var(--os-light), inset 0 1px 0 var(--os-light);
+    color: #000000;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+}
+html[data-theme="retro"] .hero::after,
+html[data-theme="retro"] .block::after {
+    position: fixed;
+    bottom: 3px;
+    z-index: 41;
+    height: 22px;
+    padding: 0 6px;
+    background: var(--os-silver);
+    border: 1px solid;
+    border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
+    box-shadow: inset -1px 0 0 var(--os-shadow), inset 0 -1px 0 var(--os-shadow),
+        inset 1px 0 0 var(--os-light), inset 0 1px 0 var(--os-light);
+    color: #000000;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+}
+/* The intro window is the active one, so its button looks pressed. */
+html[data-theme="retro"] .hero::after {
+    content: "Mingshuo Cai";
+    content: "Mingshuo Cai" / "";
+    left: 76px;
+    width: 9em;
+    padding-left: 8px;
+    background: #d4d4d4;
+    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
+    box-shadow: inset 1px 0 0 var(--os-dark), inset 0 1px 0 var(--os-dark),
+        inset -1px 0 0 var(--os-light), inset 0 -1px 0 var(--os-light);
+}
+html[data-theme="retro"] .block[data-block="news"]::after {
+    content: "News";
+    content: "News" / "";
+    left: 206px;
+    width: 4.4em;
+}
+html[data-theme="retro"] .block[data-block="honors"]::after {
+    content: "Honors";
+    content: "Honors" / "";
+    left: 272px;
+    width: 5.4em;
+}
+html[data-theme="retro"] .block[data-block="publications"]::after {
+    content: "Publications";
+    content: "Publications" / "";
+    left: 352px;
+    width: 7.8em;
+}
+html[data-theme="retro"] .block[data-block="projects"]::after {
+    content: "Projects";
+    content: "Projects" / "";
+    left: 466px;
+    width: 6em;
+}
+html[data-theme="retro"] .site-footer::before {
+    content: "12:00 PM";
+    content: "12:00 PM" / "";
+    position: fixed;
+    right: 4px;
+    bottom: 3px;
+    z-index: 41;
+    width: 6em;
+    height: 22px;
+    background: var(--os-silver);
+    border: 1px solid;
+    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
+    box-shadow: inset 1px 0 0 var(--os-dark), inset 0 1px 0 var(--os-dark),
+        inset -1px 0 0 var(--os-light), inset 0 -1px 0 var(--os-light);
+    color: #000000;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+}
+/* The one exception to leaving the switcher alone: lift it above the bar. */
+html[data-theme="retro"] .theme-switcher { bottom: 48px; }
+
+/* ---- Keyboard and pointer feedback ------------------------------------- */
+
+html[data-theme="retro"] ::selection { background: var(--os-navy); color: #ffffff; }
+/* The dotted focus rectangle of the period, drawn inside the button. */
+html[data-theme="retro"] .contact-link:focus-visible,
+html[data-theme="retro"] .link:focus-visible {
+    outline: 1px dotted #000000;
+    outline-offset: -4px;
+}
+html[data-theme="retro"] .bio a:focus-visible {
+    outline: 1px dotted var(--os-navy);
+    outline-offset: 2px;
+}
+@media (hover: hover) {
+    /* A row tints while it is pointed at, which ties its buttons to its text
+       on the wide windows. */
+    html[data-theme="retro"] .entry:hover { background: #f1f1f1; }
+    html[data-theme="retro"] .contact-link:hover,
+    html[data-theme="retro"] .link:hover { background-color: #d8d8d8; }
+}
+
+/* ---- Taskbar buttons come and go with the room there is ---------------- */
+
+@media (max-width: 699px) {
+    html[data-theme="retro"] .block[data-block="publications"]::after,
+    html[data-theme="retro"] .block[data-block="projects"]::after { display: none; }
+}
+@media (max-width: 479px) {
+    html[data-theme="retro"] .block::after { display: none; }
+}
+
+/* ---- Wider than a phone: portrait beside the text ----------------------- */
+
+@media (min-width: 560px) {
+    /* The bio's row takes the spare height when the window is stretched to
+       match its neighbours; centring the bio in it splits that spare evenly
+       above and below, and the buttons rest at the bottom. */
+    html[data-theme="retro"] .hero {
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-rows: auto max-content 1fr max-content;
+        grid-template-areas:
+            "name    name"
+            "avatar  role"
+            "avatar  bio"
+            "avatar  contact";
+    }
+    html[data-theme="retro"] .avatar { margin: 14px 28px 14px 14px; }
+    html[data-theme="retro"] .role { padding: 14px 16px 0 0; }
+    html[data-theme="retro"] .bio { align-self: center; padding: 10px 16px 0 0; }
+    html[data-theme="retro"] .contact { padding: 12px 16px 14px 0; }
+    /* Rows with their buttons in a column of their own, at the right edge. */
+    html[data-theme="retro"] .entry {
+        grid-template-columns: minmax(14em, 1fr) auto;
+        grid-template-areas:
+            "badge  links"
+            "title  links"
+            "auth   links"
+            "desc   links";
+        column-gap: 16px;
+    }
+    html[data-theme="retro"] .entry-links { margin-top: 0; }
+}
+
+@media (min-width: 700px) {
+    html[data-theme="retro"] .page { gap: 12px; padding: 20px 16px calc(var(--os-bar) + 18px); }
+}
+
+/* ---- Tablet: one column of windows, the contact buttons stacked --------- */
+
+@media (min-width: 700px) and (max-width: 999px) {
+    html[data-theme="retro"] .hero {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-rows: auto max-content max-content;
+        grid-template-areas:
+            "name    name    name"
+            "avatar  role    contact"
+            "avatar  bio     contact";
+    }
+    html[data-theme="retro"] .contact {
+        flex-direction: column;
+        align-self: start;
+        gap: 4px;
+        min-width: 6.4em;
+        padding: 14px 14px 14px 4px;
+    }
+    html[data-theme="retro"] .contact-link { height: 24px; }
+}
+
+/* ---- Desktop: intro beside News and Honors, wide windows below --------- */
+
+@media (min-width: 1000px) {
+    html[data-theme="retro"] .page {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+        grid-template-areas:
+            "hero  side"
+            "pubs  pubs"
+            "projs projs"
+            "foot  foot";
+        padding: 20px 24px calc(var(--os-bar) + 18px);
+    }
+    html[data-theme="retro"] .col-side {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        grid-area: side;
+    }
+    /* Both small windows share the height of the row. */
+    html[data-theme="retro"] .col-side > .block { flex: 1 1 auto; }
+    /* Wide rows: the description may run further; the buttons stay at the right edge. */
+    html[data-theme="retro"] .entry-authors,
+    html[data-theme="retro"] .entry-desc { max-width: 86ch; }
+}
+
+/* ---- Print: no taskbar, but keep the title bars dark -------------------- */
+
+@media print {
+    html[data-theme="retro"] .page::before,
+    html[data-theme="retro"] .page::after,
+    html[data-theme="retro"] .hero::after,
+    html[data-theme="retro"] .block::after,
+    html[data-theme="retro"] .site-footer::before,
+    html[data-theme="retro"] .backdrop { display: none; }
+    html[data-theme="retro"] .page { padding-bottom: 24px; }
+    html[data-theme="retro"] .name,
+    html[data-theme="retro"] .block-title,
+    html[data-theme="retro"] .entry-badge.is-highlight {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}

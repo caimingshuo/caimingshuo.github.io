@@ -1,0 +1,159 @@
+/* Book — a page of a classic book: cream paper, an old-style serif, a title
+   page with an engraved portrait, chapters with roman numerals and a
+   bibliography. */
+[data-theme="book"] {
+    --bg: #f8f4ea;
+    --fg: #2b2418;
+    --muted: #6b6053;
+    --accent: #7a2e1e;
+    --accent-2: #7a2e1e;
+    --surface: #f3edde;
+    --border: #cdbfa6;
+    --radius: 2px;
+    --font-body: "EB Garamond", Garamond, "Songti SC", Georgia, serif;
+    --font-display: var(--font-body);
+    --page-width: 860px;
+    --switcher-accent: #7a2e1e;
+    color-scheme: light;
+}
+
+html[data-theme="book"] body { font-size: 19px; line-height: 1.7; }
+html[data-theme="book"] .page { padding: 56px 24px 48px; gap: 56px; }
+
+/* Title page. */
+html[data-theme="book"] .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+html[data-theme="book"] .avatar {
+    order: -1;
+    width: 150px;
+    height: 190px;
+    margin-bottom: 16px;
+    border: 1px solid var(--fg);
+    border-radius: 50%;
+    outline: 1px solid var(--fg);
+    outline-offset: 5px;
+}
+html[data-theme="book"] .name {
+    font-size: 34px;
+    font-variant: small-caps;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+}
+html[data-theme="book"] .name-cn { color: var(--muted); font-size: 0.5em; font-variant: normal; letter-spacing: 0.1em; }
+html[data-theme="book"] .role { margin: 0; color: var(--muted); font-size: 20px; font-style: italic; font-weight: 400; }
+html[data-theme="book"] .role::after {
+    content: "\2766";
+    display: block;
+    margin-top: 14px;
+    color: var(--accent);
+    font-size: 22px;
+    font-style: normal;
+    line-height: 1;
+}
+html[data-theme="book"] .bio { max-width: 640px; margin-top: 16px; text-align: justify; hyphens: auto; }
+html[data-theme="book"] .bio a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(122, 46, 30, 0.6); }
+html[data-theme="book"] .bio p:first-child::first-letter {
+    float: left;
+    margin: 0.1em 0.12em 0 0;
+    color: var(--accent);
+    font-size: 3.6em;
+    line-height: 0.78;
+}
+html[data-theme="book"] .bio strong { color: var(--fg); font-weight: 600; }
+html[data-theme="book"] .contact { justify-content: center; gap: 6px 22px; margin-top: 18px; }
+html[data-theme="book"] .contact-link { color: var(--accent); font-size: 16px; letter-spacing: 0.06em; text-decoration: none; }
+html[data-theme="book"] .contact-link:hover { text-decoration: underline dotted; }
+html[data-theme="book"] .contact-link .icon { display: none; }
+
+/* Chapters. */
+html[data-theme="book"] .content { display: grid; gap: 56px; text-align: left; counter-reset: chapter; }
+html[data-theme="book"] .block-title {
+    margin-bottom: 24px;
+    font-size: 22px;
+    font-variant: small-caps;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-align: center;
+}
+html[data-theme="book"] .block-title::before {
+    content: counter(chapter, upper-roman);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--accent);
+    font-size: 16px;
+    font-variant: normal;
+    letter-spacing: 0.24em;
+}
+html[data-theme="book"] .block { counter-increment: chapter; }
+html[data-theme="book"] .block-title span::before { content: ""; }
+html[data-theme="book"] .block-title::after {
+    content: "\2766";
+    display: block;
+    margin-top: 8px;
+    color: var(--accent);
+    font-size: 16px;
+    letter-spacing: 0;
+}
+html[data-theme="book"] .block-icon { display: none; }
+
+html[data-theme="book"] .news-list { display: grid; gap: 4px; max-width: 640px; margin: 0 auto; }
+html[data-theme="book"] .news-date { color: var(--accent); font-variant: small-caps; letter-spacing: 0.06em; }
+html[data-theme="book"] .news-date::after { content: " \2014"; color: var(--muted); }
+html[data-theme="book"] .honor-list { max-width: 640px; margin: 0 auto; padding-left: 22px; list-style: disc; }
+html[data-theme="book"] .honor-list li::marker { color: var(--accent); }
+
+/* Bibliography. */
+html[data-theme="book"] .entry-list { display: grid; gap: 24px; max-width: 700px; margin: 0 auto; }
+html[data-theme="book"] .entry { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; row-gap: 2px; }
+html[data-theme="book"] .entry-authors { grid-column: 1; grid-row: 1; color: var(--fg); font-size: 17px; }
+html[data-theme="book"] .entry-authors::after { content: "."; }
+html[data-theme="book"] .entry-title { grid-column: 2; grid-row: 1; font-size: 20px; font-style: italic; font-weight: 500; line-height: 1.35; }
+html[data-theme="book"] .entry-badge {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    margin-top: 4px;
+    padding: 0;
+    background: none;
+    color: var(--accent);
+    font-size: 15px;
+    font-variant: small-caps;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: inherit;
+}
+html[data-theme="book"] .entry-badge.is-highlight { background: none; color: var(--accent); }
+html[data-theme="book"] .entry-desc { grid-column: 1 / -1; margin-top: 4px; color: var(--muted); font-size: 16.5px; line-height: 1.6; }
+html[data-theme="book"] .entry-links { grid-column: 2; grid-row: 2; gap: 12px; margin: 0; }
+html[data-theme="book"] .link { color: var(--accent); font-size: 15px; font-variant: small-caps; letter-spacing: 0.06em; text-decoration: none; }
+html[data-theme="book"] .link::before { content: "["; }
+html[data-theme="book"] .link::after { content: "]"; }
+html[data-theme="book"] .link:hover { text-decoration: underline; }
+html[data-theme="book"] .link .icon { display: none; }
+html[data-theme="book"] .link.is-disabled { color: var(--muted); }
+
+html[data-theme="book"] .site-footer { color: var(--muted); font-size: 15px; font-style: italic; text-align: center; }
+html[data-theme="book"] .site-footer::before {
+    content: "***";
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-style: normal;
+    letter-spacing: 0.3em;
+}
+
+@media (max-width: 640px) {
+    html[data-theme="book"] body { font-size: 18px; }
+    html[data-theme="book"] .bio { text-align: left; }
+    html[data-theme="book"] .entry { grid-template-columns: 1fr; }
+    html[data-theme="book"] .entry-title { grid-column: 1; grid-row: 1; margin-top: 2px; }
+    html[data-theme="book"] .entry-authors { grid-row: 2; }
+    html[data-theme="book"] .entry-badge { grid-column: 1; grid-row: 3; margin-top: 2px; }
+    html[data-theme="book"] .entry-links { grid-column: 1; grid-row: 4; margin-top: 6px; }
+}

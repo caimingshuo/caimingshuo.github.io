@@ -1,0 +1,406 @@
+/* Terminal — one terminal window on a dark desk. The page reads as a shell
+   session: a title bar with traffic lights, a green prompt in front of every
+   command (whoami, cat profile.txt, ls contacts/, tail news.log, cat
+   publications.md, ls projects/), their output in IBM Plex Mono, and a
+   blinking block cursor where the session waits. Cyan links, amber tags. */
+[data-theme="terminal"] {
+    --bg: #0a0807;
+    --fg: #e6edf3;
+    --muted: #8b949e;
+    --accent: #7ee787;
+    --accent-2: #e3b341;
+    --surface: #161b22;
+    --border: #30363d;
+    --radius: 6px;
+    --font-body: "IBM Plex Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", monospace;
+    --font-display: var(--font-body);
+    --font-mono: var(--font-body);
+    --page-width: 880px;
+    --switcher-hover: rgba(126, 231, 135, 0.08);
+    --switcher-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+
+    /* The window's own measures. */
+    --t-screen: #0d1117;
+    --t-bright: #f0f6fc;
+    --t-link: #58c4dd;
+    --t-rule: #3d444d;
+    --t-frame-ink: #6e7681;
+    --t-pad: 32px;
+    --t-line: 24px; /* one terminal line: 15px x 1.6 */
+    --t-frame: Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+}
+
+html[data-theme="terminal"] body {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+html[data-theme="terminal"] ::selection {
+    background: var(--fg);
+    color: var(--t-screen);
+}
+
+/* ---- Desk --------------------------------------------------------------- */
+html[data-theme="terminal"] .backdrop {
+    display: block;
+    background:
+        radial-gradient(ellipse 80% 55% at 50% -14%, rgba(255, 208, 160, 0.22), rgba(255, 208, 160, 0) 100%),
+        radial-gradient(ellipse 130% 100% at 50% 30%, #1e1814 0%, #120e0c 62%, #0a0808 100%);
+}
+
+/* ---- Window ------------------------------------------------------------- */
+html[data-theme="terminal"] .page {
+    gap: 0;
+    margin: 40px max(16px, calc((100% - var(--page-width)) / 2)) 56px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #454d57;
+    border-radius: var(--radius);
+    background: var(--t-screen);
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 2px 6px rgba(0, 0, 0, 0.5),
+        0 30px 70px rgba(0, 0, 0, 0.65),
+        0 0 140px rgba(88, 166, 255, 0.07);
+}
+
+/* Title bar: three traffic lights and the session's name. */
+html[data-theme="terminal"] .page::before {
+    content: "mingshuo@nju: ~";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-bottom: 1px solid var(--border);
+    background:
+        radial-gradient(circle closest-side, #ff5f57 98%, transparent 100%) 20px 50% / 12px 12px no-repeat,
+        radial-gradient(circle closest-side, #febc2e 98%, transparent 100%) 40px 50% / 12px 12px no-repeat,
+        radial-gradient(circle closest-side, #28c840 98%, transparent 100%) 60px 50% / 12px 12px no-repeat,
+        linear-gradient(#1a2029, #161b22);
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Scanlines over the whole screen. */
+html[data-theme="terminal"] .page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 4px);
+    pointer-events: none;
+}
+
+/* ---- Prompts ------------------------------------------------------------ */
+/* Every command is one generated line: the green "$ " and the typed command. */
+html[data-theme="terminal"] .name::before,
+html[data-theme="terminal"] .role::before,
+html[data-theme="terminal"] .contact::before,
+html[data-theme="terminal"] .block::before,
+html[data-theme="terminal"] .hero::after {
+    display: block;
+    flex: none;
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: var(--t-line);
+    white-space: nowrap;
+}
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    html[data-theme="terminal"] .name::before,
+    html[data-theme="terminal"] .role::before,
+    html[data-theme="terminal"] .contact::before,
+    html[data-theme="terminal"] .block::before,
+    html[data-theme="terminal"] .hero::after {
+        color: var(--fg);
+        background: linear-gradient(90deg, var(--accent) 0 2ch, currentColor 2ch) no-repeat;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
+
+/* ---- Links -------------------------------------------------------------- */
+html[data-theme="terminal"] a {
+    color: var(--t-link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(88, 196, 221, 0.45);
+    text-underline-offset: 3px;
+}
+html[data-theme="terminal"] a:hover {
+    color: #93dcee;
+    text-decoration-color: currentColor;
+}
+html[data-theme="terminal"] .contact .icon,
+html[data-theme="terminal"] .entry-links .icon { display: none; }
+/* A pointed-at entry lights up like a selected file (where a pointer can point). */
+@media (hover: hover) {
+    html[data-theme="terminal"] .contact-link:hover,
+    html[data-theme="terminal"] .link:not(.is-disabled):hover {
+        background: rgba(88, 196, 221, 0.14);
+        box-shadow: 0 0 0 3px rgba(88, 196, 221, 0.14);
+    }
+}
+
+/* ---- whoami / profile / contacts ---------------------------------------- */
+html[data-theme="terminal"] .hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    column-gap: 40px;
+    row-gap: 0;
+    padding: var(--t-line) var(--t-pad) 0;
+}
+html[data-theme="terminal"] .hero-text {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    min-width: 0;
+}
+
+html[data-theme="terminal"] .name::before { content: "$ whoami"; }
+html[data-theme="terminal"] .name {
+    margin: 0;
+    color: var(--t-bright);
+    font-size: clamp(26px, 8.2vw, 32px); /* 32px, down to 26px on the narrowest phones */
+    font-weight: 600;
+    line-height: 1.25;
+}
+html[data-theme="terminal"] .name-cn {
+    margin-left: 0.55em;
+    color: var(--muted);
+    font-size: 17px;
+    font-weight: 400;
+}
+
+html[data-theme="terminal"] .role::before { content: "$ cat profile.txt"; }
+html[data-theme="terminal"] .role {
+    margin: var(--t-line) 0 0;
+    color: var(--t-bright);
+    font-size: 15px;
+    font-weight: 600;
+}
+html[data-theme="terminal"] .bio p { margin: 0; }
+html[data-theme="terminal"] .bio p + p { margin-top: var(--t-line); }
+html[data-theme="terminal"] strong {
+    color: var(--t-bright);
+    font-weight: 600;
+}
+html[data-theme="terminal"] .mark {
+    color: var(--accent-2);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+html[data-theme="terminal"] .contact::before {
+    content: "$ ls contacts/";
+    flex: 0 0 100%;
+}
+html[data-theme="terminal"] .contact {
+    margin-top: var(--t-line);
+    gap: 0 2ch;
+}
+
+/* ---- The portrait, framed in box-drawing characters --------------------- */
+/* The frame is one block of text on a square cell grid: 11 cells wide, 11
+   lines high, every line one `ch` tall. The portrait covers the 9 x 9 inner
+   cells exactly, because both are sized in the same `ch`. The lines are set
+   tighter than the font's own height, so the strokes of the corners and of
+   the sides run into each other. */
+html[data-theme="terminal"] .hero::after {
+    content: "$ cat avatar.png";
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+}
+html[data-theme="terminal"] .hero::before {
+    content: "┌─────────┐\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A└─────────┘";
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    margin-left: -0.5ch; /* the left stroke sits under the "$" of the command */
+    color: var(--t-frame-ink);
+    font: 400 15.5px/1 var(--t-frame);
+    line-height: 1ch;
+    white-space: pre;
+    user-select: none;
+}
+html[data-theme="terminal"] .avatar {
+    grid-column: 2;
+    grid-row: 2;
+    position: relative; /* above the scanlines, so that every pixel of the drawing stays clean */
+    z-index: 4;
+    justify-self: start;
+    width: 9ch;
+    height: 9ch;
+    margin: 1ch 1ch 1ch 0.5ch;
+    border-radius: 0;
+    object-fit: contain;
+    font: 400 15.5px/1 var(--t-frame);
+    image-rendering: pixelated;
+}
+
+/* ---- The rest of the session -------------------------------------------- */
+html[data-theme="terminal"] .content {
+    gap: 0;
+    padding: 0 var(--t-pad);
+}
+html[data-theme="terminal"] .block { margin-top: 48px; }
+html[data-theme="terminal"] .block[data-block="news"]::before { content: "$ tail -n 4 news.log"; }
+html[data-theme="terminal"] .block[data-block="honors"]::before { content: "$ ls honors/"; }
+html[data-theme="terminal"] .block[data-block="publications"]::before { content: "$ cat publications.md"; }
+html[data-theme="terminal"] .block[data-block="projects"]::before { content: "$ ls projects/"; }
+
+/* Each output opens with its title and a rule to the right margin. */
+html[data-theme="terminal"] .block-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 4px;
+    color: var(--t-bright);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: var(--t-line);
+}
+html[data-theme="terminal"] .block-title span { flex: none; }
+html[data-theme="terminal"] .block-title::after {
+    content: "";
+    flex: 1 1 auto;
+    min-width: 12px;
+    border-top: 1px solid var(--t-rule);
+}
+
+html[data-theme="terminal"] .news-list { gap: 0; }
+html[data-theme="terminal"] .news-item { display: block; }
+html[data-theme="terminal"] .news-date {
+    color: var(--muted);
+    font-style: normal;
+    margin-right: 2ch;
+}
+html[data-theme="terminal"] .honor-list {
+    gap: 0;
+    padding: 0;
+    list-style: none;
+}
+
+html[data-theme="terminal"] .entry { gap: 0; }
+html[data-theme="terminal"] .entry-badge {
+    justify-self: start;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--accent-2);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: var(--t-line);
+}
+html[data-theme="terminal"] .entry-badge::before { content: "[ "; }
+html[data-theme="terminal"] .entry-badge::after { content: " ]"; }
+html[data-theme="terminal"] .entry-badge.is-highlight {
+    background: none;
+    color: var(--accent);
+}
+html[data-theme="terminal"] .entry-title {
+    color: var(--t-bright);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: var(--t-line);
+}
+html[data-theme="terminal"] .entry-authors { color: var(--muted); }
+html[data-theme="terminal"] .entry-authors strong { color: var(--fg); }
+html[data-theme="terminal"] .entry-links {
+    margin-top: 0;
+    gap: 0 2ch;
+}
+html[data-theme="terminal"] .link.is-disabled {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: currentColor;
+}
+
+/* ---- End of the session ------------------------------------------------- */
+/* The footer is a comment; then the prompt comes back and the cursor waits. */
+html[data-theme="terminal"] .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: var(--t-line) var(--t-pad) 28px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: var(--t-line);
+}
+html[data-theme="terminal"] .site-footer p {
+    flex: 0 0 100%;
+    margin: 0 0 var(--t-line);
+}
+html[data-theme="terminal"] .site-footer p::before { content: "# "; }
+html[data-theme="terminal"] .site-footer::after {
+    content: "$";
+    order: 1;
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 400;
+}
+html[data-theme="terminal"] .site-footer::before {
+    content: "";
+    order: 2;
+    width: 9px;
+    height: 17px;
+    margin-left: 9px;
+    background: var(--fg);
+    animation: terminal-blink 1.1s step-end infinite;
+}
+@keyframes terminal-blink {
+    50% { opacity: 0; }
+}
+
+/* ---- Narrow screens: the window narrows, the portrait drops below ------- */
+@media (max-width: 760px) {
+    [data-theme="terminal"] { --t-pad: 20px; }
+
+    html[data-theme="terminal"] .page { margin: 12px 12px 28px; }
+    html[data-theme="terminal"] .hero { grid-template-columns: minmax(0, 1fr); }
+    html[data-theme="terminal"] .hero-text { grid-row: 1; }
+    html[data-theme="terminal"] .hero::after {
+        grid-column: 1;
+        grid-row: 2;
+        margin-top: var(--t-line);
+    }
+    html[data-theme="terminal"] .hero::before,
+    html[data-theme="terminal"] .avatar {
+        grid-column: 1;
+        grid-row: 3;
+    }
+    html[data-theme="terminal"] .avatar { order: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-theme="terminal"] .site-footer::before { animation: none; }
+}
+
+/* ---- Generated text and assistive technology ----------------------------- */
+/* Everything drawn on this page is decoration around the real content. Where
+   alternative text for generated content is understood, it is left empty, so
+   that a screen reader hears "Mingshuo Cai", not "$ whoami Mingshuo Cai". */
+@supports (content: "x" / "") {
+    html[data-theme="terminal"] .page::before { content: "mingshuo@nju: ~" / ""; }
+    html[data-theme="terminal"] .hero::after { content: "$ cat avatar.png" / ""; }
+    html[data-theme="terminal"] .name::before { content: "$ whoami" / ""; }
+    html[data-theme="terminal"] .role::before { content: "$ cat profile.txt" / ""; }
+    html[data-theme="terminal"] .contact::before { content: "$ ls contacts/" / ""; }
+    html[data-theme="terminal"] .block[data-block="news"]::before { content: "$ tail -n 4 news.log" / ""; }
+    html[data-theme="terminal"] .block[data-block="honors"]::before { content: "$ ls honors/" / ""; }
+    html[data-theme="terminal"] .block[data-block="publications"]::before { content: "$ cat publications.md" / ""; }
+    html[data-theme="terminal"] .block[data-block="projects"]::before { content: "$ ls projects/" / ""; }
+    html[data-theme="terminal"] .entry-badge::before { content: "[ " / ""; }
+    html[data-theme="terminal"] .entry-badge::after { content: " ]" / ""; }
+    html[data-theme="terminal"] .site-footer p::before { content: "# " / ""; }
+    html[data-theme="terminal"] .site-footer::after { content: "$" / ""; }
+    html[data-theme="terminal"] .hero::before {
+        content: "┌─────────┐\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A└─────────┘" / "";
+    }
+}

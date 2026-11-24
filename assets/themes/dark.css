@@ -1,0 +1,165 @@
+/* Night — a dark, quiet page: Inter on near-black, a role line written as a
+   comment, numbered monospace section labels, news on a dotted line, honours
+   as pills and the work as cards with hairline edges. */
+[data-theme="dark"] {
+    --bg: #0b0d12;
+    --fg: #e6e8ee;
+    --muted: #8b93a7;
+    --accent: #7aa2f7;
+    --accent-2: #9ece6a;
+    --surface: #11141b;
+    --border: #1c2230;
+    --radius: 10px;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: var(--font-body);
+    --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, "PingFang SC", monospace;
+    --page-width: 1000px;
+    --switcher-bg: #11141b;
+    --switcher-fg: #e6e8ee;
+    --switcher-muted: #8b93a7;
+    --switcher-border: #1c2230;
+    --switcher-accent: #7aa2f7;
+    --switcher-hover: rgba(255, 255, 255, 0.06);
+    --switcher-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+}
+
+html[data-theme="dark"] body { font-size: 16px; line-height: 1.65; }
+html[data-theme="dark"] a { color: var(--accent); }
+
+/* Two faint glows, one per corner. */
+html[data-theme="dark"] .backdrop {
+    display: block;
+    background:
+        radial-gradient(700px 380px at 88% -6%, rgba(122, 162, 247, 0.16), transparent 65%),
+        radial-gradient(560px 340px at -8% 18%, rgba(158, 206, 106, 0.08), transparent 60%);
+}
+
+html[data-theme="dark"] .page { padding: 56px 24px 64px; gap: 56px; }
+
+/* Small round portrait and name, then the role line as the headline. */
+html[data-theme="dark"] .hero { grid-template-columns: 72px minmax(0, 1fr); grid-template-rows: auto auto auto auto; column-gap: 22px; align-items: center; }
+html[data-theme="dark"] .hero-text { display: contents; }
+html[data-theme="dark"] .avatar { grid-column: 1; grid-row: 1; width: 72px; height: 72px; border: 2px solid var(--border); box-shadow: 0 0 0 5px rgba(122, 162, 247, 0.12); }
+html[data-theme="dark"] .name { grid-column: 2; grid-row: 1; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+html[data-theme="dark"] .name-cn { color: var(--muted); font-size: 0.8em; font-weight: 400; }
+html[data-theme="dark"] .role {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 40px;
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: clamp(20px, 2.6vw, 30px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+}
+html[data-theme="dark"] .role::before { content: "// "; color: var(--accent); }
+html[data-theme="dark"] .study-year { color: var(--accent); }
+html[data-theme="dark"] .bio { grid-column: 1 / -1; grid-row: 3; max-width: 68ch; margin-top: 16px; color: var(--muted); font-size: 17px; }
+html[data-theme="dark"] .bio strong { color: var(--fg); font-weight: 600; }
+html[data-theme="dark"] .bio a { text-decoration-color: rgba(122, 162, 247, 0.45); text-underline-offset: 3px; }
+html[data-theme="dark"] .contact { grid-column: 1 / -1; grid-row: 4; gap: 10px; margin-top: 22px; }
+html[data-theme="dark"] .contact-link {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--fg);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+}
+html[data-theme="dark"] .contact-link .icon { color: var(--accent); }
+html[data-theme="dark"] .contact-link:hover { border-color: var(--accent); }
+
+/* News and honours beside the publications; the projects span the full width. */
+html[data-theme="dark"] .content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 56px 48px; align-items: start; counter-reset: section; }
+html[data-theme="dark"] .col { display: contents; }
+html[data-theme="dark"] .block[data-block="news"] { grid-column: 1; grid-row: 1; }
+html[data-theme="dark"] .block[data-block="honors"] { grid-column: 1; grid-row: 2; }
+html[data-theme="dark"] .block[data-block="publications"] { grid-column: 2; grid-row: 1 / span 2; }
+html[data-theme="dark"] .block[data-block="projects"] { grid-column: 1 / -1; grid-row: 3; }
+
+html[data-theme="dark"] .block-title {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+html[data-theme="dark"] .block-title::before { content: "0" counter(section); color: var(--accent); letter-spacing: 0.04em; }
+html[data-theme="dark"] .block { counter-increment: section; }
+html[data-theme="dark"] .block-icon { display: none; }
+
+html[data-theme="dark"] .news-list { display: grid; padding-left: 22px; border-left: 1px solid var(--border); }
+html[data-theme="dark"] .news-item { position: relative; display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; padding: 10px 0; }
+html[data-theme="dark"] .news-item::before {
+    content: "";
+    position: absolute;
+    top: 19px;
+    left: -26px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--bg);
+}
+html[data-theme="dark"] .news-date { padding-top: 3px; color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
+html[data-theme="dark"] .news-text strong { color: var(--fg); font-weight: 600; }
+html[data-theme="dark"] .honor-list { display: flex; flex-wrap: wrap; gap: 10px; padding: 0; list-style: none; }
+html[data-theme="dark"] .honor-list li { padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); font-size: 14px; }
+
+html[data-theme="dark"] .entry-list { display: grid; gap: 14px; }
+html[data-theme="dark"] .block[data-block="projects"] .entry-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+html[data-theme="dark"] .entry { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 4px; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+html[data-theme="dark"] .entry-title { grid-column: 1 / -1; font-size: 17px; font-weight: 600; line-height: 1.35; }
+html[data-theme="dark"] .entry-authors { grid-column: 1; grid-row: 2; font-size: 14px; }
+html[data-theme="dark"] .entry-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding: 1px 9px;
+    border: 1px solid rgba(122, 162, 247, 0.4);
+    border-radius: 6px;
+    background: rgba(122, 162, 247, 0.1);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.7;
+    text-transform: uppercase;
+}
+html[data-theme="dark"] .entry-badge.is-highlight { border-color: rgba(158, 206, 106, 0.45); background: rgba(158, 206, 106, 0.1); color: var(--accent-2); }
+html[data-theme="dark"] .entry-desc { grid-column: 1 / -1; font-size: 14.5px; }
+html[data-theme="dark"] .entry-links { grid-column: 1 / -1; gap: 16px; margin-top: 6px; }
+html[data-theme="dark"] .link { font-size: 14px; font-weight: 500; text-decoration: none; }
+html[data-theme="dark"] .link .icon { font-size: 14px; }
+html[data-theme="dark"] .link.is-disabled { color: var(--muted); }
+
+html[data-theme="dark"] .site-footer { padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
+
+@media (max-width: 860px) {
+    html[data-theme="dark"] .page { padding: 36px 20px 48px; gap: 40px; }
+    html[data-theme="dark"] .role { margin-top: 28px; }
+    html[data-theme="dark"] .content { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+    html[data-theme="dark"] .block[data-block="news"] { grid-column: 1; grid-row: 1; }
+    html[data-theme="dark"] .block[data-block="honors"] { grid-column: 1; grid-row: 2; }
+    html[data-theme="dark"] .block[data-block="publications"] { grid-column: 1; grid-row: 3; }
+    html[data-theme="dark"] .block[data-block="projects"] { grid-column: 1; grid-row: 4; }
+    html[data-theme="dark"] .block[data-block="projects"] .entry-list { grid-template-columns: minmax(0, 1fr); }
+    html[data-theme="dark"] .news-item { grid-template-columns: 72px minmax(0, 1fr); gap: 10px; }
+    /* Long venue names need a row of their own on a narrow screen. */
+    html[data-theme="dark"] .entry { grid-template-columns: minmax(0, 1fr); }
+    html[data-theme="dark"] .entry-badge { grid-column: 1; grid-row: 3; justify-self: start; margin-top: 4px; white-space: normal; }
+    html[data-theme="dark"] .entry-desc { grid-row: 4; }
+    html[data-theme="dark"] .entry-links { grid-row: 5; }
+}

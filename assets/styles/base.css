@@ -91,6 +91,12 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
    blank until they are in (1.5 s at most) instead of flashing an unstyled page. */
 html.theme-loading body { visibility: hidden; }
 
+/* No transitions until the page has settled (and during a theme switch): a rule
+   that changes from the base to the theme value must not briefly animate. */
+html.js:not(.theme-settled) *,
+html.js:not(.theme-settled) *::before,
+html.js:not(.theme-settled) *::after { transition: none !important; }
+
 /* Without JavaScript the portrait comes from the <noscript> copy. */
 html:not(.js) img.avatar:not([src]) { display: none; }
 
@@ -241,6 +247,8 @@ html:not(.js) img.avatar:not([src]) { display: none; }
 .theme-switcher-toggle .icon { font-size: 16px; color: var(--switcher-accent); }
 /* The palette turns while the next theme's files are still downloading. */
 .theme-switcher.is-switching .theme-switcher-toggle .icon { animation: theme-switcher-spin 0.9s linear infinite; }
+/* A picked theme should not linger as a half-faded panel in the old snapshot. */
+.theme-switcher.is-switching .theme-switcher-panel { transition: none; }
 @keyframes theme-switcher-spin { to { transform: rotate(360deg); } }
 .theme-switcher-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -260,13 +268,16 @@ html:not(.js) img.avatar:not([src]) { display: none; }
     transform: translateY(10px) scale(0.97);
     transform-origin: 100% 100%;
     pointer-events: none;
-    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.22s;
+    /* Closing: it stays visible while it fades out. Opening: visible at once,
+       so that the focused option below can receive the focus immediately. */
+    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.22s;
 }
 .theme-switcher.is-open .theme-switcher-panel {
     opacity: 1;
     visibility: visible;
     transform: none;
     pointer-events: auto;
+    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
 }
 
 .theme-switcher-head {
@@ -409,22 +420,24 @@ html:not(.js) img.avatar:not([src]) { display: none; }
 }
 
 /* ---- Switch animation ---------------------------------------------------- */
-/* Browsers with the View Transitions API cross-fade the old and the new layout
-   and let every block glide to its new place; the others get a quick fade. */
-::view-transition-group(*),
-::view-transition-old(*),
-::view-transition-new(*) {
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.6, 0, 0.3, 1);
+/* Browsers with the View Transitions API sweep the new theme in as a circle
+   growing from where the visitor picked it: no overlapping layouts, no ghosting.
+   assets/app.js sets the centre (--vt-x, --vt-y) and the radius (--vt-r).
+   The others get a quick fade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
 }
 
-html.vt-blocks .hero { view-transition-name: hero; }
-html.vt-blocks .avatar { view-transition-name: avatar; }
-html.vt-blocks .block[data-block="news"] { view-transition-name: block-news; }
-html.vt-blocks .block[data-block="honors"] { view-transition-name: block-honors; }
-html.vt-blocks .block[data-block="publications"] { view-transition-name: block-publications; }
-html.vt-blocks .block[data-block="projects"] { view-transition-name: block-projects; }
-html.vt-blocks .site-footer { view-transition-name: footer; }
+::view-transition-new(root) {
+    animation: theme-reveal 0.55s cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+
+@keyframes theme-reveal {
+    from { clip-path: circle(0 at var(--vt-x, 100%) var(--vt-y, 100%)); }
+    to { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 100%) var(--vt-y, 100%)); }
+}
 
 .page,
 .backdrop { transition: opacity 0.32s ease-out; }

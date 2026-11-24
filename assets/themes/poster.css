@@ -1,0 +1,224 @@
+/* Poster — an academic conference poster: a navy banner with the title, an
+   introduction strip, and three columns of boxed sections with coloured heads. */
+[data-theme="poster"] {
+    --bg: #dfe3e8; /* the wall the poster hangs on */
+    --fg: #14213d;
+    --muted: #4f5b70;
+    --accent: #1d6fb8;
+    --accent-2: #e8791d;
+    --surface: #ffffff;
+    --border: #14213d;
+    --radius: 8px;
+    --font-body: "Archivo", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: "Archivo Black", "Archivo", system-ui, sans-serif;
+    --page-width: 1460px;
+    --switcher-accent: #1d6fb8;
+    color-scheme: light;
+}
+
+html[data-theme="poster"] body { font-size: 16.5px; line-height: 1.45; }
+
+/* The sheet on the wall. */
+html[data-theme="poster"] .page {
+    gap: 0;
+    padding: 28px 28px 30px;
+    border-radius: 6px;
+    background: var(--surface);
+    box-shadow: 0 22px 48px rgba(20, 33, 61, 0.28);
+}
+
+/* Banner: logo, title, authors, contact details. */
+html[data-theme="poster"] .hero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 28px;
+    align-items: center;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--fg);
+    color: #ffffff;
+}
+html[data-theme="poster"] .hero-text { display: contents; }
+html[data-theme="poster"] .avatar {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 132px;
+    height: 132px;
+    margin: 24px 0 24px 24px;
+    border: 4px solid #ffffff;
+    border-radius: 10px;
+}
+html[data-theme="poster"] .name {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 26px;
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    text-align: center;
+}
+html[data-theme="poster"] .name-cn {
+    display: block;
+    margin-top: 8px;
+    color: #bcd3f0;
+    font-family: var(--font-body);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+}
+html[data-theme="poster"] .role {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 8px 0 28px;
+    color: #d7e4f7;
+    font-size: 22px;
+    font-weight: 500;
+    text-align: center;
+}
+html[data-theme="poster"] .contact {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    display: grid;
+    gap: 9px;
+    margin: 0;
+    padding-right: 26px;
+    justify-items: end;
+}
+html[data-theme="poster"] .contact-link { color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; }
+html[data-theme="poster"] .contact-link .icon { color: #f6b26b; font-size: 16px; }
+html[data-theme="poster"] .contact-link:hover { color: #f6b26b; }
+
+html[data-theme="poster"] .bio {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 32px;
+    margin: 0;
+    padding: 18px 32px 20px;
+    border-top: 5px solid var(--accent);
+    background: #eef3fa;
+    color: var(--fg);
+}
+html[data-theme="poster"] .bio::before {
+    content: "Introduction";
+    grid-column: 1 / -1;
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+html[data-theme="poster"] .bio p { margin: 0; }
+html[data-theme="poster"] .bio strong { font-weight: 700; }
+html[data-theme="poster"] .bio a { color: var(--accent); font-weight: 600; }
+
+/* Three columns of boxes. */
+html[data-theme="poster"] .content {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    align-items: start;
+}
+html[data-theme="poster"] .col { display: contents; }
+html[data-theme="poster"] .block { overflow: hidden; border: 3px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+html[data-theme="poster"] .block[data-block="news"] { grid-column: 1; grid-row: 1; }
+html[data-theme="poster"] .block[data-block="honors"] { grid-column: 1; grid-row: 2; }
+html[data-theme="poster"] .block[data-block="publications"] { grid-column: 2; grid-row: 1 / span 2; }
+html[data-theme="poster"] .block[data-block="projects"] { grid-column: 3; grid-row: 1 / span 2; }
+
+html[data-theme="poster"] .block-title {
+    margin: 0;
+    padding: 9px 16px;
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+html[data-theme="poster"] .block[data-block="news"] .block-title { background: var(--accent); }
+html[data-theme="poster"] .block[data-block="honors"] .block-title { background: var(--accent-2); }
+html[data-theme="poster"] .block[data-block="publications"] .block-title { background: #7a3e9d; }
+html[data-theme="poster"] .block[data-block="projects"] .block-title { background: #138a8a; }
+html[data-theme="poster"] .block-icon { display: none; }
+
+html[data-theme="poster"] .news-list,
+html[data-theme="poster"] .honor-list,
+html[data-theme="poster"] .entry-list { margin: 16px; }
+html[data-theme="poster"] .news-list { display: grid; gap: 12px; }
+html[data-theme="poster"] .news-item { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; align-items: start; }
+html[data-theme="poster"] .news-date {
+    padding: 2px 8px;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+html[data-theme="poster"] .news-text { font-size: 15.5px; }
+html[data-theme="poster"] .news-text strong { font-weight: 700; }
+
+html[data-theme="poster"] .honor-list { display: grid; gap: 8px; padding: 0; list-style: none; }
+html[data-theme="poster"] .honor-list li { position: relative; padding-left: 16px; font-size: 15.5px; font-weight: 500; }
+html[data-theme="poster"] .honor-list li::before {
+    content: "";
+    position: absolute;
+    top: 0.5em;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-2);
+}
+
+html[data-theme="poster"] .entry-list { display: grid; gap: 18px; }
+html[data-theme="poster"] .entry { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+html[data-theme="poster"] .entry-title { grid-column: 1; font-size: 18px; font-weight: 700; line-height: 1.25; }
+html[data-theme="poster"] .entry-authors { grid-column: 1; grid-row: 2; color: var(--muted); font-size: 14.5px; }
+html[data-theme="poster"] .entry-badge {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--accent-2);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+html[data-theme="poster"] .entry-badge.is-highlight { background: var(--accent); color: #ffffff; }
+html[data-theme="poster"] .entry-desc { grid-column: 1; grid-row: 4; font-size: 15px; }
+html[data-theme="poster"] .entry-links { grid-column: 1; grid-row: 5; gap: 12px; margin: 4px 0 0; }
+html[data-theme="poster"] .link {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+html[data-theme="poster"] .link::before { content: "\25b8 "; }
+html[data-theme="poster"] .link .icon { display: none; }
+html[data-theme="poster"] .link.is-disabled { color: #9aa5b5; }
+
+html[data-theme="poster"] .site-footer { margin-top: 20px; color: var(--muted); font-size: 13px; text-align: center; }
+
+@media (max-width: 980px) {
+    html[data-theme="poster"] .page { padding: 14px 14px 18px; }
+    html[data-theme="poster"] .hero { grid-template-columns: minmax(0, 1fr); justify-items: center; row-gap: 0; text-align: center; }
+    html[data-theme="poster"] .avatar { grid-column: 1; grid-row: 1; width: 104px; height: 104px; margin: 22px 0 0; }
+    html[data-theme="poster"] .name { grid-column: 1; grid-row: 2; margin: 14px 20px 0; font-size: 38px; }
+    html[data-theme="poster"] .name-cn { font-size: 18px; letter-spacing: 0.2em; }
+    html[data-theme="poster"] .role { grid-column: 1; grid-row: 3; margin: 6px 24px 0; font-size: 18px; }
+    html[data-theme="poster"] .contact { grid-column: 1; grid-row: 4; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 16px 16px 0; padding: 0; }
+    html[data-theme="poster"] .bio { grid-column: 1; grid-row: 5; grid-template-columns: minmax(0, 1fr); padding: 18px 20px 20px; }
+    html[data-theme="poster"] .content { grid-template-columns: minmax(0, 1fr); }
+    html[data-theme="poster"] .block { grid-column: 1; grid-row: auto; }
+}

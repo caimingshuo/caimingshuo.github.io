@@ -18,11 +18,8 @@
         window.HOMEPAGE_THEMES = [
             // Styles taken from researchers' homepages
             { id: 'plain',         name: 'Plain HTML',   note: 'Browser-default page',         fonts: [] },
-            { id: 'classic',       name: 'Classic',      note: 'Plain lists, blue links',      fonts: [] },
-            { id: 'nerfies',       name: 'Nerfies',      note: 'Portrait, red venue tags',     fonts: ['Lato', 'JetBrains Mono'] },
-            { id: 'teaser',        name: 'Teaser',       note: 'Bold titles, hover previews',  fonts: [] },
+            { id: 'nerfies',       name: 'Nerfies',      note: 'Portrait, red venue tags',     fonts: ['Lato', 'Lato 700', 'JetBrains Mono'] },
             { id: 'cayman',        name: 'Cayman',      note: 'Gradient banner header',       fonts: ['Open Sans'] },
-            { id: 'minimal-light', name: 'Minimal',     note: 'One quiet column',             fonts: ['Nunito Sans'] },
             { id: 'al-folio',      name: 'al-folio',    note: 'Icon buttons, news ticker',    fonts: ['Roboto'] },
             { id: 'academic',      name: 'Academic',    note: 'Hero, interests, news feed',   fonts: ['Inter'] },
             { id: 'sidebar',       name: 'Sidebar',      note: 'Fixed navigation column',      fonts: ['PT Sans', 'PT Sans 700', 'Abril Fatface'] },
@@ -31,10 +28,14 @@
             { id: 'arxiv',         name: 'arXiv',        note: 'Abstract page',                fonts: [] },
             { id: 'wiki',          name: 'Wikipedia',    note: 'Article with infobox',         fonts: [] },
             { id: 'paper',         name: 'Paper CV',     note: 'Printed résumé sheet',         fonts: ['Lora', 'Lora i'] },
-            { id: 'book',          name: 'Book',         note: 'Cream paper, old-style serif',  fonts: ['EB Garamond', 'EB Garamond i'] },
+            { id: 'book',          name: 'Book',         note: 'Cream paper, old-style serif',  fonts: ['EB Garamond', 'EB Garamond i'], avatar: 'images/avatar-line.webp' },
             { id: 'essay',         name: 'Essay',        note: 'Large serif, wide margins',    fonts: ['Newsreader', 'Newsreader i'] },
+            { id: 'beamer',        name: 'Beamer',     note: 'Slide deck with a navigation bar', fonts: ['CMU Sans', 'CMU Sans 700', 'CMU Typewriter'] },
+            { id: 'poster',        name: 'Poster',     note: 'Conference poster in three columns', fonts: ['Archivo', 'Archivo Black'] },
+            { id: 'sheet',         name: 'Sheet',      note: 'Publications as a spreadsheet',   fonts: ['Inter', 'JetBrains Mono'] },
+            { id: 'chalkboard',    name: 'Chalkboard', note: 'Lecture notes in chalk',         fonts: ['Caveat'] },
             // Clean and modern
-            { id: 'notes',         name: 'Notes',        note: 'Document with sidebar',        fonts: ['Public Sans', 'Lora i'] },
+            { id: 'notes',        name: 'Notes',       note: 'Document with a sidebar',      fonts: ['Public Sans'] },
             { id: 'timeline',      name: 'Timeline',     note: 'Dated vertical timeline',      fonts: ['DM Sans'] },
             { id: 'glass',         name: 'Glass',        note: 'Frosted cards, particles',     fonts: ['Outfit', 'Space Grotesk', 'JetBrains Mono'] },
             { id: 'dark',          name: 'Night',        note: 'Dark minimal',                 fonts: ['Inter', 'JetBrains Mono'], avatar: 'images/avatar-duotone-cyan.webp' },
@@ -57,7 +58,9 @@
             'Abril Fatface': 'abril-fatface-400.woff2',
             'Archivo': 'archivo-var.woff2',
             'Archivo Black': 'archivo-black-400.woff2',
+            'Caveat': 'caveat-var.woff2',
             'CMU Sans': 'cmu-sans.woff',
+            'CMU Sans 700': 'cmu-sans-700.woff',
             'CMU Serif': 'cmu-serif.woff',
             'CMU Serif 700': 'cmu-serif-700.woff',
             'CMU Serif i': 'cmu-serifi.woff',
@@ -67,7 +70,6 @@
             'EB Garamond i': 'eb-garamond-vari.woff2',
             'IBM Plex Mono': 'ibm-plex-mono-400.woff2',
             'IBM Plex Mono 600': 'ibm-plex-mono-600.woff2',
-            'IBM Plex Mono i': 'ibm-plex-mono-400i.woff2',
             'Instrument Serif': 'instrument-serif-400.woff2',
             'Instrument Serif i': 'instrument-serif-400i.woff2',
             'Inter': 'inter-var.woff2',
@@ -79,7 +81,6 @@
             'Manrope': 'manrope-var.woff2',
             'Newsreader': 'newsreader-var.woff2',
             'Newsreader i': 'newsreader-vari.woff2',
-            'Nunito Sans': 'nunito-sans-var.woff2',
             'Open Sans': 'open-sans-var.woff2',
             'Orbitron': 'orbitron-var.woff2',
             'Outfit': 'outfit-var.woff2',
@@ -115,7 +116,14 @@
             var pending = 1 + fonts.length;
             var timer = setTimeout(reveal, 1500);
 
-            function reveal() { clearTimeout(timer); root.classList.remove('theme-loading'); }
+            function reveal() {
+                clearTimeout(timer);
+                root.classList.remove('theme-loading');
+                // Style the page once while transitions are still off, so that nothing
+                // animates from the base rules into the theme's rules.
+                if (d.body) void d.body.offsetWidth;
+                root.classList.add('theme-settled');
+            }
             function ready() { if (--pending <= 0) reveal(); }
 
             root.classList.add('theme-loading');
@@ -184,7 +192,7 @@
 
                 <div class="bio">
                     <p>I am a master's student at <strong>Nanjing University</strong>, supervised by <a href="http://zhuhao.cc/">Prof. Hao Zhu</a> and <a href="https://cite.nju.edu.cn/People/Faculty/20190621/i5054.html">Prof. Xun Cao</a>. Previously, I received my B.Eng. in Artificial Intelligence from <strong>Xidian University</strong> (GPA: 3.9/4.0, <span class="mark">Top 1%</span>).</p>
-                    <p>My research interests lie in <strong>Streaming Video Generation</strong>, <strong>Generative AI</strong>, and <strong>Digital Avatars</strong>. I have previously interned at <strong>Zuoyebang</strong>, and I am currently an intern at <strong>Z.ai</strong>.</p>
+                    <p>My research interests lie in <strong>Streaming Video Generation</strong>, <strong>Generative AI</strong>, and <strong>Digital Avatars</strong>. I have previously interned at <strong>Baidu</strong>, and I am currently an intern at <strong>Z.ai</strong>.</p>
                 </div>
 
                 <ul class="contact">

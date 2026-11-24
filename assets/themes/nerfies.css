@@ -1,0 +1,114 @@
+/* Nerfies — the look of Jon Barron's homepage and the Nerfies template:
+   Lato on white, portrait beside the name, venues in bold red. */
+[data-theme="nerfies"] {
+    --bg: #ffffff;
+    --fg: #222222;
+    --muted: #777777;
+    --accent: #d40000;
+    --accent-2: #d40000;
+    --surface: #ffffff;
+    --border: #eeeeee;
+    --font-body: "Lato", "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: var(--font-body);
+    --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    --page-width: 868px;
+    --switcher-accent: #d40000;
+    color-scheme: light;
+}
+
+html[data-theme="nerfies"] body { font-size: 14.5px; line-height: 1.55; }
+html[data-theme="nerfies"] .page { padding: 40px 24px 32px; gap: 36px; }
+
+/* Portrait on the left, name, role and links beside it, bio across the full width. */
+html[data-theme="nerfies"] .hero {
+    grid-template-columns: 170px minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    gap: 0 24px;
+    align-items: start;
+}
+html[data-theme="nerfies"] .hero-text { display: contents; }
+html[data-theme="nerfies"] .avatar { grid-column: 1; grid-row: 1 / span 3; width: 170px; height: 170px; border-radius: 4px; }
+html[data-theme="nerfies"] .name { grid-column: 2; grid-row: 1; font-size: 30px; }
+html[data-theme="nerfies"] .name-cn { color: #999999; font-size: 0.6em; }
+html[data-theme="nerfies"] .role { grid-column: 2; grid-row: 2; margin: 2px 0 0; color: #444444; font-size: 15px; font-weight: 400; }
+html[data-theme="nerfies"] .contact { grid-column: 2; grid-row: 3; gap: 4px 16px; margin: 8px 0 0; }
+html[data-theme="nerfies"] .bio { grid-column: 1 / -1; grid-row: 4; margin-top: 14px; text-align: justify; }
+html[data-theme="nerfies"] .bio strong { color: #000000; font-weight: 700; }
+
+html[data-theme="nerfies"] a { color: #222222; text-decoration: none; }
+html[data-theme="nerfies"] a:hover { color: #d40000; }
+html[data-theme="nerfies"] .contact-link { font-size: 14px; }
+html[data-theme="nerfies"] .contact-link .icon { color: #777777; font-size: 15px; }
+
+html[data-theme="nerfies"] .content { display: block; }
+html[data-theme="nerfies"] .col { display: block; }
+html[data-theme="nerfies"] .block + .block,
+html[data-theme="nerfies"] .col + .col { margin-top: 34px; }
+html[data-theme="nerfies"] .block-title { margin-bottom: 12px; font-size: 18px; }
+html[data-theme="nerfies"] .block-icon { display: none; }
+
+html[data-theme="nerfies"] .news-list { display: grid; gap: 2px; }
+html[data-theme="nerfies"] .news-item { display: block; }
+html[data-theme="nerfies"] .news-date {
+    margin-right: 6px;
+    color: #6b6b6b;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+}
+html[data-theme="nerfies"] .news-date::before { content: "["; }
+html[data-theme="nerfies"] .news-date::after { content: "]"; }
+html[data-theme="nerfies"] .news-text strong { color: #000000; font-weight: 700; }
+html[data-theme="nerfies"] .honor-list { padding: 0; list-style: none; display: grid; gap: 2px; }
+html[data-theme="nerfies"] .honor-list li::before { content: "•"; margin-right: 8px; color: #d40000; }
+
+/* Title, then authors, the venue in bold red, and the links on one line. */
+html[data-theme="nerfies"] .entry-list { display: grid; gap: 14px; }
+html[data-theme="nerfies"] .entry {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    column-gap: 8px;
+    margin: 0 -8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+}
+html[data-theme="nerfies"] .entry:hover { background: #f6f6f6; }
+html[data-theme="nerfies"] .entry-title { grid-column: 1 / -1; margin-bottom: 1px; font-size: 15px; font-weight: 700; line-height: 1.4; }
+html[data-theme="nerfies"] .entry-authors { grid-column: 1; grid-row: 2; color: #222222; }
+html[data-theme="nerfies"] .entry-authors strong { color: #000000; font-weight: 700; }
+html[data-theme="nerfies"] .entry-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding: 0;
+    background: none;
+    color: #d40000;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: inherit;
+}
+html[data-theme="nerfies"] .entry-badge.is-highlight { background: none; color: #d40000; }
+html[data-theme="nerfies"] .entry-desc { grid-column: 1 / -1; margin-top: 2px; color: #666666; font-size: 14px; }
+html[data-theme="nerfies"] .entry-links { grid-column: 3; grid-row: 2; gap: 10px; margin: 0; }
+html[data-theme="nerfies"] .link { color: #222222; font-size: 14px; font-weight: 700; }
+html[data-theme="nerfies"] .link .icon { color: #606060; font-size: 14px; }
+html[data-theme="nerfies"] .link.is-disabled { color: #999999; font-weight: 400; }
+
+html[data-theme="nerfies"] .site-footer {
+    padding-top: 12px;
+    border-top: 1px solid #eeeeee;
+    color: #6f6f6f;
+    font-size: 12.5px;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    html[data-theme="nerfies"] .hero { display: flex; flex-direction: column; }
+    html[data-theme="nerfies"] .avatar { width: 132px; height: 132px; margin-bottom: 14px; }
+    html[data-theme="nerfies"] .bio { margin-top: 12px; text-align: left; }
+    /* Authors, venue and links each get their own line. */
+    html[data-theme="nerfies"] .entry { grid-template-columns: 1fr; }
+    html[data-theme="nerfies"] .entry-badge { grid-column: 1; grid-row: 3; margin-top: 2px; }
+    html[data-theme="nerfies"] .entry-links { grid-column: 1; grid-row: 4; margin-top: 6px; }
+    html[data-theme="nerfies"] .entry-desc { grid-row: 5; }
+}

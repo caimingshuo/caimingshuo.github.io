@@ -1,0 +1,189 @@
+/* Beamer — the page as a LaTeX Beamer deck: white slides on a dark desk, a
+   gradient title bar on every frame, a navigation strip on top and frame
+   numbers in the corner. */
+[data-theme="beamer"] {
+    --bg: #525a66; /* the desk the slides lie on */
+    --fg: #1a1a2e;
+    --muted: #5c6070;
+    --accent: #2f4b8f;
+    --accent-2: #c0392b;
+    --surface: #ffffff;
+    --border: #dfe3ee;
+    --radius: 4px;
+    --font-body: "CMU Sans", "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: var(--font-body);
+    --font-mono: "CMU Typewriter", "Courier New", "PingFang SC", monospace;
+    --page-width: 1028px;
+    --switcher-accent: #2f4b8f;
+    --frames: 4; /* frames after the title slide */
+    color-scheme: light;
+}
+
+html[data-theme="beamer"] body { font-size: 17px; line-height: 1.5; }
+html[data-theme="beamer"] .page { display: flex; flex-direction: column; gap: 28px; padding: 48px 24px 56px; }
+
+/* Title slide (navigation strip, logo, title, subtitle, links), then every
+   frame: white, rounded, casting one shadow on the desk. */
+html[data-theme="beamer"] .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--surface);
+    filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.35));
+}
+html[data-theme="beamer"] .block { filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.35)); }
+html[data-theme="beamer"] .block { background: var(--surface); }
+html[data-theme="beamer"] .hero-text { display: contents; }
+html[data-theme="beamer"] .avatar { order: 1; }
+html[data-theme="beamer"] .name { order: 2; }
+html[data-theme="beamer"] .role { order: 3; }
+html[data-theme="beamer"] .contact { order: 4; }
+html[data-theme="beamer"] .bio { order: 5; }
+html[data-theme="beamer"] .avatar,
+html[data-theme="beamer"] .name,
+html[data-theme="beamer"] .role,
+html[data-theme="beamer"] .contact { text-align: center; }
+
+html[data-theme="beamer"] .avatar { width: 110px; height: 110px; margin: 34px auto 18px; border-radius: 8px; }
+html[data-theme="beamer"] .name { padding: 0 32px; font-size: 38px; font-weight: 700; line-height: 1.2; }
+html[data-theme="beamer"] .name-cn { color: var(--muted); font-size: 0.55em; }
+html[data-theme="beamer"] .role { margin: 8px 32px 0; padding: 0; color: var(--muted); font-size: 21px; font-weight: 400; }
+html[data-theme="beamer"] .contact { justify-content: center; flex-wrap: wrap; gap: 6px 22px; margin: 0; padding: 20px 32px 34px; }
+html[data-theme="beamer"] .contact-link { color: var(--accent); font-size: 18px; text-decoration: none; }
+html[data-theme="beamer"] .contact-link:hover { text-decoration: underline; }
+html[data-theme="beamer"] .contact-link .icon { display: none; }
+
+/* The gradient bar that names a frame. */
+html[data-theme="beamer"] .block-title {
+    margin: 0 -24px 20px;
+    padding: 8px 16px;
+    background: linear-gradient(100deg, #2f4b8f 0%, #6a3d8f 72%, #c0392b 100%);
+    box-shadow: 3px 3px 0 rgba(47, 75, 143, 0.25);
+    border-radius: 3px;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: left;
+}
+
+html[data-theme="beamer"] .bio { margin: 28px 40px 0; padding: 22px 0 32px; border-top: 1px solid var(--border); text-align: left; }
+html[data-theme="beamer"] .bio::before {
+    content: "About";
+    display: block;
+    margin-bottom: 10px;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+html[data-theme="beamer"] .bio strong { color: var(--fg); font-weight: 700; }
+html[data-theme="beamer"] .bio a { color: var(--accent); text-decoration: none; }
+html[data-theme="beamer"] .bio a:hover { text-decoration: underline; }
+
+html[data-theme="beamer"] .content { display: flex; flex-direction: column; gap: 28px; counter-reset: frame; }
+html[data-theme="beamer"] .col { display: contents; }
+html[data-theme="beamer"] .block {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: 320px;
+    padding: 0 40px;
+    border-radius: var(--radius);
+    counter-increment: frame;
+}
+html[data-theme="beamer"] .block-title { display: flex; align-items: center; gap: 12px; }
+html[data-theme="beamer"] .block-title span { flex: 1; }
+html[data-theme="beamer"] .block-title::after {
+    content: counter(frame) "/" var(--frames);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 400;
+}
+html[data-theme="beamer"] .block-icon { display: none; }
+
+/* Navigation strip on top and footline underneath every slide. The filled dot
+   marks the current frame. */
+html[data-theme="beamer"] .hero::before,
+html[data-theme="beamer"] .block::before {
+    content: "Mingshuo Cai \00b7  Nanjing University \2003\2003 \25cb  \25cb  \25cb  \25cb";
+    margin: 0 -40px;
+    padding: 3px 12px;
+    background: #eef0f6;
+    color: #5c6070;
+    font-size: 11px;
+    text-align: left;
+    white-space: pre;
+}
+html[data-theme="beamer"] .hero::before { margin: 0; }
+html[data-theme="beamer"] .block[data-block="news"]::before { content: "News  Honors  Publications  Projects \2003\2003 \25cf  \25cb  \25cb  \25cb"; }
+html[data-theme="beamer"] .block[data-block="honors"]::before { content: "News  Honors  Publications  Projects \2003\2003 \25cb  \25cf  \25cb  \25cb"; }
+html[data-theme="beamer"] .block[data-block="publications"]::before { content: "News  Honors  Publications  Projects \2003\2003 \25cb  \25cb  \25cf  \25cb"; }
+html[data-theme="beamer"] .block[data-block="projects"]::before { content: "News  Honors  Publications  Projects \2003\2003 \25cb  \25cb  \25cb  \25cf"; }
+html[data-theme="beamer"] .block::after {
+    content: "Mingshuo Cai \00b7  Nanjing University";
+    margin: 12px -40px 0;
+    padding: 4px 12px;
+    border-top: 1px solid var(--border);
+    color: #8a8f9e;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Frame contents: triangles like Beamer's itemize, mono dates, boxed venues. */
+html[data-theme="beamer"] .news-list,
+html[data-theme="beamer"] .honor-list,
+html[data-theme="beamer"] .entry-list { align-self: start; padding: 18px 0 8px; }
+html[data-theme="beamer"] .news-list { display: grid; gap: 8px; }
+html[data-theme="beamer"] .news-item { display: flex; gap: 10px; }
+html[data-theme="beamer"] .news-item::before,
+html[data-theme="beamer"] .honor-list li::before,
+html[data-theme="beamer"] .entry-title::before { content: "\25b8"; margin-right: 8px; color: var(--accent); }
+html[data-theme="beamer"] .news-date { padding-top: 2px; color: var(--muted); font-family: var(--font-mono); font-size: 14px; }
+html[data-theme="beamer"] .honor-list { display: grid; gap: 8px; padding-left: 0; list-style: none; }
+
+html[data-theme="beamer"] .entry-list { display: grid; gap: 16px; }
+html[data-theme="beamer"] .entry { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; row-gap: 2px; }
+html[data-theme="beamer"] .entry-title { grid-column: 1 / -1; font-size: 18px; font-weight: 700; line-height: 1.35; }
+html[data-theme="beamer"] .entry-authors { grid-column: 1; grid-row: 2; color: var(--muted); font-size: 15.5px; }
+html[data-theme="beamer"] .entry-badge {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding: 0 10px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    background: none;
+    color: var(--accent);
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+html[data-theme="beamer"] .entry-badge.is-highlight { border-color: var(--accent-2); background: none; color: var(--accent-2); }
+html[data-theme="beamer"] .entry-desc { grid-column: 1 / -1; margin-top: 2px; font-size: 15.5px; }
+html[data-theme="beamer"] .entry-links { grid-column: 1 / -1; gap: 16px; margin: 4px 0 0; }
+html[data-theme="beamer"] .link { color: var(--accent); font-size: 15px; text-decoration: none; }
+html[data-theme="beamer"] .link:hover { text-decoration: underline; }
+html[data-theme="beamer"] .link .icon { display: none; }
+html[data-theme="beamer"] .link.is-disabled { color: #9a9eac; }
+
+html[data-theme="beamer"] .site-footer { padding: 8px 0 0; color: #d5d9e2; font-size: 14px; text-align: center; }
+
+@media (max-width: 640px) {
+    html[data-theme="beamer"] .page { padding: 20px 12px 32px; gap: 20px; }
+    html[data-theme="beamer"] .avatar { width: 88px; height: 88px; margin-top: 24px; }
+    html[data-theme="beamer"] .name { padding: 0 18px; font-size: 30px; }
+    html[data-theme="beamer"] .role { margin: 6px 18px 0; font-size: 18px; }
+    html[data-theme="beamer"] .contact { padding: 16px 18px 26px; }
+    html[data-theme="beamer"] .bio { margin: 22px 20px 0; padding: 18px 0 24px; }
+    html[data-theme="beamer"] .block { min-height: 0; padding: 0 20px; }
+    html[data-theme="beamer"] .bio::before,
+    html[data-theme="beamer"] .block-title { margin: 0 -8px 16px; padding: 7px 12px; font-size: 19px; }
+    html[data-theme="beamer"] .block[data-block]::before { margin: 0 -20px; }
+    html[data-theme="beamer"] .block::after { margin: 12px -20px 0; }
+    html[data-theme="beamer"] .entry { grid-template-columns: 1fr; }
+    html[data-theme="beamer"] .entry-badge { grid-column: 1; grid-row: 3; margin-top: 4px; }
+    html[data-theme="beamer"] .entry-desc { grid-row: 4; }
+    html[data-theme="beamer"] .entry-links { grid-row: 5; }
+}
