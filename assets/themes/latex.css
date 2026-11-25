@@ -1,8 +1,8 @@
 /* LaTeX — the homepage as an article typeset with pdfLaTeX: Computer Modern,
    black on a white sheet that lies on a grey desk. The title block is
-   \maketitle, the portrait is Figure 1, the first bio paragraph is the
-   abstract, the second starts the body, the four blocks are sections 1–4 and
-   publications and projects are their numbered subsections. */
+   \maketitle, the first bio paragraph is the abstract, the second starts the
+   body, the four blocks are sections 1–4 and publications and projects are
+   their numbered subsections. */
 
 [data-theme="latex"] {
     --bg: #ececec;
@@ -19,6 +19,9 @@
     --font-display: var(--font-body);
     --font-mono: "CMU Typewriter", "CMU Serif", ui-monospace, Menlo, Consolas, monospace;
     --page-width: 780px;
+    /* The text block: LaTeX's own 345 pt at a 10 pt font, 58 % of the page
+       width and about 75 characters a line. */
+    --measure: 34.5em;
     --switcher-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
     color-scheme: light;
 }
@@ -35,30 +38,61 @@ html[data-theme="latex"] .page {
     gap: 0;
     max-width: 780px;
     margin: 0 auto;
-    padding: 56px;
+    /* The side padding is the sheet's least margin; the text block is centred
+       in what is left. Top and bottom match the paper's proportions. */
+    padding: 88px 56px 72px;
     overflow-wrap: break-word;
     background: var(--surface);
     border: 1px solid #d4d4d4;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.07);
+    box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.05),
+        0 3px 7px rgba(0, 0, 0, 0.05),
+        0 18px 44px rgba(0, 0, 0, 0.075);
 }
 
-/* Running text is justified and hyphenated, as TeX sets it. On narrow screens
-   it goes ragged right instead: see the end of this file. */
+/* A second shadow behind the sheet, that of paper held a little above the
+   desk. It is visible only while the sheet is landing (see the entrance). */
+html[data-theme="latex"] .page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    box-shadow: 0 0 44px rgba(0, 0, 0, 0.15), 0 16px 40px rgba(0, 0, 0, 0.09);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Title block, sections and foot share one text block, centred on the sheet. */
+html[data-theme="latex"] .page > * {
+    justify-self: center;
+    width: 100%;
+    max-width: var(--measure);
+}
+
+/* Running text is hyphenated, and paragraphs are justified as TeX sets them,
+   with the engine's `pretty` wrapping switched off: measured on this page it
+   loosened the line before a short last line. Lists are ragged right at every
+   width (see below); on narrow screens the paragraphs are too. */
 html[data-theme="latex"] .bio p,
 html[data-theme="latex"] .news-item,
 html[data-theme="latex"] .honor-list li,
 html[data-theme="latex"] .entry-authors,
 html[data-theme="latex"] .entry-desc {
-    text-align: justify;
     -webkit-hyphens: auto;
     hyphens: auto;
-    hyphenate-limit-chars: 7 3 3;
+    hyphenate-limit-chars: 5 2 3;
+}
+html[data-theme="latex"] .bio p,
+html[data-theme="latex"] .entry-desc,
+html[data-theme="latex"] .entry-authors {
+    text-align: justify;
+    text-wrap: wrap;
 }
 
 /* Title block --------------------------------------------------------------
    The two wrappers are opened up, so the name, the author line, the contact
-   details, the portrait, its caption and the two bio paragraphs form one
-   centred column, in the order \maketitle, the figure and the abstract give. */
+   details and the two bio paragraphs form one centred column, in the order
+   \maketitle and the abstract give. */
 
 html[data-theme="latex"] .hero {
     display: flex;
@@ -94,6 +128,15 @@ html[data-theme="latex"] .role {
     line-height: 1.4;
     text-align: center;
 }
+/* \thanks: the mark that refers to the footnote at the foot of the page. */
+html[data-theme="latex"] .role::after {
+    content: "*";
+    content: "*" / "";
+    margin-left: 0.1em;
+    font-size: 0.86em;
+    font-weight: 700;
+    vertical-align: 0.3em;
+}
 
 /* Contact details: one centred line of \url{} under the author. */
 html[data-theme="latex"] .contact {
@@ -102,37 +145,26 @@ html[data-theme="latex"] .contact {
     margin-top: 0.6em;
     font-family: var(--font-mono);
     font-size: 12px;
-    line-height: 1.7;
+    line-height: 2;
     text-align: center;
 }
 html[data-theme="latex"] .contact li { display: inline; }
-html[data-theme="latex"] .contact li + li::before { content: "·"; margin: 0 0.8em; }
-
-/* Figure 1. The caption is the ::after of the column and follows the portrait:
-   an img cannot carry generated content itself. */
-html[data-theme="latex"] .avatar {
-    order: 4;
-    width: 84px;
-    height: 84px;
-    margin-top: 1.5em;
-    border-radius: 0;
-}
-html[data-theme="latex"] .hero::after {
-    order: 5;
-    content: "Figure 1: The author.";
-    margin-top: 0.45em;
-    font-size: 11px;
-    line-height: 1.4;
-    text-align: center;
+/* The separator closes the item before it, tied to that word by a no-break
+   space, so a wrapped line never starts with a lone dot. The gaps either side
+   are equal: the space before it and the one between two items match. */
+html[data-theme="latex"] .contact li:not(:last-child)::after,
+html[data-theme="latex"] .entry-links li:not(:last-child)::after {
+    content: "\00a0·";
+    margin: 0 0.5em;
 }
 
 /* Abstract */
 html[data-theme="latex"] .bio p:first-child {
-    order: 6;
+    order: 4;
     width: 80%;
-    margin-top: 1.7em;
+    margin-top: 2.6em;
     font-size: 12px;
-    line-height: 1.42;
+    line-height: 1.45;
 }
 html[data-theme="latex"] .bio p:first-child::before {
     content: "Abstract";
@@ -144,7 +176,7 @@ html[data-theme="latex"] .bio p:first-child::before {
 
 /* Body: the first paragraph after the abstract. */
 html[data-theme="latex"] .bio p + p {
-    order: 7;
+    order: 5;
     width: 100%;
     margin-top: 1.5em;
     font-size: 14px;
@@ -160,25 +192,29 @@ html[data-theme="latex"] .contact-link,
 html[data-theme="latex"] .link {
     display: inline;
     gap: 0;
-    padding: 0.3em 0;
+    /* The line box is 24 px high and so is the target, the smallest comfortable one. */
+    padding: 0.4em 0;
     color: inherit;
     font-weight: 400;
     text-decoration: underline;
     text-decoration-color: transparent;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
-    transition: text-decoration-color 0.15s ease;
 }
 html[data-theme="latex"] .contact .icon,
 html[data-theme="latex"] .entry-links .icon { display: none; }
 html[data-theme="latex"] .contact-link:hover,
 html[data-theme="latex"] .contact-link:focus-visible,
 html[data-theme="latex"] .link:hover,
-html[data-theme="latex"] .link:focus-visible { text-decoration-color: currentColor; }
+html[data-theme="latex"] .link:focus-visible {
+    text-decoration-color: currentColor;
+    transition: text-decoration-color 0.15s ease;
+}
 html[data-theme="latex"] .link.is-disabled { color: var(--muted); }
 
 /* A link inside running text keeps the text face: the thin box hyperref draws
-   around it is what marks it as a link. */
+   around it is what marks it as a link. The whole name stays on one line, as
+   Prof.~Hao~Zhu would keep it in LaTeX; a box cut in two reads as two links. */
 html[data-theme="latex"] .bio a {
     padding: 0 0.2em;
     color: inherit;
@@ -186,9 +222,11 @@ html[data-theme="latex"] .bio a {
     white-space: nowrap;
     outline: 1px solid #7a7a7a;
     outline-offset: 0;
+}
+html[data-theme="latex"] .bio a:hover {
+    outline-color: var(--fg);
     transition: outline-color 0.15s ease;
 }
-html[data-theme="latex"] .bio a:hover { outline-color: var(--fg); }
 html[data-theme="latex"] .bio a:focus-visible {
     outline: 2px solid var(--fg);
     outline-offset: 2px;
@@ -205,9 +243,9 @@ html[data-theme="latex"] .block {
     counter-reset: entry;
 }
 html[data-theme="latex"] .block-title {
-    margin: 2.3em 0 0.8em;
+    margin: 2.4em 0 0.9em;
     font-family: var(--font-body);
-    font-size: 15px;
+    font-size: 16.5px;
     font-weight: 700;
     line-height: 1.3;
     hyphens: manual;
@@ -217,7 +255,9 @@ html[data-theme="latex"] .block-title::before {
     margin-right: 1em;
 }
 
-/* News and honors: itemize, the label flush right before a \labelsep. */
+/* News and honors: itemize, the label flush right before a \labelsep. A list
+   of short entries is set ragged right: an unbreakable name would otherwise
+   stretch the line before it into a river. */
 html[data-theme="latex"] .news-list,
 html[data-theme="latex"] .honor-list {
     display: block;
@@ -231,6 +271,8 @@ html[data-theme="latex"] .honor-list li {
     padding-left: 2.2em;
     font-size: 14px;
     line-height: 1.5;
+    text-align: left;
+    text-wrap: pretty;
 }
 html[data-theme="latex"] .news-item::before,
 html[data-theme="latex"] .honor-list li::before {
@@ -259,7 +301,6 @@ html[data-theme="latex"] .entry {
     flex-wrap: wrap;
     align-items: baseline;
     column-gap: 0.6em;
-    row-gap: 0.4em;
     counter-increment: entry;
 }
 html[data-theme="latex"] .entry + .entry { margin-top: 1.6em; }
@@ -281,6 +322,7 @@ html[data-theme="latex"] .entry-title::before {
 html[data-theme="latex"] .entry-authors {
     order: 2;
     flex: 0 1 auto;
+    margin-top: 0.6em;
     color: inherit;
     font-size: 14px;
     line-height: 1.5;
@@ -288,6 +330,7 @@ html[data-theme="latex"] .entry-authors {
 html[data-theme="latex"] .entry-badge {
     order: 3;
     flex: 0 0 auto;
+    margin-top: 0.2em;
     padding: 0;
     background: none;
     color: inherit;
@@ -307,6 +350,7 @@ html[data-theme="latex"] .entry-badge.is-highlight {
 html[data-theme="latex"] .entry-desc {
     order: 4;
     flex: 0 0 100%;
+    margin-top: 0.3em;
     color: inherit;
     font-size: 14px;
     line-height: 1.5;
@@ -317,15 +361,16 @@ html[data-theme="latex"] .entry-links {
     flex: 0 0 100%;
     display: block;
     gap: 0;
+    margin-top: 0.5em;
     font-family: var(--font-mono);
     font-size: 12px;
-    line-height: 1.7;
+    line-height: 2;
 }
 html[data-theme="latex"] .entry-links li { display: inline; }
-html[data-theme="latex"] .entry-links li + li::before { content: "·"; margin: 0 0.8em; }
 
 html[data-theme="latex"] [data-block="projects"] .entry-title { flex: 0 1 auto; }
-html[data-theme="latex"] [data-block="projects"] .entry-badge { order: 2; }
+html[data-theme="latex"] [data-block="projects"] .entry-badge { order: 2; margin-top: 0; }
+html[data-theme="latex"] [data-block="projects"] .entry-desc { margin-top: 0.6em; }
 html[data-theme="latex"] [data-block="projects"] .entry-badge::before { content: "("; }
 html[data-theme="latex"] [data-block="projects"] .entry-badge::after { content: ")"; }
 
@@ -352,6 +397,15 @@ html[data-theme="latex"] .site-footer p {
     font-size: 12px;
     line-height: 1.45;
 }
+html[data-theme="latex"] .site-footer p::before {
+    content: "*";
+    content: "*" / "";
+    display: inline-block;
+    width: 1.5em;
+    margin-right: 0.2em;
+    font-weight: 700;
+    text-align: right;
+}
 html[data-theme="latex"] .site-footer::after {
     content: "1";
     content: "1" / "";
@@ -363,17 +417,38 @@ html[data-theme="latex"] .site-footer::after {
     text-align: center;
 }
 
+/* Entrance ------------------------------------------------------------------
+   The engine plays the entrance once, when the page first appears, and never
+   again on a switch: its animations stay attached to the page, finished. A
+   sheet of paper is not assembled from parts, so here the hero and the blocks
+   do not rise separately: the sheet fades in as one, quickly, and its shadow
+   then settles, as paper lowers onto the desk.
+   The engine's animations are kept and only made to finish at once (zero
+   duration and delay). `animation: none` would cancel them, and they would
+   then start over in whichever theme the visitor switches to next. */
+html[data-theme="latex"].js.theme-enter .page { animation-duration: 0.22s; }
+html[data-theme="latex"].js.theme-enter .page .hero,
+html[data-theme="latex"].js.theme-enter .page .block:nth-child(n) {
+    animation-duration: 0s;
+    animation-delay: 0s;
+}
+
+@keyframes latex-sheet-lands {
+    from { opacity: 1; translate: 0 10px; }
+    to { opacity: 0; translate: 0 0; }
+}
+html[data-theme="latex"].js.theme-enter .page::after {
+    animation: latex-sheet-lands 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
 /* Narrow screens ---------------------------------------------------------- */
 
-/* Below 768 px the sheet's measure is too short for a greedy justifier: bold
-   Computer Modern is wide, and an unbreakable name stretches the line before
-   it into rivers (measured at up to seven times the normal word space). There
-   running text goes ragged right, and `pretty` then only keeps a paragraph
-   from ending on a single word. */
-@media (max-width: 767px) {
+/* Once the sheet is too narrow to hold the full text block, running text goes
+   ragged right: a greedy justifier leaves rivers in a short column, and
+   `pretty` then only keeps a line from ending on one word. (34.5 em = 483 px,
+   plus the sheet's two 22 px margins and the desk's two 10 px.) */
+@media (max-width: 548px) {
     html[data-theme="latex"] .bio p,
-    html[data-theme="latex"] .news-item,
-    html[data-theme="latex"] .honor-list li,
     html[data-theme="latex"] .entry-authors,
     html[data-theme="latex"] .entry-desc {
         text-align: left;
@@ -383,13 +458,14 @@ html[data-theme="latex"] .site-footer::after {
 
 @media (max-width: 640px) {
     html[data-theme="latex"] body { padding: 12px 10px 48px; }
-    html[data-theme="latex"] .page { padding: 32px 22px 40px; }
+    html[data-theme="latex"] .page { padding: 36px 22px 36px; }
 }
 
-/* On paper the desk, the border and the shadow go. */
+/* On paper the desk, the border and the shadows go. */
 @media print {
     html[data-theme="latex"] body { padding: 0; background: #ffffff; }
-    html[data-theme="latex"] .page {
+    html[data-theme="latex"] .page,
+    html[data-theme="latex"] .page::after {
         max-width: none;
         padding: 0;
         border: 0;
@@ -400,7 +476,10 @@ html[data-theme="latex"] .site-footer::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html[data-theme="latex"] .contact-link,
-    html[data-theme="latex"] .link,
-    html[data-theme="latex"] .bio a { transition: none; }
+    html[data-theme="latex"].js.theme-enter .page::after { animation: none; }
+    html[data-theme="latex"] .contact-link:hover,
+    html[data-theme="latex"] .contact-link:focus-visible,
+    html[data-theme="latex"] .link:hover,
+    html[data-theme="latex"] .link:focus-visible,
+    html[data-theme="latex"] .bio a:hover { transition: none; }
 }

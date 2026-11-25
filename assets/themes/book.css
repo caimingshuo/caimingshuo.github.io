@@ -1,5 +1,5 @@
 /* Book — a page of a classic book: cream paper, an old-style serif, a title
-   page with an engraved portrait, chapters with roman numerals and a
+   page with a rule and a flourish, chapters with roman numerals and a
    bibliography. */
 [data-theme="book"] {
     --bg: #f8f4ea;
@@ -27,16 +27,6 @@ html[data-theme="book"] .hero {
     align-items: center;
     gap: 6px;
     text-align: center;
-}
-html[data-theme="book"] .avatar {
-    order: -1;
-    width: 150px;
-    height: 190px;
-    margin-bottom: 16px;
-    border: 1px solid var(--fg);
-    border-radius: 50%;
-    outline: 1px solid var(--fg);
-    outline-offset: 5px;
 }
 html[data-theme="book"] .name {
     font-size: 34px;

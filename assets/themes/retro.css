@@ -4,8 +4,16 @@
    and a taskbar along the bottom. Every icon is painted with CSS gradients.
 
    The page grid is the desktop. The intro window and the News/Honors column
-   share the first row, Publications and Projects follow as full-width windows,
-   and the footer becomes a status bar above the taskbar.
+   share the first row; Publications and Projects follow as wide windows whose
+   rows are laid out like a details view (text, type, actions); the footer is a
+   status bar above the taskbar.
+
+   One rule holds the rest together. .hero and .block each carry a fixed
+   pseudo-element of the taskbar, so they must never become the containing block
+   or the stacking context of their descendants: nothing below gives them a
+   transform, a translate, an opacity below 1, a filter, a z-index or an
+   animation. The page engine's tilt and entrance are left off for that reason;
+   the depth in this theme comes from shadows and bevels, which cost nothing.
    ========================================================================== */
 
 [data-theme="retro"] {
@@ -38,6 +46,10 @@
     --os-navy: #000080;
     --os-blue: #1084d0;
     --os-bar: 28px;
+    /* A window's inner bevel, and the shadow of the window that is in front:
+       three hard steps, as crisp as the bevels. */
+    --os-raise: inset -1px 0 0 var(--os-shadow), inset 0 -1px 0 var(--os-shadow);
+    --os-front: 6px 6px 0 rgba(0, 0, 0, 0.14), 4px 4px 0 rgba(0, 0, 0, 0.12), 2px 2px 0 rgba(0, 0, 0, 0.2);
 
     color-scheme: light;
 }
@@ -74,8 +86,33 @@ html[data-theme="retro"] .block {
     border: 1px solid;
     border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
     outline: 1px solid #000000;
-    box-shadow: inset -1px 0 0 var(--os-shadow), inset 0 -1px 0 var(--os-shadow);
+    box-shadow: var(--os-raise);
 }
+
+/* The window in front. It is the intro window until the pointer or the
+   keyboard focus reaches another one, and it is marked by a drop shadow. */
+html[data-theme="retro"] .hero,
+html[data-theme="retro"] .block:focus-within { box-shadow: var(--os-raise), var(--os-front); }
+html[data-theme="retro"] .page:has(.block:focus-within) .hero { box-shadow: var(--os-raise); }
+@media (hover: hover) {
+    html[data-theme="retro"] .hero:hover,
+    html[data-theme="retro"] .block:hover { box-shadow: var(--os-raise), var(--os-front); }
+    html[data-theme="retro"] .page:has(.block:hover) .hero { box-shadow: var(--os-raise); }
+}
+
+/* A title bar in front keeps the navy-to-blue gradient; while a window is in
+   front, the windows behind fall back to flat navy (at rest, all keep it). */
+html[data-theme="retro"] .page:has(:is(.hero, .block):is(:hover, :focus-within))
+    :is(.hero, .block):not(:hover, :focus-within) :is(.name, .block-title) {
+    background-image: linear-gradient(var(--os-navy), var(--os-navy));
+}
+
+/* The engine's entrance raises and fades .hero and .block, which would turn
+   each into the containing block of its taskbar button while it plays. The
+   windows therefore arrive with the fade of the page instead. (The selectors
+   name the element as well as its class to outrank the engine's rule.) */
+html[data-theme="retro"] .page header.hero,
+html[data-theme="retro"] .page section.block { animation: none; }
 
 /* ---- Title bars --------------------------------------------------------- */
 
@@ -237,60 +274,37 @@ html[data-theme="retro"] .name-cn {
 }
 
 /* ---- Intro window -------------------------------------------------------
-   The name is the title bar; the portrait, role, bio and contact buttons sit
-   in the white client area below it. */
+   The name is the title bar; the role and the bio fill the client area, and
+   the contact links stand in a column of their own at the right, as the
+   buttons of a dialog do. (The base sheet gives .hero a 32 px gap and centres
+   its items; both are replaced here by the paddings of the rows.) */
 
-/* The base sheet gives .hero a 32 px gap and centres its items; both are
-   replaced here by the paddings of the rows themselves. */
 html[data-theme="retro"] .hero {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto;
-    grid-template-areas: "name" "avatar" "role" "bio" "contact";
+    grid-template-areas: "name" "role" "bio" "contact";
     gap: 0;
     align-items: start;
+    align-content: start;
     background-image: linear-gradient(var(--os-silver) 27px, #ffffff 27px);
     background-repeat: no-repeat;
 }
 html[data-theme="retro"] .hero-text { display: contents; }
 html[data-theme="retro"] .name { grid-area: name; }
-html[data-theme="retro"] .avatar { grid-area: avatar; }
 html[data-theme="retro"] .role { grid-area: role; }
 html[data-theme="retro"] .bio { grid-area: bio; }
 html[data-theme="retro"] .contact { grid-area: contact; }
 
-/* Portrait in a sunken picture frame. */
-html[data-theme="retro"] .avatar {
-    align-self: start;
-    justify-self: start;
-    width: 110px;
-    height: 110px;
-    box-sizing: content-box;
-    margin: 12px 0 0 12px;
-    padding: 2px;
-    object-fit: cover;
-    border: 1px solid;
-    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
-    border-radius: 0;
-    background-color: #ffffff;
-    background-image:
-        linear-gradient(var(--os-dark), var(--os-dark)),
-        linear-gradient(var(--os-dark), var(--os-dark)),
-        linear-gradient(var(--os-light), var(--os-light)),
-        linear-gradient(var(--os-light), var(--os-light));
-    background-repeat: no-repeat;
-    background-position: 0 0, 0 0, 100% 0, 0 100%;
-    background-size: 100% 1px, 1px 100%, 1px 100%, 100% 1px;
-    image-rendering: pixelated;
-}
-
+/* The role is the heading of the client area. */
 html[data-theme="retro"] .role {
     margin: 0;
-    padding: 10px 12px 0;
+    padding: 14px 14px 0;
     color: #000000;
-    font-size: 15px;
+    font-family: var(--font-display);
+    font-size: 16px;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 1.4;
+    text-wrap: balance;
 }
 /* The year of study as a small bevelled label. */
 html[data-theme="retro"] .study-year,
@@ -306,15 +320,19 @@ html[data-theme="retro"] .entry-badge {
     font-size: 14px;
     font-weight: 400;
     line-height: 16px;
+    text-wrap: balance;
 }
+/* On a phone the label takes a line of its own, so that the heading under
+   it fits on one. */
 html[data-theme="retro"] .study-year {
-    margin-right: 6px;
+    display: block;
+    width: fit-content;
+    margin: 0 0 6px;
     font-weight: 700;
-    vertical-align: 1px;
 }
 html[data-theme="retro"] .study-year:empty { display: none; }
 
-html[data-theme="retro"] .bio { padding: 8px 12px 0; }
+html[data-theme="retro"] .bio { padding: 8px 14px 0; }
 html[data-theme="retro"] .bio p + p { margin-top: 8px; }
 html[data-theme="retro"] .bio a {
     color: var(--accent);
@@ -342,7 +360,7 @@ html[data-theme="retro"] .contact {
     flex-wrap: wrap;
     gap: 6px;
     margin: 0;
-    padding: 12px 12px 14px;
+    padding: 14px 14px 14px;
 }
 html[data-theme="retro"] .contact li,
 html[data-theme="retro"] .entry-links li { display: contents; }
@@ -363,13 +381,12 @@ html[data-theme="retro"] .link {
     color: #000000;
     font-family: var(--font-body);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
 }
-html[data-theme="retro"] .contact-link { height: 26px; }
 html[data-theme="retro"] .contact-link .icon,
 html[data-theme="retro"] .link .icon { display: none; }
 
@@ -412,31 +429,36 @@ html[data-theme="retro"] .entry-list {
         inset -1px 0 0 var(--os-light), inset 0 -1px 0 var(--os-light);
 }
 
+/* Rows read their ink from --os-ink and --os-ink-2, so that a selected row
+   can turn them with one rule. */
+html[data-theme="retro"] .news-item + .news-item,
+html[data-theme="retro"] .honor-list li + li,
+html[data-theme="retro"] .entry + .entry { border-top: 1px solid var(--os-rule, #dcdcdc); }
+
 /* News: a details list with the date in its own column. */
 html[data-theme="retro"] .news-item {
     display: grid;
     grid-template-columns: 4.6em minmax(0, 1fr);
     gap: 8px;
-    padding: 5px 6px;
+    padding: 5px 8px;
 }
-html[data-theme="retro"] .news-item + .news-item,
-html[data-theme="retro"] .honor-list li + li,
-html[data-theme="retro"] .entry + .entry { border-top: 1px solid #d9d9d9; }
 html[data-theme="retro"] .news-date {
-    color: var(--os-navy);
+    color: var(--os-ink, var(--os-navy));
     font-weight: 700;
 }
+html[data-theme="retro"] .news-text { color: var(--os-ink, #000000); }
 
 /* Honors: one row each, with a medal. */
 html[data-theme="retro"] .honor-list li {
     position: relative;
-    padding: 6px 6px 6px 30px;
+    padding: 6px 8px 6px 32px;
+    color: var(--os-ink, #000000);
 }
 html[data-theme="retro"] .honor-list li::before {
     content: "";
     position: absolute;
     top: 8px;
-    left: 7px;
+    left: 8px;
     width: 16px;
     height: 16px;
     background-repeat: no-repeat;
@@ -464,6 +486,7 @@ html[data-theme="retro"] .entry {
 }
 html[data-theme="retro"] .entry-badge {
     grid-area: badge;
+    align-self: start;
     justify-self: start;
     max-width: 100%;
 }
@@ -475,7 +498,7 @@ html[data-theme="retro"] .entry-badge.is-highlight {
 html[data-theme="retro"] .entry-title {
     grid-area: title;
     margin-top: 6px;
-    color: #000000;
+    color: var(--os-ink, #000000);
     font-family: var(--font-display);
     font-size: 16px;
     font-weight: 700;
@@ -488,7 +511,7 @@ html[data-theme="retro"] .news-text,
 html[data-theme="retro"] .bio { overflow-wrap: anywhere; }
 html[data-theme="retro"] .entry-authors,
 html[data-theme="retro"] .entry-desc {
-    color: var(--muted);
+    color: var(--os-ink-2, var(--muted));
     line-height: 1.5;
 }
 html[data-theme="retro"] .entry-authors { grid-area: auth; margin-top: 3px; }
@@ -501,16 +524,38 @@ html[data-theme="retro"] .entry-links {
     margin-top: 10px;
 }
 
-/* ---- Status bar (the footer) -------------------------------------------- */
+/* A selected row, as in a list box: navy, with white ink. The pointer
+   selects, and so does the keyboard focus inside a row. */
+html[data-theme="retro"] .entry:hover,
+html[data-theme="retro"] .entry:focus-within,
+html[data-theme="retro"] .news-item:hover,
+html[data-theme="retro"] .honor-list li:hover {
+    --os-ink: #ffffff;
+    --os-ink-2: #dbe4f7;
+    --os-rule: var(--os-navy);
+    background: var(--os-navy);
+}
+html[data-theme="retro"] .entry:hover .entry-badge.is-highlight,
+html[data-theme="retro"] .entry:focus-within .entry-badge.is-highlight { background: var(--os-blue); }
+
+/* ---- Status bar (the footer) --------------------------------------------
+   Two sunken panes: the copyright, and what the window in front holds. */
 
 html[data-theme="retro"] .site-footer {
     display: flex;
-    padding: 3px;
-    background: var(--os-silver);
+    gap: 4px;
+    padding: 3px 24px 3px 3px;
+    background-color: var(--os-silver);
+    /* The resize grip of a status bar. */
+    background-image: repeating-linear-gradient(135deg, #ffffff 0 1px, var(--os-shadow) 1px 2px, transparent 2px 4px);
+    background-repeat: no-repeat;
+    background-position: right 4px bottom 4px;
+    background-size: 16px 16px;
     border: 1px solid;
     border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
 }
-html[data-theme="retro"] .site-footer p {
+html[data-theme="retro"] .site-footer p,
+html[data-theme="retro"] .site-footer::after {
     flex: 1 1 auto;
     min-width: 0;
     padding: 1px 6px;
@@ -521,16 +566,19 @@ html[data-theme="retro"] .site-footer p {
     font-size: 14px;
     line-height: 1.4;
 }
-/* The resize grip of a status bar. */
 html[data-theme="retro"] .site-footer::after {
-    content: "";
+    content: "Done";
+    content: "Done" / "";
+    display: none;
     flex: none;
-    align-self: flex-end;
-    width: 14px;
-    height: 14px;
-    margin: 1px 1px 1px 3px;
-    background: repeating-linear-gradient(135deg, #ffffff 0 1px, var(--os-shadow) 1px 2px, transparent 2px 4px);
+    min-width: 8.5em;
 }
+/* The status line follows the window in front, in the words of Explorer. */
+html[data-theme="retro"] .page:has(.hero:hover, .hero:focus-within) .site-footer::after { content: "5 link(s)" / ""; }
+html[data-theme="retro"] .page:has([data-block="news"]:hover) .site-footer::after { content: "4 object(s)" / ""; }
+html[data-theme="retro"] .page:has([data-block="honors"]:hover) .site-footer::after { content: "3 object(s)" / ""; }
+html[data-theme="retro"] .page:has([data-block="publications"]:hover, [data-block="publications"]:focus-within) .site-footer::after { content: "2 object(s)" / ""; }
+html[data-theme="retro"] .page:has([data-block="projects"]:hover, [data-block="projects"]:focus-within) .site-footer::after { content: "6 object(s)" / ""; }
 
 /* ---- Desktop icons ------------------------------------------------------
    Only where the desktop has room beside the windows: three icons pinned to
@@ -555,7 +603,6 @@ html[data-theme="retro"] .site-footer::after {
         white-space: pre;
         user-select: none;
     }
-    /* Each label is two lines; "\A " is a newline (the space ends the escape). */
     html[data-theme="retro"] .backdrop .shape::before {
         content: "";
         position: absolute;
@@ -581,6 +628,7 @@ html[data-theme="retro"] .site-footer::after {
     background-size: 16px 2px, 20px 6px, 4px 4px, 8px 4px, 2px 2px, 16px 10px, 20px 12px, 24px 16px, 28px 20px;
         /* @end */
     }
+    /* Each label is two lines; "\A " is a newline (the space ends the escape). */
     html[data-theme="retro"] .backdrop .shape-1::after {
         content: "My\A Computer";
         content: "My\A Computer" / "";
@@ -621,8 +669,8 @@ html[data-theme="retro"] .site-footer::after {
    Fixed chrome along the bottom, built from pseudo-elements: the bar and the
    Start button hang off .page, each window adds its own task button, and the
    footer adds the clock. It is scenery, not navigation: nothing in it takes
-   the pointer, and the clock is a fixed string because CSS cannot read the
-   time. The empty alternative text keeps the labels out of screen readers. */
+   the pointer. The empty alternative text keeps the labels out of screen
+   readers. */
 
 html[data-theme="retro"] .page::before {
     content: "";
@@ -668,8 +716,14 @@ html[data-theme="retro"] .page::after {
     pointer-events: none;
     user-select: none;
 }
+/* A task button is raised; the four colours below are turned around for the
+   pressed look of the window in front. */
 html[data-theme="retro"] .hero::after,
 html[data-theme="retro"] .block::after {
+    --os-edge: #ffffff;
+    --os-edge-2: var(--os-dark);
+    --os-in: var(--os-light);
+    --os-in-2: var(--os-shadow);
     position: fixed;
     bottom: 3px;
     z-index: 41;
@@ -677,29 +731,23 @@ html[data-theme="retro"] .block::after {
     padding: 0 6px;
     background: var(--os-silver);
     border: 1px solid;
-    border-color: #ffffff var(--os-dark) var(--os-dark) #ffffff;
-    box-shadow: inset -1px 0 0 var(--os-shadow), inset 0 -1px 0 var(--os-shadow),
-        inset 1px 0 0 var(--os-light), inset 0 1px 0 var(--os-light);
+    border-color: var(--os-edge) var(--os-edge-2) var(--os-edge-2) var(--os-edge);
+    box-shadow: inset -1px 0 0 var(--os-in-2), inset 0 -1px 0 var(--os-in-2),
+        inset 1px 0 0 var(--os-in), inset 0 1px 0 var(--os-in);
     color: #000000;
     font-family: var(--font-body);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 20px;
     white-space: nowrap;
     pointer-events: none;
     user-select: none;
 }
-/* The intro window is the active one, so its button looks pressed. */
 html[data-theme="retro"] .hero::after {
     content: "Mingshuo Cai";
     content: "Mingshuo Cai" / "";
     left: 76px;
     width: 9em;
-    padding-left: 8px;
-    background: #d4d4d4;
-    border-color: var(--os-shadow) #ffffff #ffffff var(--os-shadow);
-    box-shadow: inset 1px 0 0 var(--os-dark), inset 0 1px 0 var(--os-dark),
-        inset -1px 0 0 var(--os-light), inset 0 -1px 0 var(--os-light);
 }
 html[data-theme="retro"] .block[data-block="news"]::after {
     content: "News";
@@ -725,9 +773,60 @@ html[data-theme="retro"] .block[data-block="projects"]::after {
     left: 466px;
     width: 6em;
 }
+/* Pressed: the button of the window in front. */
+html[data-theme="retro"] .hero::after,
+html[data-theme="retro"] .block:focus-within::after {
+    --os-edge: var(--os-shadow);
+    --os-edge-2: #ffffff;
+    --os-in: var(--os-dark);
+    --os-in-2: var(--os-light);
+    padding-left: 8px;
+    background: #d4d4d4;
+}
+@media (hover: hover) {
+    html[data-theme="retro"] .block:hover::after {
+        --os-edge: var(--os-shadow);
+        --os-edge-2: #ffffff;
+        --os-in: var(--os-dark);
+        --os-in-2: var(--os-light);
+        padding-left: 8px;
+        background: #d4d4d4;
+    }
+}
+/* ... and the intro's own button rises again when another window is in front. */
+html[data-theme="retro"] .page:has(.block:focus-within) .hero::after,
+html[data-theme="retro"] .page:has(.block:hover) .hero::after {
+    --os-edge: #ffffff;
+    --os-edge-2: var(--os-dark);
+    --os-in: var(--os-light);
+    --os-in-2: var(--os-shadow);
+    padding-left: 6px;
+    background: var(--os-silver);
+}
+
+/* ---- Clock --------------------------------------------------------------
+   CSS cannot read the time of day. What it can do is count: four registered
+   integers tick on the footer, and the tray shows them. So the clock runs at
+   the right rate from the moment the page (or this theme) appeared, which it
+   takes for noon. assets/app.js sets --os-clock to the real time, quoted, and
+   keeps it current, so that wins; without JavaScript, or in a browser without
+   typed properties, the tray keeps the still "12:00 PM". */
+
+@property --os-sec { syntax: "<integer>"; inherits: false; initial-value: 0; }
+@property --os-min { syntax: "<integer>"; inherits: false; initial-value: 0; }
+@property --os-hour { syntax: "<integer>"; inherits: false; initial-value: 0; }
+@property --os-half { syntax: "<integer>"; inherits: false; initial-value: 0; }
+/* Zero-based counters that print like a clock face. */
+@counter-style retro-clock-hour { system: fixed 0; symbols: "12" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11"; }
+@counter-style retro-clock-half { system: fixed 0; symbols: "PM" "AM"; }
+@keyframes retro-sec { to { --os-sec: 60; } }
+@keyframes retro-min { to { --os-min: 60; } }
+@keyframes retro-hour { to { --os-hour: 12; } }
+@keyframes retro-half { to { --os-half: 2; } }
+
 html[data-theme="retro"] .site-footer::before {
     content: "12:00 PM";
-    content: "12:00 PM" / "";
+    content: var(--os-clock, "12:00 PM") / "";
     position: fixed;
     right: 4px;
     bottom: 3px;
@@ -748,6 +847,26 @@ html[data-theme="retro"] .site-footer::before {
     pointer-events: none;
     user-select: none;
 }
+/* The tick keeps a main-thread animation running, so it is limited to
+   machines with a fine pointer, to motion being welcome, and to browsers of
+   the generation that animates typed properties (the feature test is a
+   property that arrived with them). */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    @supports (transition-behavior: allow-discrete) {
+        html[data-theme="retro"] .site-footer {
+            animation: retro-sec 60s steps(60, end) infinite,
+                retro-min 3600s steps(60, end) infinite,
+                retro-hour 43200s steps(12, end) infinite,
+                retro-half 86400s steps(2, end) infinite;
+            counter-reset: retro-hour var(--os-hour) retro-min var(--os-min)
+                retro-sec var(--os-sec) retro-half var(--os-half);
+        }
+        html[data-theme="retro"] .site-footer::before {
+            content: var(--os-clock, counter(retro-hour, retro-clock-hour) ":" counter(retro-min, decimal-leading-zero) ":" counter(retro-sec, decimal-leading-zero) " " counter(retro-half, retro-clock-half)) / "";
+            width: 7.6em;
+        }
+    }
+}
 /* The one exception to leaving the switcher alone: lift it above the bar. */
 html[data-theme="retro"] .theme-switcher { bottom: 48px; }
 
@@ -765,11 +884,8 @@ html[data-theme="retro"] .bio a:focus-visible {
     outline-offset: 2px;
 }
 @media (hover: hover) {
-    /* A row tints while it is pointed at, which ties its buttons to its text
-       on the wide windows. */
-    html[data-theme="retro"] .entry:hover { background: #f1f1f1; }
     html[data-theme="retro"] .contact-link:hover,
-    html[data-theme="retro"] .link:hover { background-color: #d8d8d8; }
+    html[data-theme="retro"] .link:hover { background-color: #dcdcdc; }
 }
 
 /* ---- Taskbar buttons come and go with the room there is ---------------- */
@@ -782,25 +898,42 @@ html[data-theme="retro"] .bio a:focus-visible {
     html[data-theme="retro"] .block::after { display: none; }
 }
 
-/* ---- Wider than a phone: portrait beside the text ----------------------- */
+/* ---- Wider than a phone: text, with the contact links in a column ------- */
 
 @media (min-width: 560px) {
-    /* The bio's row takes the spare height when the window is stretched to
-       match its neighbours; centring the bio in it splits that spare evenly
-       above and below, and the buttons rest at the bottom. */
     html[data-theme="retro"] .hero {
-        grid-template-columns: auto minmax(0, 1fr);
-        grid-template-rows: auto max-content 1fr max-content;
+        grid-template-columns: minmax(0, 1fr) auto;
         grid-template-areas:
             "name    name"
-            "avatar  role"
-            "avatar  bio"
-            "avatar  contact";
+            "role    role"
+            "bio     contact";
+        /* The row is as tall as the windows beside it; the content sits in
+           the middle of what is left under the title bar. */
+        align-content: center;
+        column-gap: 24px;
     }
-    html[data-theme="retro"] .avatar { margin: 14px 28px 14px 14px; }
-    html[data-theme="retro"] .role { padding: 14px 16px 0 0; }
-    html[data-theme="retro"] .bio { align-self: center; padding: 10px 16px 0 0; }
-    html[data-theme="retro"] .contact { padding: 12px 16px 14px 0; }
+    html[data-theme="retro"] .role { padding: 20px 20px 0 18px; }
+    html[data-theme="retro"] .study-year {
+        display: inline-block;
+        margin: 0 8px 0 0;
+        vertical-align: 1px;
+    }
+    html[data-theme="retro"] .bio { padding: 12px 20px 24px 18px; }
+    /* Reading text keeps a measure of about 75 characters, however wide the
+       window: a full-width window leaves the rest blank on the right. */
+    html[data-theme="retro"] .bio p,
+    html[data-theme="retro"] .entry-authors,
+    html[data-theme="retro"] .entry-desc { max-width: 55ch; }
+    /* The column of buttons sits in the middle of the bio's height. */
+    html[data-theme="retro"] .contact {
+        flex-direction: column;
+        align-self: center;
+        gap: 4px;
+        min-width: 7.2em;
+        margin: 16px 16px 16px 0;
+        padding: 0;
+    }
+    html[data-theme="retro"] .site-footer::after { display: block; }
     /* Rows with their buttons in a column of their own, at the right edge. */
     html[data-theme="retro"] .entry {
         grid-template-columns: minmax(14em, 1fr) auto;
@@ -818,32 +951,11 @@ html[data-theme="retro"] .bio a:focus-visible {
     html[data-theme="retro"] .page { gap: 12px; padding: 20px 16px calc(var(--os-bar) + 18px); }
 }
 
-/* ---- Tablet: one column of windows, the contact buttons stacked --------- */
-
-@media (min-width: 700px) and (max-width: 999px) {
-    html[data-theme="retro"] .hero {
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        grid-template-rows: auto max-content max-content;
-        grid-template-areas:
-            "name    name    name"
-            "avatar  role    contact"
-            "avatar  bio     contact";
-    }
-    html[data-theme="retro"] .contact {
-        flex-direction: column;
-        align-self: start;
-        gap: 4px;
-        min-width: 6.4em;
-        padding: 14px 14px 14px 4px;
-    }
-    html[data-theme="retro"] .contact-link { height: 24px; }
-}
-
 /* ---- Desktop: intro beside News and Honors, wide windows below --------- */
 
 @media (min-width: 1000px) {
     html[data-theme="retro"] .page {
-        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
         grid-template-areas:
             "hero  side"
             "pubs  pubs"
@@ -859,12 +971,27 @@ html[data-theme="retro"] .bio a:focus-visible {
     }
     /* Both small windows share the height of the row. */
     html[data-theme="retro"] .col-side > .block { flex: 1 1 auto; }
-    /* Wide rows: the description may run further; the buttons stay at the right edge. */
+    /* Wide rows read like a details view: the text (about 75 characters a
+       line), then the type in a column of fixed width, then the actions. The
+       two right-hand columns are fixed so that every row lines up. */
+    html[data-theme="retro"] .entry {
+        grid-template-columns: minmax(0, 1fr) 16em 19em;
+        grid-template-areas:
+            "title  badge  links"
+            "auth   badge  links"
+            "desc   badge  links";
+        column-gap: 16px;
+        padding: 10px 12px;
+    }
+    html[data-theme="retro"] .entry-title { margin-top: 0; }
     html[data-theme="retro"] .entry-authors,
-    html[data-theme="retro"] .entry-desc { max-width: 86ch; }
+    html[data-theme="retro"] .entry-desc { margin-top: 2px; }
 }
 
-/* ---- Print: no taskbar, but keep the title bars dark -------------------- */
+/* ---- Paper -------------------------------------------------------------- */
+/* Nothing in this theme moves under prefers-reduced-motion: the clock's
+   tick is the only animation, and its rule already requires motion to be
+   welcome. */
 
 @media print {
     html[data-theme="retro"] .page::before,
@@ -872,8 +999,10 @@ html[data-theme="retro"] .bio a:focus-visible {
     html[data-theme="retro"] .hero::after,
     html[data-theme="retro"] .block::after,
     html[data-theme="retro"] .site-footer::before,
+    html[data-theme="retro"] .site-footer::after,
     html[data-theme="retro"] .backdrop { display: none; }
     html[data-theme="retro"] .page { padding-bottom: 24px; }
+    html[data-theme="retro"] .site-footer { padding-right: 3px; background-image: none; }
     html[data-theme="retro"] .name,
     html[data-theme="retro"] .block-title,
     html[data-theme="retro"] .entry-badge.is-highlight {

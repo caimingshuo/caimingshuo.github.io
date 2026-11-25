@@ -1,8 +1,8 @@
 /* Terminal — one terminal window on a dark desk. The page reads as a shell
    session: a title bar with traffic lights, a green prompt in front of every
-   command (whoami, cat profile.txt, ls contacts/, tail news.log, cat
-   publications.md, ls projects/), their output in IBM Plex Mono, and a
-   blinking block cursor where the session waits. Cyan links, amber tags. */
+   command (whoami, cat profile.txt, ls -l contacts/, tail news.log, ls
+   honors/, tree publications/, tree projects/), their output on one character
+   grid in IBM Plex Mono, and a blinking block cursor where the session waits. */
 [data-theme="terminal"] {
     --bg: #0a0807;
     --fg: #e6edf3;
@@ -15,20 +15,26 @@
     --font-body: "IBM Plex Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", monospace;
     --font-display: var(--font-body);
     --font-mono: var(--font-body);
-    --page-width: 880px;
+    /* 78 columns of text, a margin of four columns on each side, the border. */
+    --page-width: calc(86ch + 2px);
     --switcher-hover: rgba(126, 231, 135, 0.08);
     --switcher-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
     color-scheme: dark;
+
+    /* The hook only reports where the pointer is (see the glass below): the
+       window itself never turns, so that the text stays crisp. */
+    --tilt: '.page';
+    --tilt-strength: 0.01;
 
     /* The window's own measures. */
     --t-screen: #0d1117;
     --t-bright: #f0f6fc;
     --t-link: #58c4dd;
-    --t-rule: #3d444d;
-    --t-frame-ink: #6e7681;
-    --t-pad: 32px;
+    --t-rule: #4a525d;
+    --t-pad: 4ch;
     --t-line: 24px; /* one terminal line: 15px x 1.6 */
-    --t-frame: Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
+    /* Box-drawing characters are not in the webfont: a system font draws them. */
+    --t-tree: Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace;
 }
 
 html[data-theme="terminal"] body {
@@ -52,17 +58,17 @@ html[data-theme="terminal"] .backdrop {
 /* ---- Window ------------------------------------------------------------- */
 html[data-theme="terminal"] .page {
     gap: 0;
-    margin: 40px max(16px, calc((100% - var(--page-width)) / 2)) 56px;
+    margin: 40px max(24px, calc((100% - var(--page-width)) / 2)) 48px;
     padding: 0;
     overflow: hidden;
     border: 1px solid #454d57;
     border-radius: var(--radius);
     background: var(--t-screen);
     box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.5),
-        0 2px 6px rgba(0, 0, 0, 0.5),
-        0 30px 70px rgba(0, 0, 0, 0.65),
-        0 0 140px rgba(88, 166, 255, 0.07);
+        inset 0 1px 0 rgba(240, 246, 252, 0.05),
+        0 1px 2px rgba(0, 0, 0, 0.5),
+        0 14px 34px rgba(0, 0, 0, 0.45),
+        0 40px 90px rgba(0, 0, 0, 0.6);
 }
 
 /* Title bar: three traffic lights and the session's name. */
@@ -71,8 +77,8 @@ html[data-theme="terminal"] .page::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 40px;
-    border-bottom: 1px solid var(--border);
+    height: 36px;
+    border-bottom: 1px solid var(--t-rule);
     background:
         radial-gradient(circle closest-side, #ff5f57 98%, transparent 100%) 20px 50% / 12px 12px no-repeat,
         radial-gradient(circle closest-side, #febc2e 98%, transparent 100%) 40px 50% / 12px 12px no-repeat,
@@ -97,13 +103,12 @@ html[data-theme="terminal"] .page::after {
 
 /* ---- Prompts ------------------------------------------------------------ */
 /* Every command is one generated line: the green "$ " and the typed command. */
+html[data-theme="terminal"] .hero::before,
 html[data-theme="terminal"] .name::before,
 html[data-theme="terminal"] .role::before,
 html[data-theme="terminal"] .contact::before,
-html[data-theme="terminal"] .block::before,
-html[data-theme="terminal"] .hero::after {
+html[data-theme="terminal"] .block::before {
     display: block;
-    flex: none;
     color: var(--accent);
     font-size: 15px;
     font-weight: 400;
@@ -111,11 +116,11 @@ html[data-theme="terminal"] .hero::after {
     white-space: nowrap;
 }
 @supports (-webkit-background-clip: text) or (background-clip: text) {
+    html[data-theme="terminal"] .hero::before,
     html[data-theme="terminal"] .name::before,
     html[data-theme="terminal"] .role::before,
     html[data-theme="terminal"] .contact::before,
-    html[data-theme="terminal"] .block::before,
-    html[data-theme="terminal"] .hero::after {
+    html[data-theme="terminal"] .block::before {
         color: var(--fg);
         background: linear-gradient(90deg, var(--accent) 0 2ch, currentColor 2ch) no-repeat;
         -webkit-background-clip: text;
@@ -132,48 +137,63 @@ html[data-theme="terminal"] a {
     text-decoration-color: rgba(88, 196, 221, 0.45);
     text-underline-offset: 3px;
 }
-html[data-theme="terminal"] a:hover {
+html[data-theme="terminal"] .contact .icon,
+html[data-theme="terminal"] .entry-links .icon { display: none; }
+/* A pointed-at or focused entry lights up like a selected file. */
+html[data-theme="terminal"] .contact-link:focus-visible,
+html[data-theme="terminal"] .link:not(.is-disabled):focus-visible {
+    background: rgba(88, 196, 221, 0.14);
+    box-shadow: 0 0 0 3px rgba(88, 196, 221, 0.14);
     color: #93dcee;
     text-decoration-color: currentColor;
 }
-html[data-theme="terminal"] .contact .icon,
-html[data-theme="terminal"] .entry-links .icon { display: none; }
-/* A pointed-at entry lights up like a selected file (where a pointer can point). */
+html[data-theme="terminal"] .contact-link:focus-visible > span { text-decoration-color: currentColor; }
 @media (hover: hover) {
     html[data-theme="terminal"] .contact-link:hover,
     html[data-theme="terminal"] .link:not(.is-disabled):hover {
         background: rgba(88, 196, 221, 0.14);
         box-shadow: 0 0 0 3px rgba(88, 196, 221, 0.14);
+        color: #93dcee;
+        text-decoration-color: currentColor;
     }
+    html[data-theme="terminal"] .contact-link:hover > span { text-decoration-color: currentColor; }
 }
 
 /* ---- whoami / profile / contacts ---------------------------------------- */
 html[data-theme="terminal"] .hero {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto 1fr;
-    align-items: start;
-    column-gap: 40px;
-    row-gap: 0;
+    position: relative;
+    display: block;
     padding: var(--t-line) var(--t-pad) 0;
 }
-html[data-theme="terminal"] .hero-text {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    min-width: 0;
+html[data-theme="terminal"] .hero::before { content: none; }
+html[data-theme="terminal"] .hero-text::before,
+html[data-theme="terminal"] .hero-text::after { content: none; }
+/* Glass: light catching the top of the pane. It rests in the middle and
+   drifts after the pointer while that is over the window. */
+html[data-theme="terminal"] .hero::after {
+    content: "";
+    position: absolute;
+    top: -37px; /* the title bar as well */
+    left: 0;
+    right: 0;
+    height: 1000px;
+    z-index: 3;
+    background: radial-gradient(ellipse 380px 300px at var(--px, 50%) calc(40px + var(--py, 50%) * 0.3), rgba(240, 246, 252, 0.06), rgba(240, 246, 252, 0) 100%);
+    pointer-events: none;
 }
 
 html[data-theme="terminal"] .name::before { content: "$ whoami"; }
 html[data-theme="terminal"] .name {
     margin: 0;
     color: var(--t-bright);
-    font-size: clamp(26px, 8.2vw, 32px); /* 32px, down to 26px on the narrowest phones */
+    font-size: 30px; /* two body cells per letter */
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 48px; /* two lines */
 }
 html[data-theme="terminal"] .name-cn {
     margin-left: 0.55em;
     color: var(--muted);
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 400;
 }
 
@@ -196,52 +216,30 @@ html[data-theme="terminal"] .mark {
     white-space: nowrap;
 }
 
+/* The contacts are symlinks: `ls -l` lists each with its target, in columns. */
 html[data-theme="terminal"] .contact::before {
-    content: "$ ls contacts/";
-    flex: 0 0 100%;
+    content: "$ ls -l contacts/";
 }
 html[data-theme="terminal"] .contact {
+    display: block;
     margin-top: var(--t-line);
-    gap: 0 2ch;
 }
-
-/* ---- The portrait, framed in box-drawing characters --------------------- */
-/* The frame is one block of text on a square cell grid: 11 cells wide, 11
-   lines high, every line one `ch` tall. The portrait covers the 9 x 9 inner
-   cells exactly, because both are sized in the same `ch`. The lines are set
-   tighter than the font's own height, so the strokes of the corners and of
-   the sides run into each other. */
-html[data-theme="terminal"] .hero::after {
-    content: "$ cat avatar.png";
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: start;
+html[data-theme="terminal"] .contact li { display: block; }
+html[data-theme="terminal"] .contact-link {
+    display: grid;
+    grid-template-columns: 9ch minmax(0, 1fr);
+    text-decoration: none;
 }
-html[data-theme="terminal"] .hero::before {
-    content: "┌─────────┐\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A└─────────┘";
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: start;
-    margin-left: -0.5ch; /* the left stroke sits under the "$" of the command */
-    color: var(--t-frame-ink);
-    font: 400 15.5px/1 var(--t-frame);
-    line-height: 1ch;
-    white-space: pre;
-    user-select: none;
+html[data-theme="terminal"] .contact-link > span {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(88, 196, 221, 0.45);
+    text-underline-offset: 3px;
 }
-html[data-theme="terminal"] .avatar {
-    grid-column: 2;
-    grid-row: 2;
-    position: relative; /* above the scanlines, so that every pixel of the drawing stays clean */
-    z-index: 4;
-    justify-self: start;
-    width: 9ch;
-    height: 9ch;
-    margin: 1ch 1ch 1ch 0.5ch;
-    border-radius: 0;
-    object-fit: contain;
-    font: 400 15.5px/1 var(--t-frame);
-    image-rendering: pixelated;
+html[data-theme="terminal"] .contact-link::after {
+    content: "-> " attr(href);
+    color: var(--muted);
+    overflow-wrap: anywhere;
 }
 
 /* ---- The rest of the session -------------------------------------------- */
@@ -252,15 +250,15 @@ html[data-theme="terminal"] .content {
 html[data-theme="terminal"] .block { margin-top: 48px; }
 html[data-theme="terminal"] .block[data-block="news"]::before { content: "$ tail -n 4 news.log"; }
 html[data-theme="terminal"] .block[data-block="honors"]::before { content: "$ ls honors/"; }
-html[data-theme="terminal"] .block[data-block="publications"]::before { content: "$ cat publications.md"; }
-html[data-theme="terminal"] .block[data-block="projects"]::before { content: "$ ls projects/"; }
+html[data-theme="terminal"] .block[data-block="publications"]::before { content: "$ tree publications/"; }
+html[data-theme="terminal"] .block[data-block="projects"]::before { content: "$ tree projects/"; }
 
 /* Each output opens with its title and a rule to the right margin. */
 html[data-theme="terminal"] .block-title {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 0 0 4px;
+    margin: 0;
     color: var(--t-bright);
     font-size: 17px;
     font-weight: 600;
@@ -274,12 +272,16 @@ html[data-theme="terminal"] .block-title::after {
     border-top: 1px solid var(--t-rule);
 }
 
+/* The log: a date column, then the message. */
 html[data-theme="terminal"] .news-list { gap: 0; }
-html[data-theme="terminal"] .news-item { display: block; }
+html[data-theme="terminal"] .news-item {
+    display: grid;
+    grid-template-columns: 7ch minmax(0, 1fr);
+    column-gap: 2ch;
+}
 html[data-theme="terminal"] .news-date {
     color: var(--muted);
     font-style: normal;
-    margin-right: 2ch;
 }
 html[data-theme="terminal"] .honor-list {
     gap: 0;
@@ -287,32 +289,74 @@ html[data-theme="terminal"] .honor-list {
     list-style: none;
 }
 
-html[data-theme="terminal"] .entry { gap: 0; }
+/* Publications and projects are directory trees. Each entry hangs off one
+   rail: a box-drawing stub on its first line (the title), then a line on to
+   the next. Under the title come the authors, the tag, the description and
+   the links, in that visual order. */
+html[data-theme="terminal"] .entry-list { gap: 0; }
+html[data-theme="terminal"] .entry {
+    position: relative;
+    gap: 0;
+    padding: 0 0 24px 4ch;
+}
+html[data-theme="terminal"] .entry::before {
+    content: "";
+    position: absolute;
+    left: calc(0.5ch - 0.5px); /* under the stub's own stroke */
+    top: calc(var(--t-line) / 2);
+    bottom: calc(var(--t-line) / -2); /* on to the next stub */
+    width: 1px;
+    background: var(--t-rule);
+}
+html[data-theme="terminal"] .entry::after {
+    content: "├── ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--t-rule);
+    font-family: var(--t-tree);
+    line-height: var(--t-line);
+    white-space: pre;
+    user-select: none;
+}
+html[data-theme="terminal"] .entry:last-child { padding-bottom: 0; }
+html[data-theme="terminal"] .entry:last-child::after { content: "└── "; }
+html[data-theme="terminal"] .entry:last-child::before {
+    top: 0;
+    bottom: auto;
+    height: calc(var(--t-line) / 2);
+}
+
+html[data-theme="terminal"] .entry-title { order: 1; }
+html[data-theme="terminal"] .entry-authors { order: 2; }
 html[data-theme="terminal"] .entry-badge {
+    order: 3;
     justify-self: start;
     padding: 0;
     border-radius: 0;
     background: none;
     color: var(--accent-2);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     line-height: var(--t-line);
 }
-html[data-theme="terminal"] .entry-badge::before { content: "[ "; }
-html[data-theme="terminal"] .entry-badge::after { content: " ]"; }
+html[data-theme="terminal"] .entry-badge::before { content: "[\00a0"; }
+html[data-theme="terminal"] .entry-badge::after { content: "\00a0]"; }
 html[data-theme="terminal"] .entry-badge.is-highlight {
     background: none;
     color: var(--accent);
 }
 html[data-theme="terminal"] .entry-title {
     color: var(--t-bright);
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 600;
     line-height: var(--t-line);
 }
 html[data-theme="terminal"] .entry-authors { color: var(--muted); }
 html[data-theme="terminal"] .entry-authors strong { color: var(--fg); }
+html[data-theme="terminal"] .entry-desc { order: 4; }
 html[data-theme="terminal"] .entry-links {
+    order: 5;
     margin-top: 0;
     gap: 0 2ch;
 }
@@ -328,9 +372,9 @@ html[data-theme="terminal"] .site-footer {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    padding: var(--t-line) var(--t-pad) 28px;
+    padding: 48px var(--t-pad) var(--t-line);
     color: var(--muted);
-    font-size: 14px;
+    font-size: 15px;
     line-height: var(--t-line);
 }
 html[data-theme="terminal"] .site-footer p {
@@ -358,49 +402,133 @@ html[data-theme="terminal"] .site-footer::before {
     50% { opacity: 0; }
 }
 
-/* ---- Narrow screens: the window narrows, the portrait drops below ------- */
-@media (max-width: 760px) {
-    [data-theme="terminal"] { --t-pad: 20px; }
-
-    html[data-theme="terminal"] .page { margin: 12px 12px 28px; }
-    html[data-theme="terminal"] .hero { grid-template-columns: minmax(0, 1fr); }
-    html[data-theme="terminal"] .hero-text { grid-row: 1; }
-    html[data-theme="terminal"] .hero::after {
-        grid-column: 1;
-        grid-row: 2;
-        margin-top: var(--t-line);
-    }
-    html[data-theme="terminal"] .hero::before,
-    html[data-theme="terminal"] .avatar {
-        grid-column: 1;
-        grid-row: 3;
-    }
-    html[data-theme="terminal"] .avatar { order: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    html[data-theme="terminal"] .site-footer::before { animation: none; }
-}
-
 /* ---- Generated text and assistive technology ----------------------------- */
 /* Everything drawn on this page is decoration around the real content. Where
    alternative text for generated content is understood, it is left empty, so
    that a screen reader hears "Mingshuo Cai", not "$ whoami Mingshuo Cai". */
 @supports (content: "x" / "") {
     html[data-theme="terminal"] .page::before { content: "mingshuo@nju: ~" / ""; }
-    html[data-theme="terminal"] .hero::after { content: "$ cat avatar.png" / ""; }
     html[data-theme="terminal"] .name::before { content: "$ whoami" / ""; }
     html[data-theme="terminal"] .role::before { content: "$ cat profile.txt" / ""; }
-    html[data-theme="terminal"] .contact::before { content: "$ ls contacts/" / ""; }
+    html[data-theme="terminal"] .contact::before { content: "$ ls -l contacts/" / ""; }
+    html[data-theme="terminal"] .contact-link::after { content: "-> " attr(href) / ""; }
     html[data-theme="terminal"] .block[data-block="news"]::before { content: "$ tail -n 4 news.log" / ""; }
     html[data-theme="terminal"] .block[data-block="honors"]::before { content: "$ ls honors/" / ""; }
-    html[data-theme="terminal"] .block[data-block="publications"]::before { content: "$ cat publications.md" / ""; }
-    html[data-theme="terminal"] .block[data-block="projects"]::before { content: "$ ls projects/" / ""; }
-    html[data-theme="terminal"] .entry-badge::before { content: "[ " / ""; }
-    html[data-theme="terminal"] .entry-badge::after { content: " ]" / ""; }
+    html[data-theme="terminal"] .block[data-block="publications"]::before { content: "$ tree publications/" / ""; }
+    html[data-theme="terminal"] .block[data-block="projects"]::before { content: "$ tree projects/" / ""; }
+    html[data-theme="terminal"] .entry::after { content: "├── " / ""; }
+    html[data-theme="terminal"] .entry:last-child::after { content: "└── " / ""; }
+    html[data-theme="terminal"] .entry-badge::before { content: "[\00a0" / ""; }
+    html[data-theme="terminal"] .entry-badge::after { content: "\00a0]" / ""; }
     html[data-theme="terminal"] .site-footer p::before { content: "# " / ""; }
     html[data-theme="terminal"] .site-footer::after { content: "$" / ""; }
-    html[data-theme="terminal"] .hero::before {
-        content: "┌─────────┐\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A│         │\A└─────────┘" / "";
+}
+
+/* ---- Wide screens: a small terminal, the output of `cat motd` ----------- */
+/* On a window of 78 columns the name and the role leave 22 columns free on
+   the right: a miniature of this very window, drawn in box-drawing characters
+   on the same grid (each of its cells is two columns wide and 0.75 of a line
+   high, so its eight rows fill six lines). */
+@media (min-width: 824px) {
+    html[data-theme="terminal"] .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 22ch;
+        gap: 0 4ch;
     }
+    html[data-theme="terminal"] .hero::before {
+        content: "$ cat motd";
+        grid-column: 2;
+        grid-row: 1;
+        align-self: start;
+        justify-self: start;
+        padding-left: 1ch; /* the "$ " sits over the left stroke of the miniature */
+    }
+    html[data-theme="terminal"] .hero-text {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-row: 1;
+        grid-template-columns: minmax(0, 1fr) 22ch;
+        grid-template-rows: repeat(7, var(--t-line));
+        column-gap: 4ch;
+    }
+    html[data-theme="terminal"] .name { grid-column: 1; grid-row: 1 / span 3; }
+    html[data-theme="terminal"] .role { grid-column: 1; grid-row: 5 / span 2; margin-top: 0; }
+    html[data-theme="terminal"] .bio { grid-column: 1 / -1; grid-row: 8; }
+    html[data-theme="terminal"] .contact { grid-column: 1 / -1; grid-row: 9; }
+
+    html[data-theme="terminal"] .hero-text::before {
+        content: "┌─────────┐\A│         │\A├─────────┤\A│         │\A│         │\A│         │\A│         │\A└─────────┘";
+        grid-column: 2;
+        grid-row: 2 / span 6;
+        justify-self: end;
+        color: var(--t-rule);
+        font-family: var(--t-tree);
+        font-size: calc(1em * 1.99318);
+        line-height: 1ch;
+        white-space: pre;
+        background:
+            radial-gradient(circle closest-side, #ff5f57 98%, transparent 100%) calc(2.5ch - 0.22ch) calc(1.5ch - 0.22ch) / 0.44ch 0.44ch no-repeat,
+            radial-gradient(circle closest-side, #febc2e 98%, transparent 100%) calc(3.5ch - 0.22ch) calc(1.5ch - 0.22ch) / 0.44ch 0.44ch no-repeat,
+            radial-gradient(circle closest-side, #28c840 98%, transparent 100%) calc(4.5ch - 0.22ch) calc(1.5ch - 0.22ch) / 0.44ch 0.44ch no-repeat;
+        user-select: none;
+    }
+    /* The prompt of the miniature, on the layer above the frame. */
+    html[data-theme="terminal"] .hero-text::after {
+        content: "           \A           \A           \A  >_       \A           \A           ";
+        grid-column: 2;
+        grid-row: 2 / span 6;
+        justify-self: end;
+        color: var(--accent);
+        font-family: var(--t-tree);
+        font-size: calc(1em * 1.99318);
+        line-height: 1ch;
+        white-space: pre;
+        user-select: none;
+    }
+}
+@supports (content: "x" / "") {
+    @media (min-width: 824px) {
+        html[data-theme="terminal"] .hero::before { content: "$ cat motd" / ""; }
+        html[data-theme="terminal"] .hero-text::before {
+            content: "┌─────────┐\A│         │\A├─────────┤\A│         │\A│         │\A│         │\A│         │\A└─────────┘";
+        }
+        html[data-theme="terminal"] .hero-text::after {
+            content: "           \A           \A           \A  >_       \A           \A           ";
+        }
+    }
+}
+
+/* ---- Narrow screens ----------------------------------------------------- */
+/* Below 750 px the link targets would not fit on a line: back to one row, and
+   the log wraps like a terminal does, from the first column. */
+@media (max-width: 749px) {
+    html[data-theme="terminal"] .contact::before {
+        content: "$ ls contacts/";
+        content: "$ ls contacts/" / "";
+        flex: 0 0 100%;
+    }
+    html[data-theme="terminal"] .contact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 2ch;
+    }
+    html[data-theme="terminal"] .contact li { display: contents; }
+    html[data-theme="terminal"] .contact-link {
+        display: inline-flex;
+        grid-template-columns: none;
+        text-decoration: underline;
+    }
+    html[data-theme="terminal"] .contact-link::after { content: none; }
+    html[data-theme="terminal"] .contact-link > span { text-decoration: none; }
+    html[data-theme="terminal"] .news-item { display: block; }
+    html[data-theme="terminal"] .news-date { margin-right: 2ch; }
+}
+@media (max-width: 760px) {
+    [data-theme="terminal"] { --t-pad: 2ch; }
+
+    html[data-theme="terminal"] .page { margin: 12px 12px 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-theme="terminal"] .site-footer::before { animation: none; }
 }

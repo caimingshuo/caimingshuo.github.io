@@ -20,8 +20,7 @@
 html[data-theme="arxiv"] body { font-size: 15px; line-height: 1.45; }
 html[data-theme="arxiv"] .page { display: block; padding: 16px 24px 40px; }
 
-/* Narrow screens: header, title, authors, abstract, then the portrait and
-   the tools box underneath. */
+/* Narrow screens: header, title, authors, abstract, then the tools box. */
 html[data-theme="arxiv"] .hero { display: flex; flex-direction: column; align-items: flex-start; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
 html[data-theme="arxiv"] .hero::before {
     content: "arXiv.org";
@@ -37,14 +36,12 @@ html[data-theme="arxiv"] .name { order: 1; font-family: var(--font-display); fon
 html[data-theme="arxiv"] .name-cn { color: inherit; font-size: 0.6em; }
 html[data-theme="arxiv"] .role { order: 2; margin: 6px 0 14px; color: var(--fg); font-weight: 400; }
 html[data-theme="arxiv"] .bio { order: 3; margin-bottom: 16px; }
-html[data-theme="arxiv"] .avatar { order: 4; width: 150px; height: 150px; margin: 0; padding: 9px 9px 0; border: 1px solid var(--border); border-radius: 0; }
-html[data-theme="arxiv"] .contact { order: 5; display: grid; gap: 4px; width: 150px; margin: 0; padding: 8px 9px 9px; border: 1px solid var(--border); border-top: 0; }
+html[data-theme="arxiv"] .contact { order: 4; display: grid; gap: 4px; width: 150px; margin: 0; padding: 8px 9px 9px; border: 1px solid var(--border); }
 
-/* Wide screens: the portrait and the tools box hang in the right margin. */
+/* Wide screens: the tools box hangs in the right margin. */
 @media (min-width: 761px) {
     html[data-theme="arxiv"] .hero { position: relative; display: block; padding-right: 270px; }
-    html[data-theme="arxiv"] .avatar { position: absolute; top: 48px; right: 0; width: 200px; height: 200px; }
-    html[data-theme="arxiv"] .contact { position: absolute; top: 248px; right: 0; width: 200px; }
+    html[data-theme="arxiv"] .contact { position: absolute; top: 50px; right: 0; width: 200px; padding: 10px 12px 12px; }
     html[data-theme="arxiv"] .bio { text-align: justify; }
 }
 

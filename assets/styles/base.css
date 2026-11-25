@@ -97,9 +97,6 @@ html.js:not(.theme-settled) *,
 html.js:not(.theme-settled) *::before,
 html.js:not(.theme-settled) *::after { transition: none !important; }
 
-/* Without JavaScript the portrait comes from the <noscript> copy. */
-html:not(.js) img.avatar:not([src]) { display: none; }
-
 /* Fixed full-screen layer a theme may switch on for particles, blobs, grids… */
 .backdrop {
     position: fixed;
@@ -123,16 +120,9 @@ html:not(.js) img.avatar:not([src]) { display: none; }
 
 .hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
     gap: 32px;
-}
-
-.avatar {
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    object-fit: cover;
 }
 
 .name {
@@ -208,8 +198,7 @@ html:not(.js) img.avatar:not([src]) { display: none; }
 
 @media (max-width: 640px) {
     .page { padding: 32px 20px; gap: 32px; }
-    .hero { grid-template-columns: 1fr; gap: 24px; }
-    .avatar { order: -1; }
+    .hero { grid-template-columns: 1fr; gap: 18px; }
     .content { gap: 32px; }
 }
 
@@ -256,7 +245,7 @@ html:not(.js) img.avatar:not([src]) { display: none; }
     position: absolute;
     right: 0;
     bottom: calc(100% + 10px);
-    width: 376px;
+    width: 440px; /* room for the miniatures to be legible */
     max-width: calc(100vw - 40px);
     padding: 12px;
     border: 1px solid var(--switcher-border);
@@ -369,8 +358,9 @@ html:not(.js) img.avatar:not([src]) { display: none; }
     font-size: 12px;
 }
 
-/* A miniature page wireframe. Its colours are set per option from the theme's
-   own tokens; the fallbacks are the neutral placeholder for unloaded themes. */
+/* A miniature page wireframe, the placeholder under the theme's picture. Its
+   colours are set per option from the theme's own tokens; the fallbacks are the
+   neutral placeholder for themes that are not loaded yet. */
 .theme-switcher-swatch {
     position: relative;
     display: block;
@@ -386,16 +376,8 @@ html:not(.js) img.avatar:not([src]) { display: none; }
     border-radius: 2px;
     background: var(--sw-fg, #374151);
 }
-.theme-switcher-swatch .sw-avatar {
-    top: 14%;
-    left: 10%;
-    width: 26%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: var(--sw-accent, #6366f1);
-}
-.theme-switcher-swatch .sw-line-1 { top: 18%; left: 44%; width: 36%; height: 7%; }
-.theme-switcher-swatch .sw-line-2 { top: 32%; left: 44%; width: 46%; height: 7%; opacity: 0.45; }
+.theme-switcher-swatch .sw-line-1 { top: 15%; left: 10%; width: 44%; height: 8%; border-radius: 3px; }
+.theme-switcher-swatch .sw-line-2 { top: 31%; left: 10%; width: 66%; height: 6%; opacity: 0.45; }
 .theme-switcher-swatch .sw-card-1 {
     top: 56%;
     left: 10%;
@@ -414,10 +396,66 @@ html:not(.js) img.avatar:not([src]) { display: none; }
     background: linear-gradient(135deg, var(--sw-accent, #6366f1), var(--sw-accent-2, var(--sw-accent, #6366f1)));
 }
 
+/* The real miniature fades in over the sketch once it has arrived. */
+.theme-switcher-shot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    object-position: top;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+.theme-switcher-shot.is-ready { opacity: 1; }
+
 @media (max-width: 480px) {
     .theme-switcher { right: 12px; bottom: 12px; }
-    .theme-switcher-panel { width: calc(100vw - 24px); }
+    .theme-switcher-panel { width: calc(100vw - 24px); max-width: none; }
+    .theme-switcher-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-height: min(66vh, 560px); }
 }
+
+/* Every tile leans back in 3D under the pointer. */
+.theme-switcher-swatch { transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease; }
+.theme-switcher-option:hover .theme-switcher-swatch,
+.theme-switcher-option:focus-visible .theme-switcher-swatch {
+    transform: perspective(420px) rotateX(14deg) rotateY(-12deg) translateZ(14px);
+    box-shadow: 10px 12px 22px rgba(0, 0, 0, 0.28);
+}
+
+/* ---- Depth --------------------------------------------------------------- */
+/* A theme lists the elements that should follow the pointer with, for example,
+   [data-theme="night"] { --tilt: '.entry'; --tilt-strength: 5; }
+   assets/app.js then turns those elements towards the pointer while it is over
+   them, easing the angle itself and writing the transform inline (so a theme's
+   own transitions cannot interfere), and updates --rx, --ry, --px and --py for
+   a glare or a spotlight. Only themes that opt in get the effect; it is off
+   on touch screens and under reduced motion. */
+html.js .tilt {
+    transform: perspective(var(--tilt-perspective, 1000px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+/* ---- Typography ---------------------------------------------------------- */
+.name,
+.block-title,
+.entry-title { text-wrap: balance; }
+.bio p,
+.entry-desc { text-wrap: pretty; }
+::selection { background: color-mix(in srgb, var(--accent) 26%, transparent); }
+
+/* ---- Entrance ------------------------------------------------------------ */
+/* Played once, when the page is first shown: index.html adds theme-enter at
+   that moment and drops it again once the animations are over, so switching
+   themes does not replay it (nor does a theme that opted out with
+   `animation: none` bring it back when the visitor leaves it). */
+@keyframes page-fade { from { opacity: 0; } }
+@keyframes part-rise { from { opacity: 0; translate: 0 16px; } }
+html.js.theme-enter .page { animation: page-fade 0.45s ease-out backwards; }
+html.js.theme-enter .hero,
+html.js.theme-enter .block { animation: part-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+html.js.theme-enter .hero { animation-delay: 0.08s; }
+html.js.theme-enter .col > .block:nth-child(1) { animation-delay: 0.16s; }
+html.js.theme-enter .col > .block:nth-child(2) { animation-delay: 0.24s; }
 
 /* ---- Switch animation ---------------------------------------------------- */
 /* Browsers with the View Transitions API sweep the new theme in as a circle
@@ -449,6 +487,12 @@ html.theme-fading .backdrop { opacity: 0; transition: opacity 0.16s ease-in; }
     .backdrop,
     .theme-switcher * { transition: none !important; }
     .theme-switcher.is-switching .theme-switcher-toggle .icon { animation: none; }
+    .theme-switcher-option:hover .theme-switcher-swatch,
+    .theme-switcher-option:focus-visible .theme-switcher-swatch { transform: none; }
+    html.js .tilt { transform: none; }
+    html.js.theme-enter .page,
+    html.js.theme-enter .hero,
+    html.js.theme-enter .block { animation: none; }
     ::view-transition-group(*),
     ::view-transition-image-pair(*),
     ::view-transition-old(*),

@@ -17,12 +17,16 @@
     --switcher-accent: #2f4b8f;
     --frames: 4; /* frames after the title slide */
     color-scheme: light;
+    /* Slides lie on the desk: they turn a little towards the pointer. */
+    --tilt: '.hero, .block';
+    --tilt-strength: 2;
+    --tilt-perspective: 1800px;
 }
 
 html[data-theme="beamer"] body { font-size: 17px; line-height: 1.5; }
 html[data-theme="beamer"] .page { display: flex; flex-direction: column; gap: 28px; padding: 48px 24px 56px; }
 
-/* Title slide (navigation strip, logo, title, subtitle, links), then every
+/* Title slide (navigation strip, title, subtitle, links), then every
    frame: white, rounded, casting one shadow on the desk. */
 html[data-theme="beamer"] .hero {
     display: flex;
@@ -36,21 +40,18 @@ html[data-theme="beamer"] .hero {
 html[data-theme="beamer"] .block { filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.35)); }
 html[data-theme="beamer"] .block { background: var(--surface); }
 html[data-theme="beamer"] .hero-text { display: contents; }
-html[data-theme="beamer"] .avatar { order: 1; }
 html[data-theme="beamer"] .name { order: 2; }
 html[data-theme="beamer"] .role { order: 3; }
 html[data-theme="beamer"] .contact { order: 4; }
 html[data-theme="beamer"] .bio { order: 5; }
-html[data-theme="beamer"] .avatar,
 html[data-theme="beamer"] .name,
 html[data-theme="beamer"] .role,
 html[data-theme="beamer"] .contact { text-align: center; }
 
-html[data-theme="beamer"] .avatar { width: 110px; height: 110px; margin: 34px auto 18px; border-radius: 8px; }
-html[data-theme="beamer"] .name { padding: 0 32px; font-size: 38px; font-weight: 700; line-height: 1.2; }
+html[data-theme="beamer"] .name { padding: 84px 32px 0; font-size: 48px; font-weight: 700; line-height: 1.2; }
 html[data-theme="beamer"] .name-cn { color: var(--muted); font-size: 0.55em; }
-html[data-theme="beamer"] .role { margin: 8px 32px 0; padding: 0; color: var(--muted); font-size: 21px; font-weight: 400; }
-html[data-theme="beamer"] .contact { justify-content: center; flex-wrap: wrap; gap: 6px 22px; margin: 0; padding: 20px 32px 34px; }
+html[data-theme="beamer"] .role { margin: 14px 32px 0; padding: 0; color: var(--muted); font-size: 24px; font-weight: 400; }
+html[data-theme="beamer"] .contact { justify-content: center; flex-wrap: wrap; gap: 6px 24px; margin: 0; padding: 28px 32px 48px; }
 html[data-theme="beamer"] .contact-link { color: var(--accent); font-size: 18px; text-decoration: none; }
 html[data-theme="beamer"] .contact-link:hover { text-decoration: underline; }
 html[data-theme="beamer"] .contact-link .icon { display: none; }
@@ -172,10 +173,9 @@ html[data-theme="beamer"] .site-footer { padding: 8px 0 0; color: #d5d9e2; font-
 
 @media (max-width: 640px) {
     html[data-theme="beamer"] .page { padding: 20px 12px 32px; gap: 20px; }
-    html[data-theme="beamer"] .avatar { width: 88px; height: 88px; margin-top: 24px; }
-    html[data-theme="beamer"] .name { padding: 0 18px; font-size: 30px; }
+    html[data-theme="beamer"] .name { padding: 54px 18px 0; font-size: 36px; }
     html[data-theme="beamer"] .role { margin: 6px 18px 0; font-size: 18px; }
-    html[data-theme="beamer"] .contact { padding: 16px 18px 26px; }
+    html[data-theme="beamer"] .contact { padding: 20px 18px 32px; }
     html[data-theme="beamer"] .bio { margin: 22px 20px 0; padding: 18px 0 24px; }
     html[data-theme="beamer"] .block { min-height: 0; padding: 0 20px; }
     html[data-theme="beamer"] .bio::before,

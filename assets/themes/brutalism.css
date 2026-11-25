@@ -2,7 +2,16 @@
    hard offset shadows, and three flat accents (yellow, coral, blue) that each
    keep one job. Yellow highlights (the role strip, dates, the Honors bar), blue
    labels the entry stickers, coral marks the one highlighted entry. Headings are
-   Archivo Black in uppercase; everything else is Archivo 500/700 at 15–16 px. */
+   Archivo Black in uppercase; everything else is Archivo 500/700 at 15–16 px.
+
+   Scale used throughout: an 8 px spacing grid, one inner padding (--pad) for
+   every box so that the name, the section icons, the date tags and the card
+   edges share one left line, 3 px borders for boxes and controls, 2 px borders
+   for labels and rules, 28 px for every label (tags, stickers, icon caps), one
+   6 px hard shadow for boxes and cards and a 4 px one for the buttons inside.
+
+   Depth: the intro and the cards follow the pointer and their shadow leans with
+   them (see "Depth" at the end of the rules). */
 
 [data-theme="brutalism"] {
     --bg: #fdf6e3;
@@ -21,27 +30,35 @@
     --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "PingFang SC", "Microsoft YaHei", monospace;
     --page-width: 1040px;
 
-    /* The theme's own names for its colours, its border and its shadow. */
+    /* The theme's own names for its colours, lines, shadow and padding. */
     --ink: #141414;
     --yellow: #ffd166;
     --coral: #ef476f;
     --blue: #5aa9e6;
     --box-line: 3px solid #141414;
+    --label-line: 2px solid #141414;
     --box-shadow: 6px 6px 0 #141414;
+    --pad: 24px;
+
+    /* Depth: the intro and the cards follow the pointer (assets/app.js). A
+       negative strength makes the edge under the pointer rise, not dip. */
+    --tilt: '.hero, .entry';
+    --tilt-strength: -5;
+    --tilt-perspective: 1000px;
 
     --switcher-bg: #ffffff;
     --switcher-fg: #141414;
     --switcher-muted: #574f43;
     --switcher-border: #141414;
     --switcher-hover: rgba(20, 20, 20, 0.08);
-    --switcher-shadow: 5px 5px 0 #141414;
+    --switcher-shadow: 6px 6px 0 #141414;
     color-scheme: light;
 }
 
 /* ---- Page ------------------------------------------------------------------ */
 html[data-theme="brutalism"] .page {
-    gap: 28px;
-    padding: 44px 32px 112px;
+    gap: 32px;
+    padding: 40px 32px 112px;
     font-size: 16px;
     font-weight: 500;
     line-height: 1.6;
@@ -50,7 +67,7 @@ html[data-theme="brutalism"] .page {
 html[data-theme="brutalism"] .page a { color: inherit; }
 
 /* Every visible link is bold and underlined; pointing at one, or reaching it
-   with the keyboard, highlights it. */
+   with the keyboard, highlights it. Transitions live in the state rules only. */
 html[data-theme="brutalism"] .bio a,
 html[data-theme="brutalism"] .link {
     color: var(--ink);
@@ -58,12 +75,14 @@ html[data-theme="brutalism"] .link {
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 0.2em;
-    transition: background-color 0.15s ease;
 }
 html[data-theme="brutalism"] .bio a:hover,
 html[data-theme="brutalism"] .bio a:focus-visible,
 html[data-theme="brutalism"] .link:hover,
-html[data-theme="brutalism"] .link:focus-visible { background: var(--yellow); }
+html[data-theme="brutalism"] .link:focus-visible {
+    background: var(--yellow);
+    transition: background-color 0.12s ease;
+}
 
 html[data-theme="brutalism"] .skip-link {
     border: var(--box-line);
@@ -78,7 +97,10 @@ html[data-theme="brutalism"] .page a:focus-visible {
     outline: 3px solid var(--ink);
     outline-offset: 3px;
 }
-html[data-theme="brutalism"] .contact-link:focus-visible { background: var(--yellow); }
+html[data-theme="brutalism"] .contact-link:focus-visible {
+    background: var(--yellow);
+    transition: background-color 0.12s ease;
+}
 
 /* Selected text is marked the same way as the role and the dates. */
 html[data-theme="brutalism"] ::selection {
@@ -96,99 +118,89 @@ html[data-theme="brutalism"] .site-footer {
 }
 
 /* ---- Intro ----------------------------------------------------------------- */
-/* The intro is laid out as one grid: the portrait in the left column beside
-   name, role and bio, and the contact buttons along the bottom. The portrait
-   and the text come in the opposite order in the HTML, so every part is placed
-   by hand. */
+/* A typographic lockup: the name stacked in two lines with the role strip
+   underneath on the left, the bio beside it, and the contact buttons along the
+   bottom. The left column is as wide as the longer name line. */
 html[data-theme="brutalism"] .hero {
-    grid-template-columns: 176px minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-areas:
-        "avatar name"
-        "avatar role"
-        "avatar bio"
+        "name bio"
+        "role bio"
         "contact contact";
     align-items: start;
-    column-gap: 36px;
+    column-gap: 56px;
     row-gap: 0;
-    padding: 32px 36px 32px 32px;
+    padding: 40px var(--pad) 28px;
 }
 html[data-theme="brutalism"] .hero-text { display: contents; }
 
-html[data-theme="brutalism"] .avatar {
-    grid-area: avatar;
-    width: 170px;
-    height: 170px;
-    border: var(--box-line);
-    border-radius: 0;
-    box-shadow: var(--box-shadow);
-    image-rendering: auto;
-}
-
 html[data-theme="brutalism"] .name {
     grid-area: name;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 18px;
-    min-width: 0;
+    width: min-content;
     font-family: var(--font-display);
-    font-size: clamp(2rem, 5.4vw + 13px, 3.75rem);
+    font-size: 4rem;
     font-weight: 400;
-    line-height: 1;
+    line-height: 0.94;
     letter-spacing: -0.01em;
     text-transform: uppercase;
 }
 
-/* The Chinese name is a small bordered label beside the big one. */
+/* The Chinese name is a small bordered label set against the last name line,
+   centred on the height of the capitals beside it (lengths in em count the
+   label's own 15 px, hence the large factor). */
 html[data-theme="brutalism"] .name-cn {
-    margin: 0;
-    padding: 1px 4px 1px 8px;
-    border: 2px solid var(--ink);
+    display: inline-block;
+    margin-left: 20px;
+    padding: 2px 7px 2px 11px;
+    border: var(--label-line);
     color: var(--ink);
     font-family: var(--font-body);
     font-size: 15px;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 20px;
     letter-spacing: 0.25em;
+    text-transform: none;
+    vertical-align: 1.125em;
     white-space: nowrap;
 }
 
-/* The role sits on a skewed yellow strip, as if marked with a highlighter. */
+/* The role sits on a skewed yellow strip, as if marked with a highlighter. Its
+   edge is on the same left line as the name above and the buttons below. */
 html[data-theme="brutalism"] .role {
     grid-area: role;
     justify-self: start;
     position: relative;
     isolation: isolate;
-    margin: 18px 0 0;
-    padding: 3px 14px;
+    margin: 24px 0 0;
+    padding: 4px 14px;
     color: var(--ink);
     font-size: 16px;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 20px;
 }
 html[data-theme="brutalism"] .role::before {
     content: "";
     position: absolute;
     z-index: -1;
-    inset: 2px 0 -2px;
+    inset: 0;
     background: var(--yellow);
     transform: skewX(-12deg);
 }
 
 html[data-theme="brutalism"] .study-year {
     display: inline-block;
-    margin-right: 0.5em;
-    padding: 0 7px;
+    margin-right: 10px;
+    padding: 0 8px;
     background: var(--ink);
     color: #ffffff;
-    line-height: 1.5;
+    line-height: 20px;
 }
 html[data-theme="brutalism"] .study-year:empty { display: none; }
 
 html[data-theme="brutalism"] .bio {
     grid-area: bio;
-    max-width: 68ch;
-    margin-top: 20px;
+    max-width: 64ch;
+    margin-top: 2px;
 }
 html[data-theme="brutalism"] .bio p + p { margin-top: 12px; }
 html[data-theme="brutalism"] .bio strong { font-weight: 700; }
@@ -204,31 +216,32 @@ html[data-theme="brutalism"] .mark {
 /* Contact links are block buttons: they lift on hover and press flat on click. */
 html[data-theme="brutalism"] .contact {
     grid-area: contact;
-    gap: 14px 12px;
-    margin-top: 28px;
+    gap: 12px;
+    margin-top: 32px;
 }
 html[data-theme="brutalism"] .contact li { display: contents; }
 
 html[data-theme="brutalism"] .contact-link {
     gap: 8px;
-    padding: 8px 15px;
-    border: 3px solid var(--ink);
+    padding: 8px 16px;
+    border: var(--box-line);
     background: var(--surface);
     box-shadow: 4px 4px 0 var(--ink);
     color: var(--ink);
     font-size: 15px;
     font-weight: 700;
-    line-height: 1.4;
+    line-height: 22px;
     text-decoration: none;
-    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 html[data-theme="brutalism"] .contact-link:hover {
     transform: translate(-3px, -3px);
     box-shadow: 7px 7px 0 var(--ink);
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.12s ease;
 }
 html[data-theme="brutalism"] .contact-link:active {
     transform: translate(4px, 4px);
     box-shadow: 0 0 0 var(--ink);
+    transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
 }
 html[data-theme="brutalism"] .contact-link .icon { font-size: 17px; }
 
@@ -236,36 +249,36 @@ html[data-theme="brutalism"] .contact-link .icon { font-size: 17px; }
    the full width below, each as a two-column grid of cards. ------------------ */
 html[data-theme="brutalism"] .content {
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    gap: 28px;
+    gap: 32px;
 }
 html[data-theme="brutalism"] .block[data-block="news"] { grid-area: 1 / 1 / 2 / 2; }
 html[data-theme="brutalism"] .block[data-block="honors"] { grid-area: 1 / 2 / 2 / 3; }
 html[data-theme="brutalism"] .block[data-block="publications"] { grid-area: 2 / 1 / 3 / -1; }
 html[data-theme="brutalism"] .block[data-block="projects"] { grid-area: 3 / 1 / 4 / -1; }
 
-/* Title bar: solid ink with white Archivo Black text; Honors gets the yellow one. */
+/* Title bar: solid ink with white Archivo Black text; Honors gets the yellow
+   one. The block icon sits in a 28 px outlined square, like a key cap. */
 html[data-theme="brutalism"] .block-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     margin: 0;
-    padding: 9px 20px;
+    padding: 10px var(--pad);
     background: var(--ink);
     color: #ffffff;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 400;
-    line-height: 1.25;
+    line-height: 28px;
     letter-spacing: 0.02em;
     text-transform: uppercase;
 }
-/* The block icon sits in a small outlined square, like a key cap. */
 html[data-theme="brutalism"] .block-icon {
     display: block;
     flex: none;
     width: 28px;
     height: 28px;
     padding: 5px;
-    border: 2px solid currentColor;
+    border: var(--label-line);
     stroke-width: 2.5;
 }
 html[data-theme="brutalism"] .block[data-block="honors"] .block-title {
@@ -274,28 +287,29 @@ html[data-theme="brutalism"] .block[data-block="honors"] .block-title {
 }
 
 /* ---- News: each date is a bordered yellow tag ------------------------------- */
-html[data-theme="brutalism"] .news-list { gap: 0; padding: 6px 22px 8px; }
+html[data-theme="brutalism"] .news-list { gap: 0; padding: 8px var(--pad); }
 
 html[data-theme="brutalism"] .news-item {
     display: grid;
-    grid-template-columns: 86px minmax(0, 1fr);
+    grid-template-columns: 80px minmax(0, 1fr);
     align-items: start;
-    gap: 14px;
+    gap: 16px;
     padding: 12px 0;
     line-height: 1.5;
 }
-html[data-theme="brutalism"] .news-item + .news-item { border-top: 2px solid var(--ink); }
+html[data-theme="brutalism"] .news-item + .news-item { border-top: var(--label-line); }
 
 html[data-theme="brutalism"] .news-date {
     display: inline-block;
     justify-self: start;
-    padding: 1px 8px;
-    border: 2px solid var(--ink);
+    padding: 2px 8px;
+    border: var(--label-line);
     background: var(--yellow);
     color: var(--ink);
     font-size: 15px;
     font-weight: 700;
-    line-height: 1.4;
+    line-height: 20px;
+    font-variant-numeric: tabular-nums;
 }
 
 /* ---- Honors: a numbered list with big black numerals ----------------------- */
@@ -309,8 +323,7 @@ html[data-theme="brutalism"] .honor-list {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    gap: 0;
-    padding: 6px 22px 8px;
+    padding: 8px var(--pad);
     list-style: none;
     counter-reset: honor;
 }
@@ -319,18 +332,18 @@ html[data-theme="brutalism"] .honor-list li {
     flex: 1 1 auto;
     grid-template-columns: 48px minmax(0, 1fr);
     align-items: center;
-    gap: 14px;
-    padding: 10px 0;
+    gap: 16px;
+    padding: 12px 0;
     font-size: 16px;
     font-weight: 700;
-    line-height: 1.35;
+    line-height: 1.5;
     counter-increment: honor;
 }
-html[data-theme="brutalism"] .honor-list li + li { border-top: 2px solid var(--ink); }
+html[data-theme="brutalism"] .honor-list li + li { border-top: var(--label-line); }
 html[data-theme="brutalism"] .honor-list li::before {
     content: counter(honor, decimal-leading-zero);
     font-family: var(--font-display);
-    font-size: 34px;
+    font-size: 32px;
     font-weight: 400;
     line-height: 1;
     letter-spacing: -0.03em;
@@ -339,37 +352,44 @@ html[data-theme="brutalism"] .honor-list li::before {
 /* ---- Publications and projects: bold cards -------------------------------- */
 html[data-theme="brutalism"] .entry-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px;
-    padding: 22px;
+    gap: 24px;
+    padding: var(--pad);
 }
 
 html[data-theme="brutalism"] .entry {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    padding: 17px 20px 18px;
+    padding: var(--pad);
     border: var(--box-line);
     background: var(--surface);
     box-shadow: var(--box-shadow);
 }
 
-/* Badges are stickers: a bordered label on an accent, tilted either way. */
+/* Badges are stickers: a bordered label on an accent, tilted either way. Under
+   the pointer the sticker straightens and lifts off the card. */
 html[data-theme="brutalism"] .entry-badge {
     display: inline-block;
-    margin: 0 0 14px;
+    margin: 0 0 16px;
     padding: 2px 10px;
-    border: 2px solid var(--ink);
+    border: var(--label-line);
     border-radius: 0;
     background: var(--blue);
     color: var(--ink);
     font-size: 15px;
     font-weight: 700;
-    line-height: 1.45;
+    line-height: 20px;
     transform: rotate(-2deg);
 }
 html[data-theme="brutalism"] .entry:nth-child(even) .entry-badge { transform: rotate(2deg); }
 html[data-theme="brutalism"] .entry-badge.is-highlight { background: var(--coral); }
+html[data-theme="brutalism"] .entry:hover .entry-badge {
+    transform: translateZ(24px) rotate(0deg);
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+}
 
 html[data-theme="brutalism"] .entry-title {
     font-family: var(--font-display);
@@ -381,7 +401,7 @@ html[data-theme="brutalism"] .entry-title {
 
 html[data-theme="brutalism"] .entry-authors,
 html[data-theme="brutalism"] .entry-desc {
-    margin-top: 6px;
+    margin-top: 8px;
     color: var(--muted);
     font-size: 15px;
     line-height: 1.55;
@@ -390,7 +410,7 @@ html[data-theme="brutalism"] .entry-authors strong { color: var(--ink); }
 
 /* Links sit at the bottom of every card, so they line up across a row. */
 html[data-theme="brutalism"] .entry-links {
-    gap: 6px 16px;
+    gap: 8px 16px;
     margin-top: auto;
     padding-top: 16px;
 }
@@ -419,13 +439,39 @@ html[data-theme="brutalism"] .link.is-disabled {
 html[data-theme="brutalism"] .link.is-disabled:hover,
 html[data-theme="brutalism"] .link.is-disabled:focus-visible { background: none; }
 
-/* ---- Footer: an ink bar, like the title bars ------------------------------- */
+/* ---- Footer: an ink bar as tall as the title bars -------------------------- */
 html[data-theme="brutalism"] .site-footer {
-    padding: 13px 20px;
+    padding: 12px var(--pad);
     background: var(--ink);
     color: #ffffff;
     font-size: 15px;
+    line-height: 24px;
     text-align: center;
+}
+
+/* ---- Depth ----------------------------------------------------------------- */
+/* The intro and the cards follow the pointer (see --tilt above): the edge under
+   the pointer rises, as if lifted. The hard shadow follows the lift of the
+   right and the bottom edge, which is where it rests: it widens when that edge
+   rises and thins when it lies flat. --rx / --ry are the tilt in degrees; an
+   arm of about 50 px turns them into offsets of 1.5–10.5 px. The plain shadow
+   comes first, so a browser without trigonometry keeps it. */
+html[data-theme="brutalism"] .hero,
+html[data-theme="brutalism"] .entry {
+    box-shadow: var(--box-shadow);
+    box-shadow:
+        calc(6px - var(--shadow-arm, 51px) * tan(var(--ry, 0deg)))
+        calc(6px + var(--shadow-arm, 51px) * tan(var(--rx, 0deg)))
+        0 var(--ink);
+}
+html[data-theme="brutalism"] .entry:hover { z-index: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+    /* The intro is wide: a small angle is enough to feel it. */
+    html[data-theme="brutalism"] .hero { --tilt-strength: -2; --shadow-arm: 80px; }
+    /* A card that tilts keeps its children in 3D, so the lifted sticker really
+       floats above it. */
+    html[data-theme="brutalism"].js .entry.tilt { transform-style: preserve-3d; }
 }
 
 /* ---- Narrower screens ------------------------------------------------------ */
@@ -439,67 +485,60 @@ html[data-theme="brutalism"] .site-footer {
     html[data-theme="brutalism"] .block[data-block="projects"] { grid-area: auto; }
 }
 
-/* The portrait now sits beside the name and the role only; the bio and the
-   buttons run along the full width underneath. */
+/* The intro no longer has room for two columns: name, role, bio and buttons
+   in one, the name back on a single line. */
 @media (max-width: 900px) {
     html[data-theme="brutalism"] .page { padding: 28px 20px 104px; }
     html[data-theme="brutalism"] .hero {
-        grid-template-columns: 156px minmax(0, 1fr);
-        grid-template-areas:
-            "avatar name"
-            "avatar role"
-            "bio bio"
-            "contact contact";
-        column-gap: 26px;
-        padding: 24px;
-    }
-    html[data-theme="brutalism"] .avatar { width: 150px; height: 150px; }
-    html[data-theme="brutalism"] .name { font-size: clamp(2rem, 4.6vw + 10px, 2.5rem); }
-    html[data-theme="brutalism"] .entry-list { gap: 18px; padding: 18px; }
-}
-
-/* Cards go single-column; the title bars and list padding tighten a little. */
-@media (max-width: 720px) {
-    html[data-theme="brutalism"] .page { gap: 24px; }
-    html[data-theme="brutalism"] .block-title { padding: 8px 18px; font-size: 18px; gap: 10px; }
-    html[data-theme="brutalism"] .block-icon { width: 24px; height: 24px; padding: 4px; }
-    html[data-theme="brutalism"] .news-list,
-    html[data-theme="brutalism"] .honor-list { padding: 4px 18px 6px; }
-    html[data-theme="brutalism"] .entry-list { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-}
-
-/* Phones: one column, portrait on top, then the text and the buttons. */
-@media (max-width: 480px) {
-    html[data-theme="brutalism"] .page { gap: 22px; padding: 22px 16px 100px; }
-    html[data-theme="brutalism"] .hero {
         grid-template-columns: minmax(0, 1fr);
         grid-template-areas:
-            "avatar"
             "name"
             "role"
             "bio"
             "contact";
-        padding: 20px;
+        padding: 28px var(--pad) 24px;
     }
-    html[data-theme="brutalism"] .avatar { justify-self: start; }
-    html[data-theme="brutalism"] .name { margin-top: 20px; row-gap: 12px; }
+    html[data-theme="brutalism"] .name {
+        width: auto;
+        font-size: clamp(2rem, 4.6vw + 10px, 2.5rem);
+        line-height: 1;
+    }
+    html[data-theme="brutalism"] .name-cn { margin-left: 18px; vertical-align: 0.52em; }
+    html[data-theme="brutalism"] .role { margin-top: 16px; }
+    html[data-theme="brutalism"] .bio { margin-top: 20px; }
+    html[data-theme="brutalism"] .contact { margin-top: 28px; }
+    html[data-theme="brutalism"] .entry-list { gap: 18px; }
+}
+
+/* Cards go single-column; the padding of every box tightens together. */
+@media (max-width: 720px) {
+    html[data-theme="brutalism"] .page { --pad: 18px; gap: 24px; }
+    html[data-theme="brutalism"] .block-title { padding: 8px var(--pad); font-size: 18px; line-height: 24px; gap: 12px; }
+    html[data-theme="brutalism"] .block-icon { width: 24px; height: 24px; padding: 4px; }
+    html[data-theme="brutalism"] .news-item { grid-template-columns: 78px minmax(0, 1fr); gap: 14px; }
+    html[data-theme="brutalism"] .entry-list { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: var(--pad); }
+    html[data-theme="brutalism"] .entry { --tilt-strength: -3; }
+}
+
+/* Phones: one column, the tightest padding. */
+@media (max-width: 480px) {
+    html[data-theme="brutalism"] .page { --pad: 16px; gap: 24px; padding: 22px 16px 100px; }
+    html[data-theme="brutalism"] .hero { padding: 22px var(--pad); }
     /* Sized so that "Selected Publications" keeps to one line down to 360 px. */
-    html[data-theme="brutalism"] .block-title {
-        padding: 8px 16px;
-        font-size: clamp(1rem, 4.5vw, 1.125rem);
-    }
-    html[data-theme="brutalism"] .news-list,
-    html[data-theme="brutalism"] .honor-list { padding: 4px 16px 6px; }
-    html[data-theme="brutalism"] .news-item { grid-template-columns: 78px minmax(0, 1fr); gap: 12px; }
+    html[data-theme="brutalism"] .block-title { font-size: clamp(1rem, 4.5vw, 1.125rem); }
     /* A narrower numeral column keeps every honor on one line. */
     html[data-theme="brutalism"] .honor-list li { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
     html[data-theme="brutalism"] .honor-list li::before { font-size: 30px; }
-    html[data-theme="brutalism"] .entry-list { padding: 16px; }
-    html[data-theme="brutalism"] .contact { gap: 12px 10px; }
+    html[data-theme="brutalism"] .contact { gap: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html[data-theme="brutalism"] .bio a,
-    html[data-theme="brutalism"] .link,
-    html[data-theme="brutalism"] .contact-link { transition: none; }
+    html[data-theme="brutalism"] .bio a:hover,
+    html[data-theme="brutalism"] .bio a:focus-visible,
+    html[data-theme="brutalism"] .link:hover,
+    html[data-theme="brutalism"] .link:focus-visible,
+    html[data-theme="brutalism"] .contact-link:hover,
+    html[data-theme="brutalism"] .contact-link:active,
+    html[data-theme="brutalism"] .contact-link:focus-visible,
+    html[data-theme="brutalism"] .entry:hover .entry-badge { transition: none; }
 }

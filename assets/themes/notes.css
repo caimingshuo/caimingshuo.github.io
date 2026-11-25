@@ -36,8 +36,7 @@ html[data-theme="notes"] .hero-text,
 html[data-theme="notes"] .content,
 html[data-theme="notes"] .col { display: contents; }
 
-html[data-theme="notes"] .avatar { grid-column: 1; grid-row: 1; align-self: start; justify-self: start; width: 18px; height: 18px; margin: 15px 0 0 16px; border-radius: 4px; }
-html[data-theme="notes"] .name { grid-column: 1; grid-row: 1; align-self: start; margin: 0; padding: 11px 12px 11px 44px; font-size: 14px; font-weight: 600; line-height: 26px; }
+html[data-theme="notes"] .name { grid-column: 1; grid-row: 1; align-self: start; margin: 0; padding: 12px; font-size: 14px; font-weight: 600; line-height: 26px; }
 html[data-theme="notes"] .name-cn { color: var(--muted); font-size: 0.9em; font-weight: 400; }
 html[data-theme="notes"] .contact { grid-column: 1; grid-row: 2 / span 6; display: grid; align-self: start; gap: 1px; margin: 6px 8px; padding: 0; }
 html[data-theme="notes"] .contact::before {
@@ -167,7 +166,6 @@ html[data-theme="notes"] .site-footer { margin-top: 48px; padding-bottom: 40px; 
     /* The sidebar folds into a band above the page. */
     html[data-theme="notes"] .page { display: block; padding: 0 20px 32px; }
     html[data-theme="notes"] .page::before { display: none; }
-    html[data-theme="notes"] .avatar { display: block; margin: 14px 0 0; }
     html[data-theme="notes"] .name { display: block; padding: 8px 0 4px; }
     html[data-theme="notes"] .contact { display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0 0; padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     html[data-theme="notes"] .contact::before { display: none; }

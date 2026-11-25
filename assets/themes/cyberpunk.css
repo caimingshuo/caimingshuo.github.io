@@ -22,6 +22,10 @@
     --switcher-hover: rgba(0, 229, 255, 0.08);
     --switcher-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
     color-scheme: dark;
+    /* The panels are panes of glass: they turn a little towards the pointer. */
+    --tilt: '.hero, .block';
+    --tilt-strength: 2.2;
+    --tilt-perspective: 1500px;
 }
 
 html[data-theme="cyberpunk"] body { font-size: 17px; font-weight: 500; line-height: 1.55; }
@@ -49,12 +53,29 @@ html[data-theme="cyberpunk"] .block {
     clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px));
 }
 
+/* A holographic sheen, cyan and magenta, that follows the pointer. */
+html[data-theme="cyberpunk"] .hero::after,
+html[data-theme="cyberpunk"] .block::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(440px circle at var(--px, 50%) var(--py, 50%), rgba(0, 229, 255, 0.14), transparent 62%),
+        radial-gradient(320px circle at calc(var(--px, 50%) + 16%) calc(var(--py, 50%) + 12%), rgba(255, 45, 149, 0.11), transparent 60%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+}
+html[data-theme="cyberpunk"] .hero.is-tilting::after,
+html[data-theme="cyberpunk"] .block.is-tilting::after { opacity: 1; }
+
 /* Identity panel with corner brackets. */
 html[data-theme="cyberpunk"] .hero {
     display: grid;
-    grid-template-columns: 168px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto auto auto;
-    column-gap: 30px;
+    row-gap: 4px;
     align-items: center;
     padding: 36px 36px 30px;
 }
@@ -75,18 +96,8 @@ html[data-theme="cyberpunk"] .hero::before {
     background-repeat: no-repeat;
 }
 html[data-theme="cyberpunk"] .hero-text { display: contents; }
-html[data-theme="cyberpunk"] .avatar {
-    grid-column: 1;
-    grid-row: 1 / span 3;
-    width: 168px;
-    height: 168px;
-    border: 0;
-    border-radius: 0;
-    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
-    filter: saturate(1.15);
-}
 html[data-theme="cyberpunk"] .name {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 1;
     color: #ffffff;
     font-size: clamp(26px, 3.2vw, 40px);
@@ -109,16 +120,16 @@ html[data-theme="cyberpunk"] .name::before {
 }
 html[data-theme="cyberpunk"] .name-cn { color: var(--accent-2); font-family: var(--font-body); font-size: 0.55em; letter-spacing: 0.3em; text-shadow: none; }
 html[data-theme="cyberpunk"] .role {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 2;
-    margin: 8px 0 10px;
+    margin: 6px 0 10px;
     color: var(--accent);
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
-html[data-theme="cyberpunk"] .bio { grid-column: 2; grid-row: 3; }
+html[data-theme="cyberpunk"] .bio { grid-column: 1; grid-row: 3; max-width: 72ch; }
 html[data-theme="cyberpunk"] .bio strong { color: #ffffff; font-weight: 700; }
 html[data-theme="cyberpunk"] .bio a { text-decoration-color: rgba(0, 229, 255, 0.5); text-underline-offset: 3px; }
 html[data-theme="cyberpunk"] .contact { grid-column: 1 / -1; grid-row: 4; display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 0; padding-top: 20px; border-top: 1px solid var(--border); }
@@ -198,7 +209,8 @@ html[data-theme="cyberpunk"] .honor-list li {
     clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
 }
 html[data-theme="cyberpunk"] .entry-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-html[data-theme="cyberpunk"] .entry { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 6px; padding: 16px 18px; border-top: 2px solid var(--accent); background: rgba(0, 229, 255, 0.045); }
+html[data-theme="cyberpunk"] .entry { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 6px; padding: 16px 18px; border-top: 2px solid var(--accent); background: rgba(0, 229, 255, 0.045); transition: background-color 0.3s ease, translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+html[data-theme="cyberpunk"] .entry:hover { translate: 0 -2px 0; background: rgba(0, 229, 255, 0.09); }
 html[data-theme="cyberpunk"] .entry-title { color: #ffffff; font-size: 18px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.3; }
 html[data-theme="cyberpunk"] .entry-authors { font-size: 14.5px; }
 html[data-theme="cyberpunk"] .entry-badge {
@@ -227,12 +239,18 @@ html[data-theme="cyberpunk"] .site-footer::before { content: "// END OF TRANSMIS
 @media (max-width: 760px) {
     html[data-theme="cyberpunk"] .page { padding: 20px 12px 48px; gap: 26px; }
     html[data-theme="cyberpunk"] .hero { grid-template-columns: minmax(0, 1fr); row-gap: 4px; padding: 72px 22px 24px; }
-    html[data-theme="cyberpunk"] .avatar { grid-column: 1; grid-row: 1; width: 120px; height: 120px; margin-bottom: 14px; }
-    html[data-theme="cyberpunk"] .name { grid-column: 1; grid-row: 2; }
-    html[data-theme="cyberpunk"] .role { grid-column: 1; grid-row: 3; font-size: 17px; }
-    html[data-theme="cyberpunk"] .bio { grid-column: 1; grid-row: 4; }
-    html[data-theme="cyberpunk"] .contact { grid-column: 1; grid-row: 5; margin-top: 20px; }
+    html[data-theme="cyberpunk"] .name { grid-column: 1; grid-row: 1; }
+    html[data-theme="cyberpunk"] .role { grid-column: 1; grid-row: 2; font-size: 17px; }
+    html[data-theme="cyberpunk"] .bio { grid-column: 1; grid-row: 3; }
+    html[data-theme="cyberpunk"] .contact { grid-column: 1; grid-row: 4; margin-top: 20px; }
     html[data-theme="cyberpunk"] .block { padding: 22px 20px 24px; }
     html[data-theme="cyberpunk"] .entry-list { grid-template-columns: minmax(0, 1fr); }
     html[data-theme="cyberpunk"] .news-item { grid-template-columns: 78px minmax(0, 1fr); gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-theme="cyberpunk"] .hero::after,
+    html[data-theme="cyberpunk"] .block::after { display: none; }
+    html[data-theme="cyberpunk"] .entry { transition: none; }
+    html[data-theme="cyberpunk"] .entry:hover { translate: none; }
 }

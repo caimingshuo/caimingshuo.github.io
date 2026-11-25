@@ -36,13 +36,6 @@ html[data-theme="sidebar"] .hero {
     font-size: 14.5px;
     scrollbar-width: thin;
 }
-html[data-theme="sidebar"] .avatar {
-    order: -1;
-    width: 110px;
-    height: 110px;
-    margin-bottom: 14px;
-    border: 3px solid rgba(255, 255, 255, 0.12);
-}
 html[data-theme="sidebar"] .name {
     margin-bottom: 6px;
     color: #ffffff;
@@ -115,7 +108,6 @@ html[data-theme="sidebar"] .site-footer {
 /* Too narrow for two columns: the sidebar becomes a dark band on top. */
 @media (max-width: 960px) {
     html[data-theme="sidebar"] .hero { position: static; width: auto; padding: 28px 24px 26px; overflow: visible; }
-    html[data-theme="sidebar"] .avatar { width: 88px; height: 88px; margin-bottom: 12px; }
     html[data-theme="sidebar"] .name { font-size: 30px; }
     html[data-theme="sidebar"] .contact { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 4px 16px; }
     html[data-theme="sidebar"] .contact-link { font-size: 16px; }

@@ -1,5 +1,5 @@
 /* Wikipedia — a desktop encyclopedia article: sans-serif text, serif headings
-   with a rule beneath, an infobox beside the lead, and external links. */
+   with a rule beneath, and the links in a portlet of a left column. */
 [data-theme="wiki"] {
     --bg: #ffffff;
     --fg: #202122;
@@ -28,31 +28,20 @@ html[data-theme="wiki"] .page::before {
     font-style: italic;
 }
 
-/* Narrow screens: title, portrait, caption, lead, external links. */
+/* Title, a subline, the lead, the external links. */
 html[data-theme="wiki"] .hero { display: flex; flex-direction: column; align-items: flex-start; }
 html[data-theme="wiki"] .hero-text { display: contents; }
 html[data-theme="wiki"] .name { order: 1; width: 100%; margin-bottom: 10px; padding-bottom: 3px; border-bottom: 1px solid var(--border); font-size: 28px; font-weight: 400; line-height: 1.25; }
 html[data-theme="wiki"] .name-cn { color: var(--fg); font-size: 0.6em; }
-html[data-theme="wiki"] .avatar { order: 2; width: 200px; height: 200px; margin-top: 10px; padding: 10px 10px 0; border: 1px solid var(--border); border-radius: 0; background: #f8f9fa; }
-html[data-theme="wiki"] .role { order: 3; width: 200px; margin: 0; padding: 6px 6px 8px; border: 1px solid var(--border); border-top: 1px solid #eaecf0; background: #f8f9fa; color: var(--fg); font-size: 12.4px; font-weight: 400; line-height: 1.4; text-align: center; }
-html[data-theme="wiki"] .bio { order: 4; margin-top: 14px; font-size: 14.5px; }
-html[data-theme="wiki"] .contact { order: 5; display: grid; gap: 4px; margin: 18px 0 0; padding: 0; }
+html[data-theme="wiki"] .role { order: 2; width: auto; margin: 8px 0 0; color: var(--muted); font-size: 14.5px; font-weight: 400; line-height: 1.5; }
+html[data-theme="wiki"] .bio { order: 3; margin-top: 12px; font-size: 14.5px; }
+html[data-theme="wiki"] .contact { order: 4; display: grid; gap: 4px; margin: 18px 0 0; padding: 0; }
 
-/* Wide screens: the infobox (portrait and caption) stands beside the lead and
-   the external links, so both columns end at about the same height. */
+/* Wide screens: a comfortable measure, as on the real site. */
 @media (min-width: 761px) {
-    html[data-theme="wiki"] .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 242px;
-        grid-template-rows: auto auto auto;
-        column-gap: 32px;
-        align-items: start;
-    }
-    html[data-theme="wiki"] .name { grid-column: 1 / -1; grid-row: 1; }
-    html[data-theme="wiki"] .bio { grid-column: 1; grid-row: 2; margin-top: 10px; }
-    html[data-theme="wiki"] .avatar { grid-column: 2; grid-row: 2; width: 242px; height: 242px; margin-top: 10px; }
-    html[data-theme="wiki"] .role { grid-column: 2; grid-row: 3; width: auto; }
-    html[data-theme="wiki"] .contact { grid-column: 1; grid-row: 3; align-self: start; margin: 22px 0 0; }
+    html[data-theme="wiki"] .bio,
+    html[data-theme="wiki"] .contact { max-width: 72ch; }
+    html[data-theme="wiki"] .contact { margin-top: 20px; }
 }
 
 html[data-theme="wiki"] .contact::before {
@@ -120,6 +109,45 @@ html[data-theme="wiki"] .site-footer {
     border-top: 1px solid var(--border);
     color: var(--muted);
     font-size: 12px;
+}
+
+/* Wide screens: the links sit in a portlet of a narrow left column, as in the
+   classic desktop skin, and the lead runs the full width of the article. */
+@media (min-width: 1100px) {
+    /* Browsers without subgrid keep the stacked layout. */
+    @supports (grid-template-columns: subgrid) {
+        html[data-theme="wiki"] .page { display: grid; grid-template-columns: 176px minmax(0, 1fr); column-gap: 40px; align-items: start; }
+        html[data-theme="wiki"] .page::before { grid-column: 1 / -1; }
+        html[data-theme="wiki"] .hero { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; }
+        html[data-theme="wiki"] .name,
+        html[data-theme="wiki"] .role,
+        html[data-theme="wiki"] .bio { grid-column: 2; }
+        html[data-theme="wiki"] .bio { max-width: none; }
+        html[data-theme="wiki"] .content,
+        html[data-theme="wiki"] .site-footer { grid-column: 2; }
+        html[data-theme="wiki"] .contact {
+            grid-column: 1;
+            grid-row: 1 / span 3;
+            position: sticky;
+            top: 16px;
+            gap: 0;
+            margin: 6px 0 0;
+            padding: 7px 0 8px;
+            border: 1px solid #a7d7f9;
+            background: var(--surface);
+        }
+        html[data-theme="wiki"] .contact::before {
+            content: "Contact";
+            margin: 0 10px 5px;
+            padding: 0;
+            border: 0;
+            font-family: var(--font-body);
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+        html[data-theme="wiki"] .contact-link { padding: 2px 10px; font-size: 13px; }
+        html[data-theme="wiki"] .contact-link:hover { background: #eaf3ff; text-decoration: none; }
+    }
 }
 
 @media (max-width: 760px) {

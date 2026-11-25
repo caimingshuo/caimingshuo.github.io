@@ -34,7 +34,7 @@ html[data-theme="editorial"] .page {
 
 /* Masthead, headline, lede. */
 html[data-theme="editorial"] .role {
-    grid-column: 1 / span 9;
+    grid-column: 1 / -1;
     grid-row: 1;
     margin: 0 0 34px;
     padding-top: 14px;
@@ -45,7 +45,6 @@ html[data-theme="editorial"] .role {
     letter-spacing: 0.22em;
     text-transform: uppercase;
 }
-html[data-theme="editorial"] .avatar { grid-column: 11 / -1; grid-row: 1; align-self: start; width: 64px; height: 64px; }
 html[data-theme="editorial"] .name {
     grid-column: 1 / -1;
     grid-row: 2;
@@ -185,7 +184,6 @@ html[data-theme="editorial"] .site-footer {
 @media (max-width: 960px) {
     html[data-theme="editorial"] .page { display: flex; flex-direction: column; padding: 24px 20px 40px; }
     html[data-theme="editorial"] .role { order: 1; margin-bottom: 26px; }
-    html[data-theme="editorial"] .avatar { display: none; }
     html[data-theme="editorial"] .name { order: 2; margin-bottom: 26px; font-size: clamp(64px, 19vw, 110px); }
     html[data-theme="editorial"] .name-cn { margin-top: 18px; letter-spacing: 0.3em; }
     html[data-theme="editorial"] .bio { order: 3; display: block; }

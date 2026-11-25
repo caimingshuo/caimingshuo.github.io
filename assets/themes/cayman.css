@@ -1,6 +1,7 @@
 /* Cayman — the GitHub Pages theme: a full-width band in the green-to-blue
-   gradient carrying the name and the role, then one centred 820 px column of
-   plain Open Sans text on white, small outlined buttons and a quiet footer. */
+   gradient carrying the name and the role, a centred row of small outlined
+   buttons under it, then one 820 px column of plain Open Sans text on white
+   and a quiet footer. */
 
 [data-theme="cayman"] {
     --bg: #ffffff;
@@ -18,9 +19,16 @@
 
     --cayman-content: 820px;
     --cayman-gutter: 20px;
-    --cayman-portrait: 130px;
-    --cayman-hairline: #eff0f1;
     --cayman-soft: #6b7780;
+    --cayman-hairline: #eff0f1;
+    --cayman-tint: rgba(30, 107, 184, 0.09);
+    --cayman-lift: 0 6px 14px -4px rgba(21, 87, 153, 0.35);
+
+    /* The contact buttons lean towards the pointer; see "Buttons". */
+    --tilt: '.contact-link';
+    --tilt-strength: 9;
+    --tilt-perspective: 520px;
+
     --switcher-hover: rgba(30, 107, 184, 0.08);
     color-scheme: light;
 }
@@ -32,8 +40,7 @@ html[data-theme="cayman"] body {
 
 html[data-theme="cayman"] a { color: var(--accent); text-decoration: none; }
 html[data-theme="cayman"] a:hover { text-decoration: underline; }
-html[data-theme="cayman"] a:focus-visible { border-radius: 3px; }
-html[data-theme="cayman"] ::selection { background: #159957; color: #ffffff; }
+html[data-theme="cayman"] a:focus-visible { border-radius: var(--radius); outline-offset: 2px; }
 
 /* The page spans the full width so that the band can; everything else centres
    itself on the same 820 px column. */
@@ -45,15 +52,13 @@ html[data-theme="cayman"] .page {
 
 /* ---- Header band and introduction ---------------------------------------- */
 
-/* .hero is the grid everything in the introduction is placed on: columns 2–3
-   are the 820 px column (portrait, then bio), columns 1 and 4 the margins.
-   .hero-text opens up so that the name, role, bio and contact list become
-   grid items next to the portrait. */
+/* .hero is one grid: column 2 is the 820 px column, columns 1 and 3 the
+   margins. .hero-text opens up so that the name, the role, the contact links
+   and the bio become grid items of their own. */
 html[data-theme="cayman"] .hero {
     grid-template-columns:
         minmax(var(--cayman-gutter), 1fr)
-        var(--cayman-portrait)
-        minmax(0, calc(var(--cayman-content) - var(--cayman-portrait)))
+        minmax(0, var(--cayman-content))
         minmax(var(--cayman-gutter), 1fr);
     gap: 0;
     align-items: start;
@@ -61,18 +66,24 @@ html[data-theme="cayman"] .hero {
 html[data-theme="cayman"] .hero-text { display: contents; }
 
 /* The band is a grid item of its own behind the name and the role, so it is
-   exactly as tall as the two lines it carries, at every width. */
+   exactly as tall as the two lines it carries, at every width. The first
+   background layer is a narrow stripe of light that "Sheen" moves across it. */
 html[data-theme="cayman"] .hero::before {
     content: "";
     grid-column: 1 / -1;
     grid-row: 1 / 3;
     align-self: stretch;
-    background: linear-gradient(20deg, #159957, #155799);
+    background-image:
+        linear-gradient(104deg, transparent 18%, rgba(255, 255, 255, 0.09) 50%, transparent 82%),
+        linear-gradient(20deg, #159957, #155799);
+    background-size: 52% 100%, 100% 100%;
+    background-position: -260% 0, 0 0;
+    background-repeat: no-repeat;
 }
 
 html[data-theme="cayman"] .name {
     z-index: 1;
-    grid-column: 2 / 4;
+    grid-column: 2;
     grid-row: 1;
     padding: 56px 0 0;
     color: #ffffff;
@@ -95,7 +106,7 @@ html[data-theme="cayman"] .name-cn {
    over the bluer part of the gradient (white on #159957 is only 3.7:1). */
 html[data-theme="cayman"] .role {
     z-index: 1;
-    grid-column: 2 / 4;
+    grid-column: 2;
     grid-row: 2;
     margin: 10px 0 0;
     padding: 0 0 80px;
@@ -107,69 +118,94 @@ html[data-theme="cayman"] .role {
     text-wrap: balance;
 }
 
-html[data-theme="cayman"] .avatar {
+html[data-theme="cayman"] .contact {
     grid-column: 2;
     grid-row: 3;
-    align-self: center;
-    width: var(--cayman-portrait);
-    height: var(--cayman-portrait);
-    margin-top: 48px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 40px 0 0;
 }
 
+/* The bio leads: a size above the body text, so its lines fill the column
+   without running past 75 characters. */
 html[data-theme="cayman"] .bio {
-    grid-column: 3;
-    grid-row: 3;
-    align-self: center;
+    grid-column: 2;
+    grid-row: 4;
     min-width: 0;
-    margin-top: 48px;
-    padding-left: 36px;
+    max-width: 34em;
+    margin-top: 44px;
     color: var(--muted);
-    font-size: 16px;
-    line-height: 1.65;
+    font-size: 18px;
+    line-height: 1.6;
 }
-html[data-theme="cayman"] .bio p + p { margin-top: 12px; }
+html[data-theme="cayman"] .bio p + p { margin-top: 14px; }
 html[data-theme="cayman"] .bio strong { color: var(--fg); font-weight: 600; }
 html[data-theme="cayman"] .bio a {
     text-decoration: underline;
     text-decoration-color: rgba(30, 107, 184, 0.35);
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
+}
+html[data-theme="cayman"] .bio a:hover {
+    text-decoration-color: currentColor;
     transition: text-decoration-color 0.2s ease;
 }
-html[data-theme="cayman"] .bio a:hover { text-decoration-color: currentColor; }
 html[data-theme="cayman"] .mark {
+    padding: 0 0.15em;
+    margin: 0 -0.15em;
     color: var(--fg);
+    white-space: nowrap;
     font-weight: 600;
-    background: linear-gradient(transparent 64%, #e2ecf7 64%);
+    background: #e8f0f9;
+    border-radius: var(--radius);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
 }
 
-html[data-theme="cayman"] .contact {
-    grid-column: 2 / 4;
-    grid-row: 4;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 28px 0 0;
-}
+/* ---- Buttons --------------------------------------------------------------
+   Cayman's outlined buttons, each on its own hinge: while the pointer is over
+   one, the engine turns it towards the pointer (base.css owns that transform)
+   and reports the pointer position in --px / --py, which places a soft
+   highlight under the label. The lift uses the translate property, so it never
+   fights the tilt. */
+
 html[data-theme="cayman"] .contact-link {
+    position: relative;
+    isolation: isolate;
     gap: 0;
     padding: 7px 12px;
     color: rgba(0, 0, 0, 0.75);
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    border-radius: var(--radius);
     font-size: 13px;
     font-weight: 700;
     line-height: 1.25;
-    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 html[data-theme="cayman"] .contact-link .icon { margin-right: 6px; font-size: 14px; }
+html[data-theme="cayman"] .contact-link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(130% 150% at var(--px, 50%) var(--py, 20%), #ffffff 0%, rgba(255, 255, 255, 0.5) 42%, rgba(255, 255, 255, 0) 74%);
+    opacity: 0;
+}
 html[data-theme="cayman"] .contact-link:hover {
     color: var(--accent);
-    background: #f6f9fd;
-    border-color: rgba(30, 107, 184, 0.5);
+    background: #e3eefb;
+    border-color: rgba(30, 107, 184, 0.45);
+    box-shadow: var(--cayman-lift);
+    translate: 0 -1px;
     text-decoration: none;
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease, translate 0.2s ease;
+}
+html[data-theme="cayman"] .contact-link:hover::before { opacity: 1; transition: opacity 0.3s ease; }
+html[data-theme="cayman"] .contact-link:active {
+    box-shadow: 0 1px 2px rgba(21, 87, 153, 0.2);
+    translate: 0 0;
 }
 
 /* ---- Sections ------------------------------------------------------------ */
@@ -193,17 +229,28 @@ html[data-theme="cayman"] .block[data-block="publications"] { grid-column: 1 / -
 html[data-theme="cayman"] .block[data-block="projects"] { grid-column: 1 / -1; grid-row: 3; }
 
 html[data-theme="cayman"] .block-title {
-    margin: 0 0 22px;
+    margin: 0 0 26px;
+    color: var(--fg);
     font-family: var(--font-body);
     font-size: 24px;
     font-weight: 700;
     line-height: 1.3;
-    color: var(--fg);
     text-align: center;
-    text-wrap: balance;
+}
+/* A short rule in the band's two colours ties each centred title to the
+   header above it. */
+html[data-theme="cayman"] .block-title::after {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 2px;
+    margin: 14px auto 0;
+    border-radius: 1px;
+    background: linear-gradient(90deg, #159957, #155799);
 }
 
-/* News: a dated list */
+/* News: a dated list. The date column is fixed, so every text starts at the
+   same x whatever the date. */
 html[data-theme="cayman"] .news-list { gap: 12px; }
 html[data-theme="cayman"] .news-item {
     display: grid;
@@ -211,7 +258,6 @@ html[data-theme="cayman"] .news-item {
     gap: 0 12px;
     font-size: 16px;
     line-height: 1.55;
-    text-wrap: pretty;
 }
 html[data-theme="cayman"] .news-date {
     padding-top: 4px;
@@ -254,12 +300,11 @@ html[data-theme="cayman"] .entry-badge.is-highlight {
     text-transform: uppercase;
 }
 html[data-theme="cayman"] .entry-title {
-    margin-top: 4px;
+    margin-top: 6px;
     color: var(--fg);
     font-size: 20px;
     font-weight: 700;
     line-height: 1.35;
-    text-wrap: balance;
 }
 html[data-theme="cayman"] .entry-authors {
     margin-top: 4px;
@@ -269,26 +314,37 @@ html[data-theme="cayman"] .entry-authors {
 }
 html[data-theme="cayman"] .entry-authors strong { color: var(--fg); font-weight: 700; }
 html[data-theme="cayman"] .entry-desc {
-    max-width: 68ch;
-    margin-top: 6px;
+    max-width: 64ch;
+    margin-top: 8px;
     font-size: 16px;
     line-height: 1.55;
-    text-wrap: pretty;
 }
 
 html[data-theme="cayman"] .entry-links {
     flex-wrap: wrap;
-    gap: 4px 8px;
-    margin-top: 10px;
+    gap: 6px 8px;
+    margin-top: 12px;
     font-size: 14px;
     font-weight: 600;
     line-height: 1.5;
 }
-html[data-theme="cayman"] .link { gap: 0; white-space: nowrap; }
+/* The brackets are the link's own frame; the padding and the margin cancel
+   out, so a hovered link tints a rounded patch without moving its neighbours. */
+html[data-theme="cayman"] .link {
+    gap: 0;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    border-radius: var(--radius);
+    white-space: nowrap;
+}
 html[data-theme="cayman"] .link::before { content: "["; }
 html[data-theme="cayman"] .link::after { content: "]"; }
-html[data-theme="cayman"] .link .icon { margin: 0 5px 0 3px; font-size: 14px; }
-html[data-theme="cayman"] a.link:hover { text-underline-offset: 3px; }
+html[data-theme="cayman"] .link .icon { margin: 0 5px 0 2px; font-size: 14px; }
+html[data-theme="cayman"] a.link:hover {
+    background: var(--cayman-tint);
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
 html[data-theme="cayman"] .link.is-disabled { color: var(--cayman-soft); cursor: default; }
 
 /* ---- Footer -------------------------------------------------------------- */
@@ -306,6 +362,28 @@ html[data-theme="cayman"] .site-footer p {
     font-size: 13px;
     line-height: 1.6;
     text-align: center;
+}
+
+/* Wide enough for a name to stay on its line. */
+@media (min-width: 641px) {
+    html[data-theme="cayman"] .bio a { white-space: nowrap; }
+}
+
+/* ---- Sheen ---------------------------------------------------------------
+   A stripe of light crosses the band once in a while and then rests. It is the
+   band's own background that moves, so nothing can leak outside the band. */
+
+@keyframes cayman-sheen {
+    0% { background-position: -260% 0, 0 0; }
+    24% { background-position: 260% 0, 0 0; }
+    100% { background-position: 260% 0, 0 0; }
+}
+/* Not hung on theme-enter: that class is dropped about two seconds after the
+   page is first shown, and this sheen keeps returning. */
+@media (prefers-reduced-motion: no-preference) {
+    html[data-theme="cayman"] .hero::before {
+        animation: cayman-sheen 14s cubic-bezier(0.45, 0, 0.3, 1) 1.6s infinite;
+    }
 }
 
 /* ---- Narrow screens ------------------------------------------------------ */
@@ -336,23 +414,11 @@ html[data-theme="cayman"] .site-footer p {
         font-size: 18px;
         font-weight: 400;
     }
-    html[data-theme="cayman"] .avatar {
-        grid-column: 2 / 4;
-        justify-self: center;
-        margin-top: 36px;
-    }
-    html[data-theme="cayman"] .bio {
-        grid-column: 2 / 4;
-        grid-row: 4;
-        margin-top: 22px;
-        padding-left: 0;
-    }
-    html[data-theme="cayman"] .contact {
-        grid-row: 5;
-        justify-content: center;
-        margin-top: 24px;
-    }
-    html[data-theme="cayman"] .block-title { margin-bottom: 18px; font-size: 21px; }
+    html[data-theme="cayman"] .contact { gap: 8px; margin-top: 32px; }
+    html[data-theme="cayman"] .bio { margin-top: 36px; font-size: 17px; }
+    html[data-theme="cayman"] .news-item { grid-template-columns: 3.2em minmax(0, 1fr); gap: 0 10px; }
+    html[data-theme="cayman"] .block-title { margin-bottom: 22px; font-size: 21px; }
+    html[data-theme="cayman"] .block-title::after { margin-top: 12px; }
     html[data-theme="cayman"] .entry-title { font-size: 18px; }
     html[data-theme="cayman"] .site-footer { padding: 40px var(--cayman-gutter) 72px; }
 }
@@ -361,11 +427,20 @@ html[data-theme="cayman"] .site-footer p {
     html[data-theme="cayman"] .role { font-size: 17px; }
 }
 
+/* Between a phone and a tablet the subtitle only just fits on one line, with
+   its first word over the greenest corner of the band. Two shorter, centred
+   lines keep it over the bluer middle. */
+@media (min-width: 441px) and (max-width: 760px) {
+    html[data-theme="cayman"] .role { max-width: 15em; margin-right: auto; margin-left: auto; }
+}
+
 @media (max-width: 340px) {
     html[data-theme="cayman"] .name { font-size: 32px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html[data-theme="cayman"] .contact-link,
-    html[data-theme="cayman"] .bio a { transition: none; }
+    html[data-theme="cayman"] .contact-link:hover,
+    html[data-theme="cayman"] .contact-link:hover::before,
+    html[data-theme="cayman"] a.link:hover,
+    html[data-theme="cayman"] .bio a:hover { transition: none; }
 }

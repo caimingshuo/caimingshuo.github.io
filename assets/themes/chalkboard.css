@@ -53,32 +53,19 @@ html[data-theme="chalkboard"] .page::after {
         linear-gradient(#b57c45, #8a5a2b);
 }
 
-/* A photograph pinned to the board, the name in yellow chalk beside it. */
+/* The name in yellow chalk, the subline in blue. */
 html[data-theme="chalkboard"] .hero {
     display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto auto auto;
-    column-gap: 34px;
+    row-gap: 4px;
     align-items: center;
 }
 html[data-theme="chalkboard"] .hero-text { display: contents; }
-html[data-theme="chalkboard"] .avatar {
-    grid-column: 1;
-    grid-row: 1 / span 3;
-    width: 150px;
-    height: 170px;
-    margin-left: 6px;
-    padding: 10px 10px 30px;
-    border: 0;
-    border-radius: 2px;
-    background: #f7f4ea;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
-    transform: rotate(-4deg);
-}
-html[data-theme="chalkboard"] .name { grid-column: 2; grid-row: 1; color: var(--accent); font-size: 48px; font-weight: 700; line-height: 1.1; }
+html[data-theme="chalkboard"] .name { grid-column: 1; grid-row: 1; color: var(--accent); font-size: 60px; font-weight: 700; line-height: 1.1; }
 html[data-theme="chalkboard"] .name-cn { margin-left: 0.3em; color: var(--fg); font-size: 0.65em; }
-html[data-theme="chalkboard"] .role { grid-column: 2; grid-row: 2; margin: 4px 0 10px; color: var(--accent-2); font-size: 28px; font-weight: 600; }
-html[data-theme="chalkboard"] .bio { grid-column: 2; grid-row: 3; }
+html[data-theme="chalkboard"] .role { grid-column: 1; grid-row: 2; margin: 2px 0 10px; color: var(--accent-2); font-size: 28px; font-weight: 600; }
+html[data-theme="chalkboard"] .bio { grid-column: 1; grid-row: 3; }
 html[data-theme="chalkboard"] .bio strong { color: #ffd0de; font-weight: 700; }
 html[data-theme="chalkboard"] .bio a {
     color: var(--accent-2);
@@ -167,11 +154,10 @@ html[data-theme="chalkboard"] .site-footer { color: var(--muted); font-size: 22p
     html[data-theme="chalkboard"] body { font-size: 23px; }
     html[data-theme="chalkboard"] .page { gap: 30px; margin: 14px 10px 48px; padding: 28px 22px 36px; border-width: 10px; }
     html[data-theme="chalkboard"] .hero { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
-    html[data-theme="chalkboard"] .avatar { grid-column: 1; grid-row: 1; width: 112px; height: 128px; margin: 0 0 14px 6px; }
-    html[data-theme="chalkboard"] .name { grid-column: 1; grid-row: 2; font-size: 40px; }
-    html[data-theme="chalkboard"] .role { grid-column: 1; grid-row: 3; font-size: 26px; }
-    html[data-theme="chalkboard"] .bio { grid-column: 1; grid-row: 4; }
-    html[data-theme="chalkboard"] .contact { grid-row: 5; gap: 6px 20px; }
+    html[data-theme="chalkboard"] .name { grid-column: 1; grid-row: 1; font-size: 50px; }
+    html[data-theme="chalkboard"] .role { grid-column: 1; grid-row: 2; font-size: 28px; }
+    html[data-theme="chalkboard"] .bio { grid-column: 1; grid-row: 3; }
+    html[data-theme="chalkboard"] .contact { grid-row: 4; gap: 6px 20px; }
     html[data-theme="chalkboard"] .contact-link { font-size: 23px; }
     html[data-theme="chalkboard"] .block-title { font-size: 32px; }
     html[data-theme="chalkboard"] .news-item { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 10px; }

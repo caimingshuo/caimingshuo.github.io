@@ -1,5 +1,5 @@
-/* Glass — light glassmorphism: frosted cards on a pale green gradient with a
-   slow particle network drifting behind them. */
+/* Glass — light glassmorphism: frosted cards that blur the slow particle
+   network drifting behind them, with colour orbs inside the intro card. */
 [data-theme="glass"] {
     --bg: #f8fafc;
     --fg: #1e293b;
@@ -9,7 +9,7 @@
     --surface: #ffffff;
     --border: #e2e8f0;
     --radius: 16px;
-    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-bg: rgba(255, 255, 255, 0.66);
     --glass-border: rgba(255, 255, 255, 0.6);
     --glass-shadow: 0 8px 32px rgba(16, 185, 129, 0.05);
     --font-body: "Outfit", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -18,6 +18,10 @@
     --page-width: 1000px;
     --switcher-border: #e2e8f0;
     --switcher-shadow: 0 8px 32px rgba(16, 185, 129, 0.12);
+    /* The cards turn a little towards the pointer, with a glare that follows it. */
+    --tilt: '.hero, .block';
+    --tilt-strength: 2.4;
+    --tilt-perspective: 1400px;
     color-scheme: light;
 }
 
@@ -28,26 +32,74 @@ html[data-theme="glass"] .backdrop {
 }
 html[data-theme="glass"] #particles-js { position: absolute; inset: 0; }
 
-/* Cards */
+/* Cards: frosted, so the network behind shows as soft blobs of light. */
 html[data-theme="glass"] .hero,
 html[data-theme="glass"] .block {
+    position: relative;
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    backdrop-filter: blur(16px) saturate(1.5);
     box-shadow: var(--glass-shadow);
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.5s ease;
 }
 html[data-theme="glass"] .hero:hover,
-html[data-theme="glass"] .block:hover { box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1); }
+html[data-theme="glass"] .block:hover { box-shadow: 0 18px 44px rgba(16, 185, 129, 0.13); }
+
+/* The glare: a pool of light under the pointer, behind the text. */
+html[data-theme="glass"] .hero::after,
+html[data-theme="glass"] .block::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(520px circle at var(--px, 50%) var(--py, 30%), rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 64%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+}
+html[data-theme="glass"] .hero.is-tilting::after,
+html[data-theme="glass"] .block.is-tilting::after { opacity: 1; }
 
 html[data-theme="glass"] .page { padding: 40px 20px; gap: 24px; }
 
-/* Intro */
+/* Intro: who and how to reach on the left, the bio on the right, and three
+   orbs of colour drifting behind them. */
 html[data-theme="glass"] .hero {
     position: relative;
     overflow: hidden;
-    gap: 50px;
-    padding: 45px;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 52px 56px 48px;
+}
+html[data-theme="glass"] .hero-text {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: 48px;
+    min-width: 0;
+}
+html[data-theme="glass"] .hero-text::before {
+    content: "";
+    position: absolute;
+    inset: -52px -56px -48px;
+    z-index: -1;
+    background:
+        radial-gradient(closest-side, rgba(16, 185, 129, 0.4), transparent),
+        radial-gradient(closest-side, rgba(225, 29, 48, 0.22), transparent),
+        radial-gradient(closest-side, rgba(56, 189, 248, 0.3), transparent);
+    background-position: 86% -6%, 2% 104%, 50% 128%;
+    background-size: 440px 440px, 380px 380px, 560px 560px;
+    background-repeat: no-repeat;
+    filter: blur(36px);
+    animation: glass-drift 14s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+@keyframes glass-drift {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to { transform: translate3d(-36px, 22px, 0) scale(1.14); }
 }
 html[data-theme="glass"] .hero::before {
     content: "";
@@ -58,20 +110,12 @@ html[data-theme="glass"] .hero::before {
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
-html[data-theme="glass"] .hero-text { min-width: 0; }
-
-html[data-theme="glass"] .avatar {
-    width: 190px;
-    height: 190px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-html[data-theme="glass"] .avatar:hover { transform: scale(1.05) rotate(2deg); }
-
 html[data-theme="glass"] .name {
-    margin-bottom: 5px;
-    font-size: 2.8rem;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    margin-bottom: 0;
+    font-size: clamp(2.4rem, 5vw, 3.1rem);
     letter-spacing: -0.5px;
     background: linear-gradient(to right, #1e293b, #059669);
     -webkit-background-clip: text;
@@ -79,18 +123,30 @@ html[data-theme="glass"] .name {
     -webkit-text-fill-color: transparent;
 }
 html[data-theme="glass"] .name-cn {
-    margin-left: 12px;
+    display: block;
+    margin: 12px 0 0;
     color: var(--muted);
-    font-size: 1.5rem;
+    font-family: var(--font-body);
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: 0.42em;
     -webkit-text-fill-color: initial;
 }
 
 html[data-theme="glass"] .role {
+    grid-column: 1;
+    grid-row: 2;
     display: inline-block;
-    margin: 0 0 25px;
+    justify-self: start;
+    margin: 18px 0 0;
+    padding: 6px 12px;
+    border: 1px solid rgba(5, 150, 105, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
     color: #047857; /* the accent green, darkened enough to read as text */
     font-family: var(--font-mono);
-    font-size: 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
     font-weight: 600;
 }
 html[data-theme="glass"] .role::before { content: "> "; }
@@ -139,11 +195,13 @@ html[data-theme="glass"] .mark {
     white-space: nowrap;
 }
 
-html[data-theme="glass"] .contact { gap: 12px; margin-top: 30px; }
+html[data-theme="glass"] .contact { grid-column: 1; grid-row: 3; align-self: end; gap: 10px; margin: 28px 0 0; }
 
 html[data-theme="glass"] .contact-link {
     padding: 8px 18px;
     border: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     border-radius: 8px;
     background: #ffffff;
     color: var(--fg);
@@ -151,15 +209,16 @@ html[data-theme="glass"] .contact-link {
     font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
 }
 html[data-theme="glass"] .contact-link .icon { color: var(--accent); font-size: 1rem; transition: color 0.3s ease; }
-html[data-theme="glass"] .contact-link:hover {
+html[data-theme="glass"] .contact-link:hover,
+html[data-theme="glass"] .contact-link:focus-visible {
     background: var(--accent);
     border-color: var(--accent);
     color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+    translate: 0 -2px 0;
+    box-shadow: 0 8px 18px rgba(16, 185, 129, 0.28);
 }
 html[data-theme="glass"] .contact-link:hover .icon { color: #ffffff; }
 
@@ -304,12 +363,13 @@ html[data-theme="glass"] .site-footer {
 }
 
 @media (max-width: 768px) {
-    html[data-theme="glass"] .page { padding: 24px 16px; }
-    html[data-theme="glass"] .hero { gap: 30px; padding: 28px 22px; }
-    html[data-theme="glass"] .hero-text { justify-self: center; }
-    html[data-theme="glass"] .avatar { justify-self: center; }
-    html[data-theme="glass"] .name { font-size: 2.2rem; }
-    html[data-theme="glass"] .bio p { text-align: justify; }
+    html[data-theme="glass"] .page { padding: 20px 14px; gap: 18px; }
+    html[data-theme="glass"] .hero { padding: 32px 24px 30px; }
+    html[data-theme="glass"] .hero-text { display: block; }
+    html[data-theme="glass"] .role { margin-top: 16px; padding: 6px 12px; white-space: normal; line-height: 1.45; }
+    html[data-theme="glass"] .bio { margin-top: 24px; }
+    html[data-theme="glass"] .contact { margin-top: 22px; }
+    html[data-theme="glass"] .block { padding: 24px 20px; }
     html[data-theme="glass"] .content { grid-template-columns: 1fr; }
     html[data-theme="glass"] .col-side { display: contents; }
     html[data-theme="glass"] .col-side,
@@ -319,5 +379,8 @@ html[data-theme="glass"] .site-footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html[data-theme="glass"] .role::after { animation: none; }
+    html[data-theme="glass"] .role::after,
+    html[data-theme="glass"] .hero-text::before { animation: none; }
+    html[data-theme="glass"] .hero::after,
+    html[data-theme="glass"] .block::after { display: none; }
 }

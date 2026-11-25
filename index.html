@@ -12,13 +12,14 @@
         // Theme catalog: one entry per stylesheet in assets/themes/.
         //   fonts  – keys of HOMEPAGE_FONT_FILES below; only the opening theme's
         //            fonts are loaded up front.
-        //   avatar – portrait variant in images/ the theme shows (omit for the default,
-        //            "none" to hide it).
+        //   note   – one line shown under the miniature in the theme switcher.
+        // The rest of a theme's behaviour (3D tilt, entrance, colours) lives in
+        // its own stylesheet; assets/themes/README.md is the contract.
         // A random theme opens the page on every visit; #theme=<id> pins one.
         window.HOMEPAGE_THEMES = [
             // Styles taken from researchers' homepages
             { id: 'plain',         name: 'Plain HTML',   note: 'Browser-default page',         fonts: [] },
-            { id: 'nerfies',       name: 'Nerfies',      note: 'Portrait, red venue tags',     fonts: ['Lato', 'Lato 700', 'JetBrains Mono'] },
+            { id: 'nerfies',       name: 'Nerfies',      note: 'Bold titles, red venue tags',     fonts: ['Lato', 'Lato 700', 'JetBrains Mono'] },
             { id: 'cayman',        name: 'Cayman',      note: 'Gradient banner header',       fonts: ['Open Sans'] },
             { id: 'al-folio',      name: 'al-folio',    note: 'Icon buttons, news ticker',    fonts: ['Roboto'] },
             { id: 'academic',      name: 'Academic',    note: 'Hero, interests, news feed',   fonts: ['Inter'] },
@@ -26,9 +27,9 @@
             // Academic looks
             { id: 'latex',         name: 'LaTeX',        note: 'Typeset article',              fonts: ['CMU Serif', 'CMU Serif 700', 'CMU Serif i', 'CMU Typewriter'] },
             { id: 'arxiv',         name: 'arXiv',        note: 'Abstract page',                fonts: [] },
-            { id: 'wiki',          name: 'Wikipedia',    note: 'Article with infobox',         fonts: [] },
+            { id: 'wiki',          name: 'Wikipedia',    note: 'Encyclopedia article',          fonts: [] },
             { id: 'paper',         name: 'Paper CV',     note: 'Printed résumé sheet',         fonts: ['Lora', 'Lora i'] },
-            { id: 'book',          name: 'Book',         note: 'Cream paper, old-style serif',  fonts: ['EB Garamond', 'EB Garamond i'], avatar: 'images/avatar-line.webp' },
+            { id: 'book',          name: 'Book',         note: 'Cream paper, old-style serif',  fonts: ['EB Garamond', 'EB Garamond i'] },
             { id: 'essay',         name: 'Essay',        note: 'Large serif, wide margins',    fonts: ['Newsreader', 'Newsreader i'] },
             { id: 'beamer',        name: 'Beamer',     note: 'Slide deck with a navigation bar', fonts: ['CMU Sans', 'CMU Sans 700', 'CMU Typewriter'] },
             { id: 'poster',        name: 'Poster',     note: 'Conference poster in three columns', fonts: ['Archivo', 'Archivo Black'] },
@@ -36,19 +37,19 @@
             { id: 'chalkboard',    name: 'Chalkboard', note: 'Lecture notes in chalk',         fonts: ['Caveat'] },
             // Clean and modern
             { id: 'notes',        name: 'Notes',       note: 'Document with a sidebar',      fonts: ['Public Sans'] },
-            { id: 'timeline',      name: 'Timeline',     note: 'Dated vertical timeline',      fonts: ['DM Sans'] },
+            { id: 'timeline',      name: 'Timeline',     note: 'Cards along a timeline',      fonts: ['DM Sans'] },
             { id: 'glass',         name: 'Glass',        note: 'Frosted cards, particles',     fonts: ['Outfit', 'Space Grotesk', 'JetBrains Mono'] },
-            { id: 'dark',          name: 'Night',        note: 'Dark minimal',                 fonts: ['Inter', 'JetBrains Mono'], avatar: 'images/avatar-duotone-cyan.webp' },
+            { id: 'dark',          name: 'Night',        note: 'Dark page, orbit rings',      fonts: ['Inter', 'JetBrains Mono'] },
             { id: 'bento',         name: 'Bento',        note: 'Grid of rounded tiles',        fonts: ['Manrope'] },
             { id: 'github',        name: 'GitHub',       note: 'Profile with pinned cards',    fonts: [] },
             // Bolder, still an academic page
             { id: 'editorial',     name: 'Editorial',    note: 'Oversized serif headline',     fonts: ['Instrument Serif', 'Instrument Serif i', 'Inter'] },
             { id: 'swiss',         name: 'Swiss',        note: 'Grid, Helvetica, one red accent', fonts: [] },
-            { id: 'pixel',         name: 'Pixel',        note: '8-bit dialogue boxes',         fonts: ['Press Start 2P', 'VT323'], avatar: 'images/avatar-pixel.png' },
-            { id: 'terminal',      name: 'Terminal',     note: 'Command-line session',         fonts: ['IBM Plex Mono', 'IBM Plex Mono 600'], avatar: 'images/avatar-pixel.png' },
-            { id: 'retro',         name: 'Retro OS',     note: '90s beveled windows',          fonts: ['Pixelify Sans'], avatar: 'images/avatar-pixel.png' },
-            { id: 'brutalism',     name: 'Brutalist',   note: 'Thick borders, hard shadows',  fonts: ['Archivo Black', 'Archivo'], avatar: 'images/avatar-halftone.png' },
-            { id: 'cyberpunk',     name: 'Cyberpunk',    note: 'Neon accents on navy',         fonts: ['Orbitron', 'Rajdhani 500', 'Rajdhani 700'], avatar: 'images/avatar-duotone-cyan.webp' }
+            { id: 'pixel',         name: 'Pixel',        note: '8-bit dialogue boxes',         fonts: ['Press Start 2P', 'VT323'] },
+            { id: 'terminal',      name: 'Terminal',     note: 'Command-line session',         fonts: ['IBM Plex Mono', 'IBM Plex Mono 600'] },
+            { id: 'retro',         name: 'Retro OS',     note: '90s beveled windows',          fonts: ['Pixelify Sans'] },
+            { id: 'brutalism',     name: 'Brutalist',   note: 'Thick borders, hard shadows',  fonts: ['Archivo Black', 'Archivo'] },
+            { id: 'cyberpunk',     name: 'Cyberpunk',    note: 'Neon accents on navy',         fonts: ['Orbitron', 'Rajdhani 500', 'Rajdhani 700'] }
         ];
 
         // Webfont files in assets/fonts/ (listed in assets/fonts.css). A key is the
@@ -109,7 +110,6 @@
 
             root.classList.add('js');
             root.setAttribute('data-theme', theme.id);
-            window.HOMEPAGE_AVATAR = theme.avatar === 'none' ? '' : (theme.avatar || '');
 
             // Stay blank until the theme's stylesheet and fonts are in (1.5 s at most).
             var fonts = theme.fonts || [];
@@ -123,6 +123,11 @@
                 // animates from the base rules into the theme's rules.
                 if (d.body) void d.body.offsetWidth;
                 root.classList.add('theme-settled');
+                // Held only until the entrance has played, then dropped. A theme that
+                // opts out with `animation: none` would otherwise make the entrance
+                // replay the moment the visitor switches away from it.
+                root.classList.add('theme-enter');
+                setTimeout(function () { root.classList.remove('theme-enter'); }, 2400);
             }
             function ready() { if (--pending <= 0) reveal(); }
 
@@ -204,9 +209,6 @@
                 </ul>
             </div>
 
-            <img class="avatar" alt="Portrait of Mingshuo Cai" width="560" height="560">
-            <noscript><img class="avatar" src="images/avatar.webp" alt="Portrait of Mingshuo Cai" width="560" height="560"></noscript>
-            <script>document.querySelector('.avatar').src = window.HOMEPAGE_AVATAR || 'images/avatar.webp';</script>
         </header>
 
         <main class="content">

@@ -22,14 +22,6 @@ html[data-theme="plain"] .page { display: block; padding: 16px; }
 
 html[data-theme="plain"] .hero { display: flow-root; }
 
-html[data-theme="plain"] .avatar {
-    float: right;
-    width: 200px;
-    height: 200px;
-    margin: 0 0 8px 16px;
-    border-radius: 0;
-}
-
 html[data-theme="plain"] .name {
     margin: 0.67em 0;
     font-size: 2em;
